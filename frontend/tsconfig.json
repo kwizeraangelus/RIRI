@@ -1,0 +1,48 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+   
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "ignoreDeprecations": "5.0"
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    ".next/dev/types/**/*.ts",
+    "src/app/organizer/page.jsx",
+    "src/app/innovator/page.jsx",
+    "src/app/innovation/page.tsx",
+    "src/app/innovation/page.tsx",
+    "src/app/innovation/[id]/page.jsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
