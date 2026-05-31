@@ -1,0 +1,7 @@
+{
+  "/(main)/experts/page": "app/(main)/experts/page.js",
+  "/(main)/page": "app/(main)/page.js",
+  "/(main)/researcher/page": "app/(main)/researcher/page.js",
+  "/(main)/researchers/page": "app/(main)/researchers/page.js",
+  "/(main)/researchers/[id]/page": "app/(main)/researchers/[id]/page.js"
+}

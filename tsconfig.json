@@ -1,0 +1,56 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "checkJs": false, 
+    "strict": false,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "types": [
+      "node"
+    ],
+   
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "ignoreDeprecations": "5.0"
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.js",            
+    "src/**/*.jsx",
+    "lib/**/*.ts",
+    "**/*.d.ts",
+    ".next/dev/types/**/*.ts",
+    "src/app/organizer/page.jsx",
+    "src/app/innovator/page.jsx",
+    "src/app/innovation/page.tsx",
+    "src/app/innovation/page.tsx",
+    "src/app/innovation/[id]/page.jsx"
+, "src/app/admin-dashboard/approved-innovation/page.jsx", "src/app/admin-dashboard/pending-innovations/page.jsx", "src/app/admin-dashboard/pending-events/page.jsx", "src/app/admin-dashboard/organizer/page.jsx", "src/app/admin-dashboard/pending-publication/page.jsx", "src/app/book/[id]/page.jsx", "src/app/books/[id]/page.jsx"  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

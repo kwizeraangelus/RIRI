@@ -1,0 +1,395 @@
+<!DOCTYPE html><html lang="en" class="scroll-smooth"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" href="/_next/static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2" as="font" crossorigin="" type="font/woff2"/><link rel="preload" href="/_next/static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2" as="font" crossorigin="" type="font/woff2"/><link rel="preload" href="/_next/static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2" as="font" crossorigin="" type="font/woff2"/><link rel="preload" href="/_next/static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2" as="font" crossorigin="" type="font/woff2"/><link rel="stylesheet" href="/_next/static/chunks/0glvdzox-hh_1.css" data-precedence="next"/><link rel="stylesheet" href="/_next/static/chunks/03kcrwq1b~-5l.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/0yb2wil16uz6h.js"/><script src="/_next/static/chunks/0yp8owlnu5ns~.js" async=""></script><script src="/_next/static/chunks/0itiyyj-mcj8k.js" async=""></script><script src="/_next/static/chunks/0n1bpogj.il~n.js" async=""></script><script src="/_next/static/chunks/0pqt~8bl3ukh4.js" async=""></script><script src="/_next/static/chunks/turbopack-0-5pq0~1hc~a6.js" async=""></script><script src="/_next/static/chunks/123gq3mnfgh.b.js" async=""></script><script src="/_next/static/chunks/0d3shmwh5_nmn.js" async=""></script><script src="/_next/static/chunks/08xygg_pylium.js" async=""></script><script src="/_next/static/chunks/0fmbxyqw0w9e8.js" async=""></script><meta name="next-size-adjust" content=""/><link rel="icon" href="/favicon.ico?favicon.05er0stj44ppl.ico" sizes="48x48" type="image/x-icon"/><script src="/_next/static/chunks/03~yq9q893hmn.js" noModule=""></script></head><body class="poppins_d1f2960f-module__6Q3uvW__variable font-sans antialiased m-0 p-0 min-h-screen"><div hidden=""><!--$--><!--/$--></div><div class="min-h-screen"><div class="poppins_d1f2960f-module__6Q3uvW__variable font-sans text-white"><nav class="fixed inset-x-0 top-0 z-50 flex justify-between items-center px-8 lg:px-[50px] py-6 transition-all duration-300 bg-transparent"><a class="text-[40px] font-bold uppercase italic tracking-[3px] hover:text-[#FFD700]" href="/">RIRI</a><ul class="hidden lg:flex gap-10 items-center"><li><a class="text-lg capitalize transition text-[#FFD700] font-bold border-b-2 border-[#FFD700]" href="/">home</a></li><li><a class="text-lg capitalize transition hover:text-[#FFD700]" href="/researchers">researchers</a></li><li><a class="text-lg capitalize transition hover:text-[#FFD700]" href="/publications">theses</a></li><li><a class="text-lg capitalize transition hover:text-[#FFD700]" href="/researches">publications</a></li><li><a class="text-lg capitalize transition hover:text-[#FFD700]" href="/expert">expert</a></li><li><a class="text-lg capitalize transition hover:text-[#FFD700]" href="/innovation">innovation</a></li><li><a class="text-lg capitalize transition hover:text-[#FFD700]" href="/about">about</a></li><li><a class="text-lg capitalize transition hover:text-[#FFD700]" href="/events">events</a></li><li><a class="text-lg capitalize transition hover:text-[#FFD700]" href="/contact">contact</a></li></ul><div class="flex items-center gap-6"><div class="hidden md:flex gap-4"><button class="px-6 py-2 border border-white/30 rounded-full hover:bg-white/10 transition">Login</button><button class="px-6 py-2 bg-[#FFD700] text-black font-bold rounded-full hover:bg-yellow-400 transition">Sign Up</button></div><button class="lg:hidden"><svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu" aria-hidden="true"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg></button></div></nav><main class="pt-0"><style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold:   #FFD700;
+    --black:  #050A14;
+    --dark:   #0a1120;
+    --card:   #0f1a2e;
+    --border: rgba(255,255,255,0.08);
+    --white:  #f5f2ee;
+    --muted:  rgba(245,242,238,0.52);
+    --muted2: rgba(245,242,238,0.22);
+    --r:      14px;
+    --serif:  'Playfair Display', Georgia, serif;
+    --sans:   'DM Sans', system-ui, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--black); color: var(--white); font-family: var(--sans); overflow-x: hidden; }
+
+  /* ── WRAP — matches original max-w-6xl mx-auto px-4 sm:px-6 exactly ── */
+  .riri-wrap {
+    max-width: 72rem;   /* 1152px = Tailwind max-w-6xl */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    width: 100%;
+  }
+  @media (min-width: 640px) {
+    .riri-wrap { padding-left: 1.5rem; padding-right: 1.5rem; }
+  }
+
+  /* ── SCROLL REVEAL ── */
+  .riri-reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+  .riri-reveal--in { opacity: 1; transform: translateY(0); }
+
+  /* ── HERO BAND — dark strip that nav sits on top of (same as EventsPage h-32 bg) ── */
+  .riri-hero-band {
+    height: 0;           /* nav handles its own height — zero here so no gap */
+    background: var(--black);
+  }
+
+  /* ── HERO — full screen, same as original min-h-screen ── */
+  .riri-hero {
+    position: relative;
+    display: flex; flex-direction: column;
+    min-height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(to bottom, var(--black) 0%, #0a1f3d 100%);
+  }
+
+  .riri-hero__bg {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center 30%;
+    transform: scale(1.03); transition: transform 14s ease;
+    filter: brightness(0.38) saturate(0.65);
+  }
+  .riri-hero:hover .riri-hero__bg { transform: scale(1.0); }
+
+  .riri-hero__grain {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 180px; opacity: 0.45;
+  }
+
+  .riri-hero__vignette {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(5,10,20,0.75) 100%);
+  }
+
+  .riri-hero__body {
+    position: relative; z-index: 5; flex: 1;
+    display: flex; align-items: center; padding: 4rem 0;
+  }
+
+  .riri-hero__layout {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 3rem; align-items: center; width: 100%;
+  }
+
+  .riri-hero__left {
+    display: flex; flex-direction: column; gap: 1.5rem;
+    max-width: 480px;
+  }
+
+  .riri-hero__badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0; animation: heroFadeUp 0.6s ease 0.15s forwards;
+  }
+
+  .riri-hero__badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0;
+    animation: pulse 2.2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
+
+  .riri-hero__sub {
+    font-size: 1.02rem; line-height: 1.78;
+    color: var(--muted); font-weight: 300;
+    opacity: 0; animation: heroFadeUp 0.6s ease 0.3s forwards;
+  }
+
+  .riri-hero__actions {
+    display: flex; flex-wrap: wrap; gap: 0.85rem;
+    opacity: 0; animation: heroFadeUp 0.6s ease 0.45s forwards;
+  }
+
+  @keyframes heroFadeUp {
+    from { opacity:0; transform:translateY(18px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* Card slides in from the right */
+  .riri-hero__right {
+    opacity: 0; transform: translateX(70px);
+    animation: heroSlideRight 0.75s cubic-bezier(0.22,1,0.36,1) 0.2s forwards;
+  }
+  @keyframes heroSlideRight {
+    from { opacity:0; transform:translateX(70px); }
+    to   { opacity:1; transform:translateX(0); }
+  }
+
+  .riri-hero__card {
+    background: rgba(135,206,235,0.1);
+    border: 1px solid rgba(135,206,235,0.22);
+    backdrop-filter: blur(18px);
+    border-radius: 20px;
+    padding: 2.25rem 2rem;
+    min-width: 270px; max-width: 310px;
+    display: flex; flex-direction: column; gap: 0.85rem;
+  }
+
+  .riri-hero__card-label {
+    font-size: 0.62rem; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(135,206,235,0.65);
+  }
+
+  .riri-hero__card-title {
+    font-family: var(--serif);
+    font-size: 1.65rem; font-weight: 700; line-height: 1.22;
+    color: var(--white);
+  }
+  .riri-hero__card-title em { font-style: italic; color: var(--gold); }
+
+  /* Proof bar */
+  .riri-hero__proof-bar {
+    position: relative; z-index: 5;
+    background: rgba(5,10,20,0.65); backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    padding: 0.95rem 0;
+    opacity: 0; animation: heroFadeUp 0.6s ease 0.65s forwards;
+  }
+  .riri-hero__proof-inner { display: flex; align-items: center; flex-wrap: wrap; gap: 1.25rem; }
+  .riri-hero__proof-item { font-size: 0.8rem; color: var(--muted); }
+  .riri-hero__proof-item strong { color: var(--white); font-weight: 600; }
+  .riri-hero__proof-sep { width: 1px; height: 14px; background: var(--border); flex-shrink: 0; }
+
+  /* ── TICKER ── */
+  .riri-ticker { background: var(--gold); overflow: hidden; padding: 0.58rem 0; }
+  .riri-ticker__track { display:flex; white-space:nowrap; animation: tickerScroll 26s linear infinite; }
+  @keyframes tickerScroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  .riri-ticker__item {
+    display:inline-flex; align-items:center; gap:0.5rem;
+    font-size:0.7rem; font-weight:600; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--black); padding:0 1.75rem;
+  }
+  .riri-ticker__dot { width:4px; height:4px; border-radius:50%; background:var(--black); opacity:0.3; flex-shrink:0; }
+
+  /* ── MAIN ── */
+  .riri-main { background: var(--black); }
+  .riri-section { padding: 5rem 0; }
+
+  .riri-section__overline {
+    font-size:0.67rem; font-weight:600; letter-spacing:0.17em;
+    text-transform:uppercase; color:var(--gold); margin-bottom:0.55rem;
+  }
+  .riri-section__title {
+    font-family:var(--serif); font-size:clamp(1.7rem,2.7vw,2.45rem);
+    font-weight:700; line-height:1.18; color:var(--white);
+  }
+  .riri-section__desc {
+    font-size:0.9rem; color:var(--muted); line-height:1.8;
+    max-width:370px; font-weight:300; align-self:flex-end;
+  }
+  .riri-section__header { margin-bottom:2.75rem; }
+  .riri-section__header--split { display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; }
+  .riri-section__view-all { flex-shrink:0; }
+
+  /* ── STATS ── */
+  .riri-stats-section { position:relative; border-bottom:1px solid var(--border); }
+
+  .riri-stats-bg {
+    position:absolute; inset:0;
+    background-size:cover; background-position:center;
+    /* Barely dimmed — image is clearly visible */
+    filter: brightness(0.55) saturate(0.85);
+  }
+
+  /* Soft warm-dark gradient — very light touch, not a blue wall */
+  .riri-stats-overlay {
+    position:absolute; inset:0;
+    background: linear-gradient(
+      to bottom,
+      rgba(5,10,20,0.35) 0%,
+      rgba(5,10,20,0.18) 40%,
+      rgba(5,10,20,0.55) 100%
+    );
+  }
+
+  .riri-stats-inner { position:relative; z-index:2; }
+
+  .riri-stats-grid {
+    display:grid; grid-template-columns:repeat(4,1fr);
+    gap:1px; background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:var(--r); overflow:hidden;
+  }
+
+  .riri-stat {
+    background:rgba(5,10,20,0.55); backdrop-filter:blur(12px);
+    padding:2.25rem 1.75rem; text-align:center;
+    opacity:0; transform:translateY(16px);
+    transition:opacity 0.55s ease, transform 0.55s ease;
+  }
+  .riri-stat--visible { opacity:1; transform:translateY(0); }
+  .riri-stat__value {
+    font-family:var(--serif); font-size:2.4rem; font-weight:700;
+    color:var(--white); line-height:1; margin-bottom:0.35rem;
+  }
+  .riri-stat__label { font-size:0.7rem; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; }
+
+  /* ── BOOKS ── */
+  .riri-books-section { border-bottom:1px solid var(--border); }
+  .riri-books-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.25rem; margin-bottom:2.75rem; }
+
+  .riri-book-card {
+    background:var(--card); border-radius:var(--r);
+    border:1px solid var(--border); overflow:hidden;
+    transition:transform 0.3s ease, box-shadow 0.3s ease;
+    cursor:pointer; height:100%;
+  }
+  .riri-book-card:hover { transform:translateY(-5px); box-shadow:0 18px 48px rgba(0,0,0,0.45); }
+
+  .riri-book-card__cover { position:relative; aspect-ratio:3/4; overflow:hidden; }
+  .riri-book-card__img-wrap { position:absolute; inset:0; }
+  .riri-book-card__img { object-fit:cover; transition:transform 0.5s ease; }
+  .riri-book-card:hover .riri-book-card__img { transform:scale(1.06); }
+
+  .riri-book-card__overlay {
+    position:absolute; inset:0;
+    background:linear-gradient(to bottom, transparent 45%, rgba(5,10,20,0.88) 100%);
+  }
+  .riri-book-card__category {
+    position:absolute; top:0.6rem; left:0.6rem; z-index:2;
+    font-size:0.58rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--gold); background:rgba(5,10,20,0.78);
+    padding:0.22rem 0.5rem; border-radius:100px; backdrop-filter:blur(4px);
+  }
+  .riri-book-card__year {
+    position:absolute; top:0.6rem; right:0.6rem; z-index:2;
+    font-size:0.58rem; color:var(--muted); background:rgba(5,10,20,0.65);
+    padding:0.22rem 0.5rem; border-radius:100px;
+  }
+
+  .riri-book-card__body { padding:1rem; }
+  .riri-book-card__field { font-size:0.62rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); margin-bottom:0.28rem; }
+  .riri-book-card__title { font-family:var(--serif); font-size:0.95rem; font-weight:700; color:var(--white); line-height:1.25; margin-bottom:0.22rem; }
+  .riri-book-card__author { font-size:0.74rem; color:var(--muted); margin-bottom:0.8rem; }
+  .riri-book-card__footer { display:flex; align-items:center; justify-content:space-between; gap:0.5rem; padding-top:0.65rem; border-top:1px solid var(--border); }
+  .riri-book-card__supervisor { font-size:0.6rem; color:var(--muted2); line-height:1.4; }
+  .riri-book-card__btn { font-size:0.68rem; color:var(--gold); background:none; border:none; cursor:pointer; font-weight:600; white-space:nowrap; font-family:var(--sans); transition:letter-spacing 0.2s; flex-shrink:0; }
+  .riri-book-card:hover .riri-book-card__btn { letter-spacing:0.04em; }
+
+  .riri-books-footer { display:flex; align-items:center; justify-content:space-between; padding-top:1.75rem; border-top:1px solid var(--border); }
+  .riri-books-footer__quote { font-family:var(--serif); font-style:italic; font-size:1rem; color:var(--muted); }
+
+  /* ── MEDIA ── */
+  .riri-media-section { border-bottom:1px solid var(--border); }
+  .riri-media-card { display:grid; grid-template-columns:1fr 1fr; border-radius:calc(var(--r)*1.5); overflow:hidden; border:1px solid var(--border); min-height:420px; }
+  .riri-media-card__image { position:relative; overflow:hidden; }
+  .riri-media-card__img { object-fit:cover; transition:transform 0.6s ease; }
+  .riri-media-card:hover .riri-media-card__img { transform:scale(1.04); }
+  .riri-media-card__overlay { position:absolute; inset:0; background:linear-gradient(to right, transparent 60%, var(--card) 100%); }
+  .riri-media-card__content { background:var(--card); padding:3rem; display:flex; flex-direction:column; justify-content:center; gap:1.2rem; }
+  .riri-media-card__tag { font-size:0.66rem; font-weight:600; letter-spacing:0.13em; text-transform:uppercase; color:var(--gold); }
+  .riri-media-card__title { font-family:var(--serif); font-size:1.95rem; font-weight:700; line-height:1.12; color:var(--white); }
+  .riri-media-card__body { font-size:0.88rem; color:var(--muted); line-height:1.8; font-weight:300; }
+
+  /* ── HOW ── */
+  .riri-how-section { border-bottom:1px solid var(--border); }
+  .riri-how-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; }
+  .riri-how-card { background:var(--dark); padding:2.5rem 2rem; transition:background 0.3s; }
+  .riri-how-card:hover { background:var(--card); }
+  .riri-how-card__number { font-family:var(--serif); font-size:2.8rem; font-weight:700; line-height:1; margin-bottom:0.9rem; -webkit-text-stroke:1px var(--gold); color:transparent; }
+  .riri-how-card__divider { width:26px; height:1px; background:var(--gold); margin-bottom:0.9rem; }
+  .riri-how-card__title { font-family:var(--serif); font-size:1.18rem; font-weight:700; color:var(--white); margin-bottom:0.6rem; }
+  .riri-how-card__desc { font-size:0.84rem; color:var(--muted); line-height:1.75; font-weight:300; }
+
+  /* ── QUOTE ── */
+  .riri-quote-section { border-bottom:1px solid var(--border); }
+  .riri-quote-card { background:var(--dark); border:1px solid var(--border); border-radius:calc(var(--r)*1.5); padding:3.5rem 4rem; position:relative; overflow:hidden; }
+  .riri-quote-card::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 15% 50%, rgba(255,215,0,0.04), transparent 55%); pointer-events:none; }
+  .riri-quote-card__mark { font-family:var(--serif); font-size:6.5rem; line-height:0.7; color:var(--gold); opacity:0.16; margin-bottom:1.25rem; font-weight:700; }
+  .riri-quote-card__text { font-family:var(--serif); font-size:clamp(1.08rem,1.9vw,1.45rem); font-style:italic; line-height:1.62; color:var(--white); margin-bottom:2rem; max-width:740px; }
+  .riri-quote-card__author { display:flex; align-items:center; gap:0.8rem; }
+  .riri-quote-card__avatar { width:42px; height:42px; border-radius:50%; background:var(--gold); color:var(--black); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; flex-shrink:0; }
+  .riri-quote-card__name { font-weight:600; font-size:0.88rem; color:var(--white); }
+  .riri-quote-card__role { font-size:0.74rem; color:var(--muted); }
+
+  /* ── EVENTS ── */
+  .riri-events-section { border-bottom:1px solid var(--border); }
+  .riri-events-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
+  .riri-event-card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:1.75rem; display:flex; flex-direction:column; gap:0.78rem; transition:border-color 0.25s, transform 0.25s; height:100%; }
+  .riri-event-card:hover { border-color:rgba(255,215,0,0.28); transform:translateY(-4px); }
+  .riri-event-card__header { display:flex; justify-content:space-between; align-items:center; }
+  .riri-event-card__tag { font-size:0.58rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); background:rgba(255,215,0,0.1); padding:0.22rem 0.58rem; border-radius:100px; }
+  .riri-event-card__num { font-family:var(--serif); font-size:1.15rem; color:rgba(255,255,255,0.06); font-weight:700; }
+  .riri-event-card__title { font-family:var(--serif); font-size:1.18rem; font-weight:700; color:var(--white); line-height:1.2; }
+  .riri-event-card__desc { font-size:0.79rem; color:var(--muted); line-height:1.72; font-weight:300; flex:1; }
+  .riri-event-card__meta { display:flex; flex-direction:column; gap:0.26rem; font-size:0.74rem; color:var(--muted); padding-top:0.55rem; border-top:1px solid var(--border); }
+  .riri-event-card__btn { display:inline-block; font-size:0.76rem; font-weight:600; color:var(--gold); text-decoration:none; transition:letter-spacing 0.2s; }
+  .riri-event-card:hover .riri-event-card__btn { letter-spacing:0.04em; }
+
+  /* ── CTA ── */
+  .riri-cta-section { padding-bottom:6rem; }
+  .riri-cta-card { background:var(--dark); border:1px solid var(--border); border-radius:calc(var(--r)*2); overflow:hidden; position:relative; }
+  .riri-cta-card::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 80% 20%, rgba(255,215,0,0.055), transparent 50%), radial-gradient(ellipse at 20% 80%, rgba(59,130,246,0.03), transparent 50%); pointer-events:none; }
+  .riri-cta-card__inner { padding:4.5rem; position:relative; z-index:1; }
+  .riri-cta-card__title { font-family:var(--serif); font-size:clamp(1.6rem,2.5vw,2.2rem); font-weight:700; line-height:1.15; color:var(--white); margin-bottom:1.75rem; }
+  .riri-cta-list { list-style:none; display:flex; flex-direction:column; gap:0.72rem; margin-bottom:2.25rem; }
+  .riri-cta-list li { display:flex; align-items:center; gap:0.7rem; font-size:0.88rem; color:var(--muted); font-weight:300; }
+  .riri-cta-list li::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--gold); flex-shrink:0; }
+  .riri-cta-actions { display:flex; flex-wrap:wrap; gap:0.85rem; }
+
+  /* ── BUTTONS ── */
+  .riri-btn { display:inline-flex; align-items:center; padding:0.65rem 1.5rem; border-radius:100px; font-size:0.83rem; font-weight:600; text-decoration:none; transition:all 0.2s; cursor:pointer; font-family:var(--sans); border:none; letter-spacing:0.02em; }
+  .riri-btn--white { background:var(--white); color:var(--black); }
+  .riri-btn--white:hover { background:#dedad4; }
+  .riri-btn--ghost { background:rgba(255,255,255,0.09); color:var(--white); border:1px solid var(--border); backdrop-filter:blur(4px); }
+  .riri-btn--ghost:hover { background:rgba(255,255,255,0.15); }
+  .riri-btn--outline { background:transparent; color:var(--white); border:1px solid var(--border); }
+  .riri-btn--outline:hover { border-color:rgba(255,255,255,0.28); }
+  .riri-btn--gold { background:var(--gold); color:var(--black); }
+  .riri-btn--gold:hover { background:#e6c200; }
+
+  /* ── FOOTER ── */
+  .riri-footer { background:var(--black); border-top:1px solid var(--border); padding:4.5rem 0 2.25rem; }
+  .riri-footer__top { display:grid; grid-template-columns:1fr 2fr; gap:4rem; padding-bottom:3rem; border-bottom:1px solid var(--border); margin-bottom:2rem; }
+  .riri-footer__logo { font-family:var(--serif); font-size:2rem; font-weight:700; color:var(--white); letter-spacing:0.08em; margin-bottom:0.55rem; }
+  .riri-footer__tagline { font-size:0.84rem; color:var(--muted); font-style:italic; font-family:var(--serif); }
+  .riri-footer__cols { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; }
+  .riri-footer__col { display:flex; flex-direction:column; gap:0.52rem; }
+  .riri-footer__col-title { font-size:0.63rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted2); margin-bottom:0.38rem; }
+  .riri-footer__link, .riri-footer__text { font-size:0.83rem; color:var(--muted); text-decoration:none; font-weight:300; transition:color 0.2s; }
+  .riri-footer__link:hover { color:var(--white); }
+  .riri-footer__bottom { display:flex; justify-content:space-between; align-items:center; font-size:0.73rem; color:var(--muted2); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width:1024px) {
+    .riri-books-grid { grid-template-columns:repeat(2,1fr); }
+    .riri-stats-grid { grid-template-columns:repeat(2,1fr); }
+  }
+  @media (max-width:768px) {
+    .riri-wrap { padding-left:1.25rem; padding-right:1.25rem; }
+    .riri-hero__layout { grid-template-columns:1fr; gap:2rem; }
+    .riri-hero__card { max-width:100%; min-width:0; }
+    .riri-section { padding:3.5rem 0; }
+    .riri-section__header--split { flex-direction:column; align-items:flex-start; }
+    .riri-books-grid { grid-template-columns:1fr 1fr; }
+    .riri-media-card { grid-template-columns:1fr; }
+    .riri-media-card__image { min-height:200px; }
+    .riri-how-grid { grid-template-columns:1fr; gap:1px; }
+    .riri-events-grid { grid-template-columns:1fr; }
+    .riri-footer__top { grid-template-columns:1fr; gap:2rem; }
+    .riri-footer__cols { grid-template-columns:1fr 1fr; }
+    .riri-quote-card { padding:2.5rem 1.75rem; }
+    .riri-cta-card__inner { padding:2.5rem; }
+    .riri-books-footer { flex-direction:column; gap:1.25rem; align-items:flex-start; }
+  }
+  @media (max-width:480px) {
+    .riri-books-grid { grid-template-columns:1fr; }
+    .riri-stats-grid { grid-template-columns:1fr 1fr; }
+    .riri-footer__cols { grid-template-columns:1fr; }
+  }
+</style><div class="riri-hero-band" aria-hidden="true"></div><header class="riri-hero"><div class="riri-hero__bg" style="background-image:url(&#x27;/home.jpg&#x27;)" aria-hidden="true"></div><div class="riri-hero__grain" aria-hidden="true"></div><div class="riri-hero__vignette" aria-hidden="true"></div><div class="riri-hero__body"><div class="riri-wrap"><div class="riri-hero__layout"><div class="riri-hero__left"><div class="riri-hero__badge"><span class="riri-hero__badge-dot"></span>Rwanda&#x27;s Academic &amp; Literary Platform</div><p class="riri-hero__sub">A trusted home for research, creative writing, and academic excellence — built for the curious minds of Rwanda and beyond.</p><div class="riri-hero__actions"><a class="riri-btn riri-btn--white" href="/publications">Explore Publications</a><a class="riri-btn riri-btn--ghost" href="/events">Upcoming Events ↗</a></div></div><div class="riri-hero__right"><div class="riri-hero__card"><p class="riri-hero__card-label">Est. 2024</p><h1 class="riri-hero__card-title">Discover a<br/>New Era of<br/><em>Books,<br/>Creativity</em><br/>&amp; Innovation</h1></div></div></div></div></div><div class="riri-hero__proof-bar"><div class="riri-wrap riri-hero__proof-inner"><span class="riri-hero__proof-item">Joined by <strong>12,000+</strong> readers &amp; researchers</span><span class="riri-hero__proof-sep"></span><span class="riri-hero__proof-item">1,500+ published works</span><span class="riri-hero__proof-sep"></span><span class="riri-hero__proof-item">40+ partner institutions</span></div></div></header><div class="riri-ticker"><div class="riri-ticker__track"><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Technology Research</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Agricultural Studies</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Medical Dissertations</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Environmental Science</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Academic Publishing</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Knowledge Sharing</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Rwanda Innovations</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Global Voices</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Technology Research</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Agricultural Studies</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Medical Dissertations</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Environmental Science</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Academic Publishing</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Knowledge Sharing</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Rwanda Innovations</span><span class="riri-ticker__item"><span class="riri-ticker__dot"></span>Global Voices</span></div></div><main class="riri-main"><section class="riri-section riri-stats-section"><div class="riri-stats-bg" style="background-image:url(&#x27;https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=1600&amp;q=80&#x27;)" aria-hidden="true"></div><div class="riri-stats-overlay" aria-hidden="true"></div><div class="riri-wrap riri-stats-inner"><div class="riri-reveal  " style="transition-delay:0ms"><div class="riri-section__header riri-section__header--split"><div><p class="riri-section__overline">Our Impact</p><h2 class="riri-section__title">Built for real academic<br/>and creative impact</h2></div><p class="riri-section__desc">From compelling dissertations to groundbreaking research, RIRI drives innovation and knowledge sharing across Rwanda and the continent.</p></div></div><div class="riri-stats-grid"><div class="riri-stat " style="transition-delay:0ms"><div class="riri-stat__value">1,500+</div><div class="riri-stat__label">Research Uploads</div></div><div class="riri-stat " style="transition-delay:100ms"><div class="riri-stat__value">12,000+</div><div class="riri-stat__label">Active Readers</div></div><div class="riri-stat " style="transition-delay:200ms"><div class="riri-stat__value">40+</div><div class="riri-stat__label">Partner Institutions</div></div><div class="riri-stat " style="transition-delay:300ms"><div class="riri-stat__value">120+</div><div class="riri-stat__label">Community Events</div></div></div></div></section><section class="riri-section riri-books-section"><div class="riri-wrap"><div class="riri-reveal  " style="transition-delay:0ms"><div class="riri-section__header"><p class="riri-section__overline">Latest Works</p><h2 class="riri-section__title">Explore the latest dissertations<br/>and research publications</h2></div></div><div class="riri-books-grid"><div class="riri-reveal  " style="transition-delay:0ms"><div class="riri-book-card"><div class="riri-book-card__cover"><div class="riri-book-card__img-wrap"><img alt="AI in Healthcare Diagnostics" loading="lazy" decoding="async" data-nimg="fill" class="riri-book-card__img" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent" src="/old.jpg"/></div><div class="riri-book-card__overlay"></div><span class="riri-book-card__category">Technology</span><span class="riri-book-card__year">2024</span></div><div class="riri-book-card__body"><p class="riri-book-card__field">Artificial Intelligence</p><h3 class="riri-book-card__title">AI in Healthcare Diagnostics</h3><p class="riri-book-card__author">Dr. Amina Uwase</p><div class="riri-book-card__footer"><span class="riri-book-card__supervisor">142 pages<!-- --> · Supervised by <!-- -->Prof. Jean Habimana</span><button class="riri-book-card__btn">Read →</button></div></div></div></div><div class="riri-reveal  " style="transition-delay:80ms"><div class="riri-book-card"><div class="riri-book-card__cover"><div class="riri-book-card__img-wrap"><img alt="Sustainable Farming in Rwanda" loading="lazy" decoding="async" data-nimg="fill" class="riri-book-card__img" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent" src="/old.jpg"/></div><div class="riri-book-card__overlay"></div><span class="riri-book-card__category">Agriculture</span><span class="riri-book-card__year">2024</span></div><div class="riri-book-card__body"><p class="riri-book-card__field">Agronomy &amp; Food Security</p><h3 class="riri-book-card__title">Sustainable Farming in Rwanda</h3><p class="riri-book-card__author">Erick Nshimiyimana</p><div class="riri-book-card__footer"><span class="riri-book-card__supervisor">98 pages<!-- --> · Supervised by <!-- -->Prof. Grace Mukamana</span><button class="riri-book-card__btn">Read →</button></div></div></div></div><div class="riri-reveal  " style="transition-delay:160ms"><div class="riri-book-card"><div class="riri-book-card__cover"><div class="riri-book-card__img-wrap"><img alt="Medicinal Plants of Central Africa" loading="lazy" decoding="async" data-nimg="fill" class="riri-book-card__img" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent" src="/old.jpg"/></div><div class="riri-book-card__overlay"></div><span class="riri-book-card__category">Medication</span><span class="riri-book-card__year">2023</span></div><div class="riri-book-card__body"><p class="riri-book-card__field">Pharmacology</p><h3 class="riri-book-card__title">Medicinal Plants of Central Africa</h3><p class="riri-book-card__author">Claudine Ingabire</p><div class="riri-book-card__footer"><span class="riri-book-card__supervisor">210 pages<!-- --> · Supervised by <!-- -->Dr. Patrick Rugira</span><button class="riri-book-card__btn">Read →</button></div></div></div></div><div class="riri-reveal  " style="transition-delay:240ms"><div class="riri-book-card"><div class="riri-book-card__cover"><div class="riri-book-card__img-wrap"><img alt="Urban Green Space &amp; Mental Health" loading="lazy" decoding="async" data-nimg="fill" class="riri-book-card__img" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent" src="/old.jpg"/></div><div class="riri-book-card__overlay"></div><span class="riri-book-card__category">Environment</span><span class="riri-book-card__year">2024</span></div><div class="riri-book-card__body"><p class="riri-book-card__field">Environmental Science</p><h3 class="riri-book-card__title">Urban Green Space &amp; Mental Health</h3><p class="riri-book-card__author">Samuel Bizimana</p><div class="riri-book-card__footer"><span class="riri-book-card__supervisor">117 pages<!-- --> · Supervised by <!-- -->Prof. Yvette Dusabe</span><button class="riri-book-card__btn">Read →</button></div></div></div></div></div><div class="riri-reveal  " style="transition-delay:0ms"><div class="riri-books-footer"><p class="riri-books-footer__quote">&quot;We believe in the power of every story.&quot;</p><a class="riri-btn riri-btn--outline" href="/publications">View all publications →</a></div></div></div></section><section class="riri-section riri-media-section"><div class="riri-wrap"><div class="riri-reveal  " style="transition-delay:0ms"><div class="riri-media-card"><div class="riri-media-card__image"><img alt="RIRI Creative Community" loading="lazy" decoding="async" data-nimg="fill" class="riri-media-card__img" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent" src="/thesis.jpg"/><div class="riri-media-card__overlay"></div></div><div class="riri-media-card__content"><span class="riri-media-card__tag">Community Spotlight</span><h2 class="riri-media-card__title">A glimpse into our<br/>Creative Community</h2><p class="riri-media-card__body">Where stories transcend the written word. Dive into our latest multimedia features and discover the voices shaping Rwanda&#x27;s literary future.</p><a class="riri-btn riri-btn--white" href="/community">Meet the community →</a></div></div></div></div></section><section class="riri-section riri-how-section"><div class="riri-wrap"><div class="riri-reveal  " style="transition-delay:0ms"><div class="riri-section__header"><p class="riri-section__overline">The Process</p><h2 class="riri-section__title">How RIRI works</h2></div></div><div class="riri-how-grid"><div class="riri-reveal  " style="transition-delay:0ms"><div class="riri-how-card"><div class="riri-how-card__number">01</div><div class="riri-how-card__divider"></div><h3 class="riri-how-card__title">Upload &amp; Publish</h3><p class="riri-how-card__desc">Researchers and creators submit quality work to share verified knowledge with a broader academic and creative audience.</p></div></div><div class="riri-reveal  " style="transition-delay:120ms"><div class="riri-how-card"><div class="riri-how-card__number">02</div><div class="riri-how-card__divider"></div><h3 class="riri-how-card__title">Discover &amp; Learn</h3><p class="riri-how-card__desc">Readers explore books, research papers, and innovations using clear categories and powerful searchable content.</p></div></div><div class="riri-reveal  " style="transition-delay:240ms"><div class="riri-how-card"><div class="riri-how-card__number">03</div><div class="riri-how-card__divider"></div><h3 class="riri-how-card__title">Connect &amp; Grow</h3><p class="riri-how-card__desc">Communities engage through events, workshops, and partnerships that turn ideas into real-world impact.</p></div></div></div></div></section><section class="riri-section riri-quote-section"><div class="riri-wrap"><div class="riri-reveal  " style="transition-delay:0ms"><div class="riri-quote-card"><div class="riri-quote-card__mark">&quot;</div><blockquote class="riri-quote-card__text">The future of literature lies in the intersection of technology and creativity. At RIRI, we are pioneering new ways to experience stories, connect authors with readers, and foster innovation in the literary world.</blockquote><div class="riri-quote-card__author"><div class="riri-quote-card__avatar">DI</div><div><p class="riri-quote-card__name">Dr. Mungwarakarama Irene</p><p class="riri-quote-card__role">Founder, RIRI Platform</p></div></div></div></div></div></section><section class="riri-section riri-events-section"><div class="riri-wrap"><div class="riri-reveal  " style="transition-delay:0ms"><div class="riri-section__header riri-section__header--split"><div><p class="riri-section__overline">Community</p><h2 class="riri-section__title">Join our upcoming<br/>events &amp; workshops</h2></div><a class="riri-btn riri-btn--outline riri-section__view-all" href="/events">View all events →</a></div></div><div class="riri-events-grid"><div class="riri-reveal  " style="transition-delay:0ms"><div class="riri-event-card"><div class="riri-event-card__header"><span class="riri-event-card__tag">Showcase</span><span class="riri-event-card__num">0<!-- -->1</span></div><h3 class="riri-event-card__title">Research Showcase 2025</h3><p class="riri-event-card__desc">Authors and researchers from across the platform present their published dissertations and receive live feedback from academic panels.</p><div class="riri-event-card__meta"><span>📅 <!-- -->Mar 12, 2025</span><span>📍 <!-- -->Kigali Innovation City</span></div><a class="riri-event-card__btn" href="/events">Register now →</a></div></div><div class="riri-reveal  " style="transition-delay:100ms"><div class="riri-event-card"><div class="riri-event-card__header"><span class="riri-event-card__tag">Workshop</span><span class="riri-event-card__num">0<!-- -->2</span></div><h3 class="riri-event-card__title">Academic Writing Bootcamp</h3><p class="riri-event-card__desc">A two-day intensive workshop helping graduate students structure, write, and publish dissertation-quality research on RIRI.</p><div class="riri-event-card__meta"><span>📅 <!-- -->Apr 8, 2025</span><span>📍 <!-- -->University of Rwanda — Huye</span></div><a class="riri-event-card__btn" href="/events">Register now →</a></div></div><div class="riri-reveal  " style="transition-delay:200ms"><div class="riri-event-card"><div class="riri-event-card__header"><span class="riri-event-card__tag">Forum</span><span class="riri-event-card__num">0<!-- -->3</span></div><h3 class="riri-event-card__title">Innovation &amp; Knowledge Forum</h3><p class="riri-event-card__desc">Bringing together institutions, supervisors, and emerging researchers to explore how RIRI is transforming knowledge sharing in Rwanda.</p><div class="riri-event-card__meta"><span>📅 <!-- -->May 20, 2025</span><span>📍 <!-- -->Kigali Convention Center</span></div><a class="riri-event-card__btn" href="/events">Register now →</a></div></div></div></div></section><section class="riri-section riri-cta-section"><div class="riri-wrap"><div class="riri-reveal  " style="transition-delay:0ms"><div class="riri-cta-card"><div class="riri-cta-card__inner"><p class="riri-section__overline">Why RIRI</p><h2 class="riri-cta-card__title">The home for Rwanda&#x27;s best<br/>academic and creative voices</h2><ul class="riri-cta-list"><li>A trusted home for academic and creative excellence</li><li>Clear categories for research, innovation, and events</li><li>Opportunities for institutions, authors, and readers to collaborate</li></ul><div class="riri-cta-actions"><a class="riri-btn riri-btn--white" href="/publications">Explore Publications</a><a class="riri-btn riri-btn--gold" href="/innovation">Discover Innovations</a></div></div></div></div></div></section></main><footer class="riri-footer"><div class="riri-wrap"><div class="riri-footer__top"><div class="riri-footer__brand"><div class="riri-footer__logo">RIRI</div><p class="riri-footer__tagline">Discover. Create. Inspire.</p></div><div class="riri-footer__cols"><div class="riri-footer__col"><h4 class="riri-footer__col-title">Platform</h4><a class="riri-footer__link" href="/publications">Publications</a><a class="riri-footer__link" href="/innovation">Innovation</a><a class="riri-footer__link" href="/events">Events</a><a class="riri-footer__link" href="/community">Community</a></div><div class="riri-footer__col"><h4 class="riri-footer__col-title">Contact</h4><a href="mailto:hello@riri.com" class="riri-footer__link">hello@riri.com</a><span class="riri-footer__text">Kigali, Rwanda</span></div><div class="riri-footer__col"><h4 class="riri-footer__col-title">Follow Us</h4><a href="#" class="riri-footer__link">Facebook</a><a href="#" class="riri-footer__link">WhatsApp</a><a href="#" class="riri-footer__link">Instagram</a><a href="#" class="riri-footer__link">TikTok</a></div></div></div><div class="riri-footer__bottom"><p>© <!-- -->2026<!-- --> RIRI. All rights reserved.</p><p>Made with care in Kigali 🇷🇼</p></div></div></footer><!--$--><!--/$--></main></div></div><script src="/_next/static/chunks/0yb2wil16uz6h.js" id="_R_" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0])</script><script>self.__next_f.push([1,"1:\"$Sreact.fragment\"\n2:I[11034,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\"],\"default\"]\n3:I[41402,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\"],\"NotificationProvider\"]\n4:I[39756,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\"],\"default\"]\n5:I[37457,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\"],\"default\"]\n6:I[92825,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\"],\"ClientSegmentRoot\"]\n7:I[49631,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\",\"/_next/static/chunks/08xygg_pylium.js\"],\"default\"]\n9:I[47257,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\"],\"ClientPageRoot\"]\na:I[22474,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\",\"/_next/static/chunks/08xygg_pylium.js\",\"/_next/static/chunks/0fmbxyqw0w9e8.js\"],\"default\"]\nd:I[97367,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\"],\"OutletBoundary\"]\ne:\"$Sreact.suspense\"\n10:I[97367,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\"],\"ViewportBoundary\"]\n12:I[97367,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\"],\"MetadataBoundary\"]\n14:I[68027,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\"],\"default\",1]\n:HL[\"/_next/static/chunks/0glvdzox-hh_1.css\",\"style\"]\n:HL[\"/_next/static/chunks/03kcrwq1b~-5l.css\",\"style\"]\n:HL[\"/_next/static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2\",\"font\",{\"crossOrigin\":\"\",\"type\":\"font/woff2\"}]\n:HL[\"/_next/static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2\",\"font\",{\"crossOrigin\":\"\",\"type\":\"font/woff2\"}]\n:HL[\"/_next/static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2\",\"font\",{\"crossOrigin\":\"\",\"type\":\"font/woff2\"}]\n:HL[\"/_next/static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2\",\"font\",{\"crossOrigin\":\"\",\"type\":\"font/woff2\"}]\n"])</script><script>self.__next_f.push([1,"0:{\"P\":null,\"c\":[\"\",\"\"],\"q\":\"\",\"i\":false,\"f\":[[[\"\",{\"children\":[\"(main)\",{\"children\":[\"__PAGE__\",{}]}]},\"$undefined\",\"$undefined\",16],[[\"$\",\"$1\",\"c\",{\"children\":[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/chunks/0glvdzox-hh_1.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}],[\"$\",\"link\",\"1\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/chunks/03kcrwq1b~-5l.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}],[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/123gq3mnfgh.b.js\",\"async\":true,\"nonce\":\"$undefined\"}],[\"$\",\"script\",\"script-1\",{\"src\":\"/_next/static/chunks/0d3shmwh5_nmn.js\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"html\",null,{\"lang\":\"en\",\"className\":\"scroll-smooth\",\"children\":[\"$\",\"body\",null,{\"className\":\"poppins_d1f2960f-module__6Q3uvW__variable font-sans antialiased m-0 p-0 min-h-screen\",\"children\":[\"$\",\"$L2\",null,{\"children\":[\"$\",\"$L3\",null,{\"children\":[\"$\",\"$L4\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L5\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"}],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}}],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":404}],[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"}]}]]}]}]],[]],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\"}]}]}]}]}]]}],{\"children\":[[\"$\",\"$1\",\"c\",{\"children\":[[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/08xygg_pylium.js\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"$L6\",null,{\"Component\":\"$7\",\"slots\":{\"children\":[\"$\",\"$L4\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L5\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"}],[\"$\",\"div\",null,{\"style\":\"$0:f:0:1:0:props:children:1:props:children:props:children:props:children:props:children:props:notFound:0:1:props:style\",\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}}],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":\"$0:f:0:1:0:props:children:1:props:children:props:children:props:children:props:children:props:notFound:0:1:props:children:props:children:1:props:style\",\"children\":404}],[\"$\",\"div\",null,{\"style\":\"$0:f:0:1:0:props:children:1:props:children:props:children:props:children:props:children:props:notFound:0:1:props:children:props:children:2:props:style\",\"children\":[\"$\",\"h2\",null,{\"style\":\"$0:f:0:1:0:props:children:1:props:children:props:children:props:children:props:children:props:notFound:0:1:props:children:props:children:2:props:children:props:style\",\"children\":\"This page could not be found.\"}]}]]}]}]],[]],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\"}]},\"serverProvidedParams\":{\"params\":{},\"promises\":[\"$@8\"]}}]]}],{\"children\":[[\"$\",\"$1\",\"c\",{\"children\":[[\"$\",\"$L9\",null,{\"Component\":\"$a\",\"serverProvidedParams\":{\"searchParams\":{},\"params\":\"$0:f:0:1:1:children:0:props:children:1:props:serverProvidedParams:params\",\"promises\":[\"$@b\",\"$@c\"]}}],[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/0fmbxyqw0w9e8.js\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"$Ld\",null,{\"children\":[\"$\",\"$e\",null,{\"name\":\"Next.MetadataOutlet\",\"children\":\"$@f\"}]}]]}],{},null,false,null]},null,false,null]},null,false,null],[\"$\",\"$1\",\"h\",{\"children\":[null,[\"$\",\"$L10\",null,{\"children\":\"$L11\"}],[\"$\",\"div\",null,{\"hidden\":true,\"children\":[\"$\",\"$L12\",null,{\"children\":[\"$\",\"$e\",null,{\"name\":\"Next.Metadata\",\"children\":\"$L13\"}]}]}],[\"$\",\"meta\",null,{\"name\":\"next-size-adjust\",\"content\":\"\"}]]}],false]],\"m\":\"$undefined\",\"G\":[\"$14\",[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/chunks/0glvdzox-hh_1.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}],[\"$\",\"link\",\"1\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/chunks/03kcrwq1b~-5l.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\",\"nonce\":\"$undefined\"}]]],\"S\":true,\"h\":null,\"s\":\"$undefined\",\"l\":\"$undefined\",\"p\":\"$undefined\",\"d\":\"$undefined\",\"b\":\"LvKN8RKVL_XXD65tqsgnA\"}\n"])</script><script>self.__next_f.push([1,"8:\"$0:f:0:1:1:children:0:props:children:1:props:serverProvidedParams:params\"\nb:{}\nc:\"$0:f:0:1:1:children:0:props:children:1:props:serverProvidedParams:params\"\n"])</script><script>self.__next_f.push([1,"11:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"}],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"}]]\n"])</script><script>self.__next_f.push([1,"15:I[27201,[\"/_next/static/chunks/123gq3mnfgh.b.js\",\"/_next/static/chunks/0d3shmwh5_nmn.js\"],\"IconMark\"]\nf:null\n13:[[\"$\",\"link\",\"0\",{\"rel\":\"icon\",\"href\":\"/favicon.ico?favicon.05er0stj44ppl.ico\",\"sizes\":\"48x48\",\"type\":\"image/x-icon\"}],[\"$\",\"$L15\",\"1\",{}]]\n"])</script></body></html>
