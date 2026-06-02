@@ -1,7 +1,8 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
+  "/organizer/page": "app/organizer/page.js",
   "/(main)/page": "app/(main)/page.js",
-  "/(main)/researchers/page": "app/(main)/researchers/page.js",
-  "/(main)/researcher/page": "app/(main)/researcher/page.js",
-  "/(main)/researchers/[id]/page": "app/(main)/researchers/[id]/page.js",
-  "/(main)/about/page": "app/(main)/about/page.js"
+  "/(main)/admin-dashboard/page": "app/(main)/admin-dashboard/page.js",
+  "/(main)/admin-dashboard/pending-events/page": "app/(main)/admin-dashboard/pending-events/page.js",
+  "/(main)/events/page": "app/(main)/events/page.js"
 }

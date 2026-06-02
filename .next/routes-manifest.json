@@ -117,6 +117,12 @@
       "namedRegex": "^/admin\\-dashboard/approved\\-innovation(?:/)?$"
     },
     {
+      "page": "/admin-dashboard/create-reseach",
+      "regex": "^/admin\\-dashboard/create\\-reseach(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin\\-dashboard/create\\-reseach(?:/)?$"
+    },
+    {
       "page": "/admin-dashboard/organizer",
       "regex": "^/admin\\-dashboard/organizer(?:/)?$",
       "routeKeys": {},
@@ -157,6 +163,12 @@
       "regex": "^/events(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/events(?:/)?$"
+    },
+    {
+      "page": "/experts",
+      "regex": "^/experts(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/experts(?:/)?$"
     },
     {
       "page": "/favicon.ico",

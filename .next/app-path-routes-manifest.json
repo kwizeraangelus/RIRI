@@ -1,6 +1,7 @@
 {
   "/(main)/about/page": "/about",
   "/(main)/admin-dashboard/approved-innovation/page": "/admin-dashboard/approved-innovation",
+  "/(main)/admin-dashboard/create-reseach/page": "/admin-dashboard/create-reseach",
   "/(main)/admin-dashboard/organizer/page": "/admin-dashboard/organizer",
   "/(main)/admin-dashboard/page": "/admin-dashboard",
   "/(main)/admin-dashboard/pending-events/page": "/admin-dashboard/pending-events",
@@ -9,6 +10,7 @@
   "/(main)/admin-dashboard/pending-researches/page": "/admin-dashboard/pending-researches",
   "/(main)/contact/page": "/contact",
   "/(main)/events/page": "/events",
+  "/(main)/experts/page": "/experts",
   "/(main)/innovation/[id]/page": "/innovation/[id]",
   "/(main)/innovation/page": "/innovation",
   "/(main)/innovator/page": "/innovator",
