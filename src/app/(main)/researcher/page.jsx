@@ -20,9 +20,11 @@ export default function ResearcherDashboard() {
   const [platformId, setPlatformId] = useState(user?.orcid || '');
   const [profileImage, setProfileImage] = useState(null);
 
-  // NEW: Qualification & Specialization
+  // NEW: Qualification & Position
   const [qualification, setQualification] = useState('');
-  const [specialization, setSpecialization] = useState('');
+  const [Field, setField] = useState('');
+  
+  const [Position, setPosition] = useState('');
 
   // Profile edit
   const [showEditProfile, setShowEditProfile] = useState(false);
@@ -182,7 +184,8 @@ export default function ResearcherDashboard() {
   formData.append('bio', bio || '');
   formData.append('platformId', platformId || '');
   formData.append('qualification', qualification || '');
-  formData.append('specialization', specialization || '');
+  formData.append('Field', Field || '');
+  formData.append('Position', Position || '');
 
   if (profileImage) {
     formData.append('profile_image', profileImage);   // ← No [0], it's already a File
@@ -620,16 +623,27 @@ export default function ResearcherDashboard() {
                     placeholder="Ph.D. in Computer Science"
                   />
                 </div>
-
-                {/* Specialization - NEW */}
+                 {/* Field - NEW */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Specialization</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Field </label>
                   <input
                     type="text"
-                    value={specialization}
-                    onChange={(e) => setSpecialization(e.target.value)}
+                    value={Field}
+                    onChange={(e) => setField(e.target.value)}
                     className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none"
-                    placeholder="Machine Learning, Data Science, AI"
+                    placeholder="teaching AI intergation"
+                  />
+                </div>
+
+                {/* Position - NEW */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Position</label>
+                  <input
+                    type="text"
+                    value={Position}
+                    onChange={(e) => setPosition(e.target.value)}
+                    className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none"
+                    placeholder="UNILAK"
                   />
                 </div>
 
