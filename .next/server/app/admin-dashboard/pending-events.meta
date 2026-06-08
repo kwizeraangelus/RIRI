@@ -2,15 +2,14 @@
   "headers": {
     "x-nextjs-stale-time": "300",
     "x-nextjs-prerender": "1",
-    "x-next-cache-tags": "_N_T_/layout,_N_T_/(main)/layout,_N_T_/(main)/admin-dashboard/layout,_N_T_/(main)/admin-dashboard/pending-events/layout,_N_T_/(main)/admin-dashboard/pending-events/page,_N_T_/admin-dashboard/pending-events"
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/admin-dashboard/layout,_N_T_/admin-dashboard/pending-events/layout,_N_T_/admin-dashboard/pending-events/page,_N_T_/admin-dashboard/pending-events"
   },
   "segmentPaths": [
     "/_tree",
     "/_full",
-    "/!KG1haW4p/admin-dashboard/pending-events/__PAGE__",
-    "/!KG1haW4p/admin-dashboard/pending-events",
-    "/!KG1haW4p/admin-dashboard",
-    "/!KG1haW4p",
+    "/admin-dashboard/pending-events/__PAGE__",
+    "/admin-dashboard/pending-events",
+    "/admin-dashboard",
     "/_index",
     "/_head"
   ]

@@ -2,15 +2,14 @@
   "headers": {
     "x-nextjs-stale-time": "300",
     "x-nextjs-prerender": "1",
-    "x-next-cache-tags": "_N_T_/layout,_N_T_/(main)/layout,_N_T_/(main)/admin-dashboard/layout,_N_T_/(main)/admin-dashboard/pending-innovations/layout,_N_T_/(main)/admin-dashboard/pending-innovations/page,_N_T_/admin-dashboard/pending-innovations"
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/admin-dashboard/layout,_N_T_/admin-dashboard/pending-innovations/layout,_N_T_/admin-dashboard/pending-innovations/page,_N_T_/admin-dashboard/pending-innovations"
   },
   "segmentPaths": [
     "/_tree",
     "/_full",
-    "/!KG1haW4p/admin-dashboard/pending-innovations/__PAGE__",
-    "/!KG1haW4p/admin-dashboard/pending-innovations",
-    "/!KG1haW4p/admin-dashboard",
-    "/!KG1haW4p",
+    "/admin-dashboard/pending-innovations/__PAGE__",
+    "/admin-dashboard/pending-innovations",
+    "/admin-dashboard",
     "/_index",
     "/_head"
   ]

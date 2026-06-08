@@ -39,6 +39,14 @@
       "namedRegex": "^/books/(?<nxtPid>[^/]+?)(?:/)?$"
     },
     {
+      "page": "/experts/[id]",
+      "regex": "^/experts/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/experts/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/innovation/[id]",
       "regex": "^/innovation/([^/]+?)(?:/)?$",
       "routeKeys": {
@@ -121,6 +129,12 @@
       "regex": "^/admin\\-dashboard/create\\-reseach(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/admin\\-dashboard/create\\-reseach(?:/)?$"
+    },
+    {
+      "page": "/admin-dashboard/create-reseach/create-expert",
+      "regex": "^/admin\\-dashboard/create\\-reseach/create\\-expert(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin\\-dashboard/create\\-reseach/create\\-expert(?:/)?$"
     },
     {
       "page": "/admin-dashboard/organizer",

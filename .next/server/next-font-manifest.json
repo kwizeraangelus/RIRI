@@ -6,54 +6,6 @@
       "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
       "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
     ],
-    "[project]/src/app/(main)/admin-dashboard/approved-innovation/page": [
-      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
-      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
-      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
-      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
-    ],
-    "[project]/src/app/(main)/admin-dashboard/create-reseach/page": [
-      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
-      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
-      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
-      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
-    ],
-    "[project]/src/app/(main)/admin-dashboard/organizer/page": [
-      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
-      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
-      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
-      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
-    ],
-    "[project]/src/app/(main)/admin-dashboard/page": [
-      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
-      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
-      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
-      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
-    ],
-    "[project]/src/app/(main)/admin-dashboard/pending-events/page": [
-      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
-      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
-      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
-      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
-    ],
-    "[project]/src/app/(main)/admin-dashboard/pending-innovations/page": [
-      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
-      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
-      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
-      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
-    ],
-    "[project]/src/app/(main)/admin-dashboard/pending-publication/page": [
-      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
-      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
-      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
-      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
-    ],
-    "[project]/src/app/(main)/admin-dashboard/pending-researches/page": [
-      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
-      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
-      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
-      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
-    ],
     "[project]/src/app/(main)/contact/page": [
       "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
       "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
@@ -61,6 +13,12 @@
       "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
     ],
     "[project]/src/app/(main)/events/page": [
+      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
+      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
+      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
+      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
+    ],
+    "[project]/src/app/(main)/experts/[id]/page": [
       "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
       "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
       "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
@@ -151,6 +109,60 @@
       "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
     ],
     "[project]/src/app/_not-found/page": [
+      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
+      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
+      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
+      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
+    ],
+    "[project]/src/app/admin-dashboard/approved-innovation/page": [
+      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
+      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
+      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
+      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
+    ],
+    "[project]/src/app/admin-dashboard/create-reseach/create-expert/page": [
+      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
+      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
+      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
+      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
+    ],
+    "[project]/src/app/admin-dashboard/create-reseach/page": [
+      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
+      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
+      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
+      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
+    ],
+    "[project]/src/app/admin-dashboard/organizer/page": [
+      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
+      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
+      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
+      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
+    ],
+    "[project]/src/app/admin-dashboard/page": [
+      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
+      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
+      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
+      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
+    ],
+    "[project]/src/app/admin-dashboard/pending-events/page": [
+      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
+      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
+      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
+      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
+    ],
+    "[project]/src/app/admin-dashboard/pending-innovations/page": [
+      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
+      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
+      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
+      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
+    ],
+    "[project]/src/app/admin-dashboard/pending-publication/page": [
+      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
+      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
+      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
+      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
+    ],
+    "[project]/src/app/admin-dashboard/pending-researches/page": [
       "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
       "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
       "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",

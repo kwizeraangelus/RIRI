@@ -1,23 +1,25 @@
 'use client';
-
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { getApiUrl } from '@/utils/api';
 
-type Expert = {
+interface Expert {
   id: string;
   name: string;
-  qualification: string;
-  email: string;
-  contact: string;
-  specialization: string;
-  image: string;
-};
+  title: string;
+  location: string;
+  bio: string;
+  profileImage?: string;
+  yearOfExperience: number;
+  expertise: string[];
+  verified: boolean;
+}
 
 export default function ExpertsPage() {
   const [experts, setExperts] = useState<Expert[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchExperts();
@@ -26,108 +28,85 @@ export default function ExpertsPage() {
   const fetchExperts = async () => {
     try {
       setLoading(true);
-      setError(null);
-
-      const res = await fetch('http://localhost:8000/api/experts');
-
-      if (!res.ok) {
-        throw new Error(`Server error: ${res.status}`);
-      }
-
-      const data = await res.json();
-
-      // Safety check
-      if (Array.isArray(data)) {
-        setExperts(data);
-      } else {
-        console.error("API did not return array:", data);
-        setExperts([]);
-        setError("Invalid data received from server");
-      }
-    } catch (err: any) {
-      console.error("Fetch Error:", err);
-      setError(err.message || "Failed to load experts");
-      setExperts([]);
+      const response = await fetch(getApiUrl('/experts'));
+      const data = await response.json();
+      setExperts(data);
+    } catch (err) {
+      setError('Failed to fetch experts');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const filtered = Array.isArray(experts) 
-    ? experts.filter(r =>
-        r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        r.specialization.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
-
-  if (loading) return <div className="text-center py-20 text-xl">Loading Experts...</div>;
-  if (error) return <div className="text-center py-20 text-red-600">Error: {error}</div>;
+  if (loading) return <div className="p-8 text-center">Loading experts...</div>;
+  if (error) return <div className="p-8 text-center text-red-600">{error}</div>;
 
   return (
-    <div className="min-h-screen bg-[#E0F2FE] py-8">
-      <div className="max-w-5xl mx-auto px-6">
-        <div className="text-sm text-gray-500 mb-6">HOME / SCHOOL OF COMPUTER STUDIES / EXPERTS</div>
-
-        <h1 className="text-3xl font-bold text-red-800 mb-8">Experts</h1>
-
-        <div className="mb-8">
-          <input
-            type="text"
-            placeholder="Search by Name or Specialization..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-96 px-5 py-3 border border-gray-300 rounded focus:outline-none focus:border-red-700"
-          />
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900">Expert Directory</h1>
+          
         </div>
 
-        <div className="space-y-8">
-          {filtered.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              {searchTerm ? "No matching experts found." : "No experts available yet."}
-            </div>
-          ) : (
-            filtered.map((person) => (
-              <div key={person.id} className="flex flex-col md:flex-row gap-6 border-b border-gray-200 pb-8 last:border-none">
-                <div className="w-32 h-40 flex-shrink-0 bg-gray-100">
-                  <img 
-                    src={person.image} 
-                    alt={person.name} 
-                    className="w-full h-full object-cover border border-gray-300" 
-                    onError={(e) => {
-                      e.currentTarget.src = 'https://via.placeholder.com/120x150/003087/ffffff?text=Expert';
-                    }}
-                  />
-                </div>
-
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{person.name}</h3>
-
-                  <div className="space-y-2 text-sm">
-                    <div className="text-gray-500">
-                      <span className="font-medium text-gray-700">Qualification:</span> {person.qualification}
+        {experts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No experts found</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {experts.map((expert) => (
+              <Link key={expert.id} href={`/experts/${expert.id}`}>
+                <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer overflow-hidden">
+                  {expert.profileImage && (
+                    <div className="relative h-48 w-full">
+                      <Image
+                        src={expert.profileImage}
+                        alt={expert.name}
+                        fill
+                        className="object-cover"
+                      />
                     </div>
-                    <div className="text-gray-500">
-                      <span className="font-medium text-gray-700">E-Mail ID:</span>{' '}
-                      <a href={`mailto:${person.email}`} className="text-blue-600 hover:underline">{person.email}</a>
+                  )}
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h2 className="text-xl font-semibold text-gray-900">{expert.name}</h2>
+                      {expert.verified && (
+                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                          Verified
+                        </span>
+                      )}
                     </div>
-                    <div className="text-gray-500">
-                      <span className="font-medium text-gray-700">Contact Number:</span> {person.contact}
+                    <p className="text-blue-600 font-medium mb-1">{expert.title}</p>
+                    <p className="text-gray-600 text-sm mb-2">{expert.location}</p>
+                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">{expert.bio}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">
+                        {expert.yearOfExperience} years exp.
+                      </span>
                     </div>
-                    <div className="text-gray-500">
-                      <span className="font-medium text-gray-700">Area Of Specialization:</span> {person.specialization}
+                    <div className="mt-4 flex flex-wrap gap-1">
+                      {expert.expertise.slice(0, 3).map((skill, idx) => (
+                        <span
+                          key={idx}
+                          className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                      {expert.expertise.length > 3 && (
+                        <span className="text-gray-500 text-xs px-2 py-1">
+                          +{expert.expertise.length - 3} more
+                        </span>
+                      )}
                     </div>
                   </div>
-
-                  <Link href={`/researchers/${person.id}`}>
-                    <button className="mt-5 bg-red-700 hover:bg-red-800 text-white font-medium px-6 py-2.5 rounded text-sm transition-colors">
-                      VIEW PROFILE
-                    </button>
-                  </Link>
                 </div>
-              </div>
-            ))
-          )}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

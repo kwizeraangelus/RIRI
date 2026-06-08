@@ -58,7 +58,7 @@ export default function PublicResearcherProfile() {
               Research Portal
             </h1>
           </div>
-          <div className="text-sm text-slate-500">Faculty Profile</div>
+          <div className="text-sm text-slate-500"></div>
         </div>
       </header>
 

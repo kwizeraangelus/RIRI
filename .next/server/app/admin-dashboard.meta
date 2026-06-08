@@ -2,14 +2,13 @@
   "headers": {
     "x-nextjs-stale-time": "300",
     "x-nextjs-prerender": "1",
-    "x-next-cache-tags": "_N_T_/layout,_N_T_/(main)/layout,_N_T_/(main)/admin-dashboard/layout,_N_T_/(main)/admin-dashboard/page,_N_T_/admin-dashboard"
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/admin-dashboard/layout,_N_T_/admin-dashboard/page,_N_T_/admin-dashboard"
   },
   "segmentPaths": [
     "/_tree",
     "/_full",
-    "/!KG1haW4p/admin-dashboard/__PAGE__",
-    "/!KG1haW4p/admin-dashboard",
-    "/!KG1haW4p",
+    "/admin-dashboard/__PAGE__",
+    "/admin-dashboard",
     "/_index",
     "/_head"
   ]
