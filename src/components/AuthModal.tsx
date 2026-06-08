@@ -7,9 +7,6 @@ import { X, LogIn, UserPlus, Loader2 } from 'lucide-react';
 import { notifySuccess } from '@/context/NotificationContext';
 import { getApiUrl } from '@/utils/api';
 
-
-
-
 interface UserData {
   id: string;
   username: string;
@@ -17,8 +14,7 @@ interface UserData {
   user_category: string;
   first_name?: string;
   last_name?: string;
-  is_staff:boolean;
-  
+  is_staff: boolean;
 }
 
 type ModalType = 'login' | 'signup';
@@ -33,7 +29,6 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-
     last_name: '',
     first_name: '',
     username: '',
@@ -51,12 +46,10 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
   const isLogin = type === 'login';
 
   const loginUser = async (data: { username: string; password: string }) => {
-    // Detect whether the user typed an email or a username
     const isEmail = data.username.includes('@');
-
     const res = await fetch(getApiUrl('/api/nova/login'), {
       method: 'POST',
-      credentials: 'include', // ✅ matches real login page — required for session cookie
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: isEmail ? data.username : undefined,
@@ -64,7 +57,6 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
         password: data.password,
       }),
     });
-
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.message || err.detail || 'Login failed');
@@ -87,7 +79,6 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
         user_category: formData.user_category.toLowerCase(),
       }),
     });
-
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.message || err.detail || 'Registration failed');
@@ -108,79 +99,66 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
 
     try {
       if (isLogin) {
-        const response = await loginUser({
+        const loginResponse = await loginUser({
           username: formData.username,
           password: formData.password,
         });
 
-        console.log("🔍 Full Backend Response:", response);
+        const token = loginResponse.access_token || loginResponse.access;
+        if (!token) throw new Error('No token received from server');
 
-        const token = response.access_token || response.access;
+        const payloadBase64 = token.split('.')[1];
+        const decoded = JSON.parse(atob(payloadBase64)) as {
+          sub: string;
+          email: string;
+          category: string;
+          is_staff: boolean;
+        };
 
-        if (!token) {
-          throw new Error("No token received from server");
+        localStorage.setItem('token', token);
+        localStorage.setItem('access_token', token);
+
+        let user: UserData;
+        try {
+          const profileRes = await fetch(`${API}/profile/${decoded.sub}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!profileRes.ok) throw new Error('profile fetch failed');
+          const profileData = await profileRes.json();
+          user = {
+            id: profileData.id,
+            username: profileData.username,
+            email: profileData.email,
+            user_category: profileData.user_category,
+            first_name: profileData.first_name || '',
+            last_name: profileData.last_name || '',
+            is_staff: profileData.is_staff || false,
+          };
+        } catch {
+          user = {
+            id: decoded.sub,
+            username: formData.username,
+            email: decoded.email || '',
+            user_category: decoded.category || 'PUBLIC_VISITOR',
+            first_name: '',
+            last_name: '',
+            is_staff: decoded.is_staff || false,
+          };
         }
 
-        // ✅ Save token with the SAME key the real login page uses ('token')
-        // so all dif (isLogin) {
-  const loginResponse = await loginUser({       // ← loginResponse not response
-    username: formData.username,
-    password: formData.password,
-  });
-
-  
-  if (!token) throw new Error('No token received from server');
-
-  const payloadBase64 = token.split('.')[1];
-  const decoded = JSON.parse(atob(payloadBase64)) as {
-    sub: string;
-    email: string;
-    category: string;
-    is_staff: boolean;
-  };
-  console.log('DECODED JWT:', decoded);
-
-  localStorage.setItem('token', token);
-  localStorage.setItem('access_token', token);
-
-  let user: UserData;
-  try {
-    const profileRes = await fetch(`${API}/profile/${decoded.sub}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!profileRes.ok) throw new Error('profile fetch failed');
-    const profileData = await profileRes.json();
-    user = {
-      id:            profileData.id,
-      username:      profileData.username,
-      email:         profileData.email,
-      user_category: profileData.user_category,
-      first_name:    profileData.first_name  || '',
-      last_name:     profileData.last_name   || '',
-      is_staff:      profileData.is_staff    || false,
-    };
-  } catch {
-    user = {
-      id:            decoded.sub,
-      username:      formData.username,
-      email:         decoded.email     || '',
-      user_category: decoded.category  || 'PUBLIC_VISITOR',
-      first_name:    '',
-      last_name:     '',
-      is_staff:      decoded.is_staff  || false,
-    };
-  }
-
-  localStorage.setItem('user', JSON.stringify(user));
-
-  const redirectPath = loginResponse.redirect || '';  // ← loginResponse not response
-  onAuthSuccess();
-  notifySuccess(`Welcome back, ${user.username}!`);
-  onClose();
-  if (redirectPath) setTimeout(() => router.push(redirectPath), 100);
-}
+        localStorage.setItem('user', JSON.stringify(user));
+        const redirectPath = loginResponse.redirect || '';
+        onAuthSuccess();
+        notifySuccess(`Welcome back, ${user.username}!`);
+        onClose();
+        if (redirectPath) setTimeout(() => router.push(redirectPath), 100);
+      } else {
+        await registerUser();
+        notifySuccess('Account created! Please log in.');
+        onClose('login');
+      }
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Login failed. Please try again.';
+      const errorMessage = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
       console.error(err);
       setError(errorMessage);
     } finally {
@@ -308,6 +286,22 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
             className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-blue-500"
             disabled={loading}
           />
+
+          {/* ✅ Forgot Password link — only shown on login */}
+          {isLogin && (
+            <div className="text-right -mt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  router.push('/forgot-password');
+                }}
+                className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+              >
+                Forgot password?
+              </button>
+            </div>
+          )}
 
           {!isLogin && (
             <input
