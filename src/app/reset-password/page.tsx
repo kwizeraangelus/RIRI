@@ -19,16 +19,23 @@ function ResetPasswordForm() {
   const [tokenValid, setTokenValid] = useState<boolean | null>(null);
 
   // Verify token on mount
-  useEffect(() => {
-    if (!token) {
-      setTokenValid(false);
-      return;
-    }
-    fetch(getApiUrl(`/api/auth/verify-reset-token?token=${token}`))
-      .then((res) => setTokenValid(res.ok))
-      .catch(() => setTokenValid(false));
-  }, [token]);
+ useEffect(() => {
+  if (!token) return;  // ← just return, don't setState here
 
+  let cancelled = false;  // prevent setState after unmount
+
+  fetch(getApiUrl(`/api/auth/verify-reset-token?token=${token}`))
+    .then((res) => {
+      if (!cancelled) setTokenValid(res.ok);
+    })
+    .catch(() => {
+      if (!cancelled) setTokenValid(false);
+    });
+
+  return () => {
+    cancelled = true;  // cleanup
+  };
+}, [token]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
