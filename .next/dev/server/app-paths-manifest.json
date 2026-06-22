@@ -1,5 +1,7 @@
 {
-  "/admin-dashboard/page": "app/admin-dashboard/page.js",
-  "/organizer/page": "app/organizer/page.js",
-  "/(main)/page": "app/(main)/page.js"
+  "/[id]/page": "app/[id]/page.js",
+  "/(main)/page": "app/(main)/page.js",
+  "/(main)/events/page": "app/(main)/events/page.js",
+  "/(main)/about/page": "app/(main)/about/page.js",
+  "/(main)/contact/page": "app/(main)/contact/page.js"
 }

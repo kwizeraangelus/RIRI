@@ -148,15 +148,13 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
 
         localStorage.setItem('user', JSON.stringify(user));
         
-        // ✅ NO AUTO REDIRECT
         onAuthSuccess();
         notifySuccess(`Welcome back, ${user.username || user.email}!`);
         onClose();
-        
       } else {
         await registerUser();
         notifySuccess('Account created successfully!');
-        onClose('login');   // Switch to login modal
+        onClose('login');
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
@@ -205,14 +203,58 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
             </div>
           )}
 
+          {/* All form fields now have larger font size */}
           {!isLogin && (
             <>
-              <input type="text" placeholder="First Name" value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500" disabled={loading} />
-              <input type="text" placeholder="Last Name" value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500" disabled={loading} />
-              <input type="text" placeholder="Username" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} required className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500" disabled={loading} />
-              <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500" disabled={loading} />
-              <input type="tel" placeholder="Phone Number" value={formData.phone_number} onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })} className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500" disabled={loading} />
-              <select value={formData.user_category} onChange={(e) => setFormData({ ...formData, user_category: e.target.value })} required className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 bg-white" disabled={loading}>
+              <input
+                type="text"
+                placeholder="First Name"
+                value={formData.first_name}
+                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
+                disabled={loading}
+              />
+              <input
+                type="text"
+                placeholder="Last Name"
+                value={formData.last_name}
+                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
+                disabled={loading}
+              />
+              <input
+                type="text"
+                placeholder="Username"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                required
+                className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
+                disabled={loading}
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+                className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
+                disabled={loading}
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                value={formData.phone_number}
+                onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
+                disabled={loading}
+              />
+              <select
+                value={formData.user_category}
+                onChange={(e) => setFormData({ ...formData, user_category: e.target.value })}
+                required
+                className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 bg-white text-lg"
+                disabled={loading}
+              >
                 <option value="" disabled>Select Account Type</option>
                 <option value="innovator">Innovator</option>
                 <option value="researcher">Researcher</option>
@@ -230,7 +272,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               required
-              className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-blue-500"
+              className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-blue-500 text-lg"
               disabled={loading}
             />
           )}
@@ -241,7 +283,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             required
-            className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-blue-500"
+            className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-blue-500 text-lg"
             disabled={loading}
           />
 
@@ -264,7 +306,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               required
-              className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500"
+              className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
               disabled={loading}
             />
           )}
@@ -273,7 +315,9 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
             type="submit"
             disabled={loading}
             className={`w-full py-4 font-bold text-lg rounded-xl transition-all ${
-              isLogin ? 'bg-[#FFD700] hover:bg-yellow-400 text-black' : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+              isLogin
+                ? 'bg-[#FFD700] hover:bg-yellow-400 text-black'
+                : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
             }`}
           >
             {loading ? (
