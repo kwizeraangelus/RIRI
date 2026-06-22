@@ -92,6 +92,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // ✅ NO AUTO REDIRECTION - User stays on current page
   const handleAuthSuccess = useCallback(() => {
     const storedUserStr = localStorage.getItem('user');
     const storedToken = localStorage.getItem('access_token');
@@ -100,25 +101,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     if (user && storedToken) {
       setAuthData({ user, loading: false });
       setModalType(null);
-
-      let redirectPath = '/dashboard';
-
-      if (user.user_category === 'ADMIN' || user.is_staff) {
-        redirectPath = '/admin-dashboard';
-      } else {
-        switch (user.user_category) {
-          case 'UNIVERSITY': redirectPath = '/university'; break;
-          case 'RESEARCHER': redirectPath = '/researcher'; break;
-          case 'CONF_ORGANIZER': redirectPath = '/organizer'; break;
-          case 'PUBLIC_VISITOR': redirectPath = '/'; break;
-          case 'INNOVATOR': redirectPath = '/innovator'; break;
-          default: redirectPath = '/dashboard';
-        }
-      }
-
-      setTimeout(() => router.push(redirectPath), 500);
+      // No router.push() - stays on the same page
     }
-  }, [router]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
@@ -126,6 +111,23 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     setAuthData({ user: null, loading: false });
     setDropdownOpen(false);
     router.push('/');
+  };
+
+  const getDashboardPath = (user: UserData | null): string => {
+    if (!user) return '/dashboard';
+
+    if (user.user_category === 'ADMIN' || user.is_staff) {
+      return '/admin-dashboard';
+    }
+
+    switch (user.user_category?.toUpperCase()) {
+      case 'UNIVERSITY': return '/university';
+      case 'RESEARCHER': return '/researcher';
+      case 'CONF_ORGANIZER': return '/organizer';
+      case 'PUBLIC_VISITOR': return '/';
+      case 'INNOVATOR': return '/innovator';
+      default: return '/dashboard';
+    }
   };
 
   const getUserInitial = (user: UserData | null) => {
@@ -164,12 +166,19 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <div className="flex items-center gap-6">
           {!isLoggedIn ? (
             <div className="hidden md:flex gap-4">
-              <button onClick={() => setModalType('login')} className="px-6 py-2 border border-white/30 rounded-full hover:bg-white/10 transition">Login</button>
-              <button onClick={() => setModalType('signup')} className="px-6 py-2 bg-[#FFD700] text-black font-bold rounded-full hover:bg-yellow-400 transition">Sign Up</button>
+              <button 
+                onClick={() => setModalType('login')} 
+                className="px-6 py-2 border border-white/30 rounded-full hover:bg-white/10 transition"
+              >
+                Login
+              </button>
             </div>
           ) : (
             <div className="relative">
-              <button onClick={() => setDropdownOpen(!dropdownOpen)} className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition ${getInitialColor(userInitial)}`}>
+              <button 
+                onClick={() => setDropdownOpen(!dropdownOpen)} 
+                className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition ${getInitialColor(userInitial)}`}
+              >
                 <span className="text-white font-bold text-xl">{userInitial}</span>
               </button>
 
@@ -187,10 +196,26 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     </div>
                   </div>
                   <div className="py-2">
-                    <Link href="/profile" onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/10">
+                    <Link 
+                      href={getDashboardPath(authData.user)} 
+                      onClick={() => setDropdownOpen(false)} 
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-white/10"
+                    >
+                      <User size={20} /> My Dashboard
+                    </Link>
+
+                    <Link 
+                      href="/profile" 
+                      onClick={() => setDropdownOpen(false)} 
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-white/10"
+                    >
                       <User size={20} /> My Profile
                     </Link>
-                    <button onClick={handleLogout} className="w-full text-left flex items-center gap-3 px-5 py-3 text-red-400 hover:bg-red-500/10">
+
+                    <button 
+                      onClick={handleLogout} 
+                      className="w-full text-left flex items-center gap-3 px-5 py-3 text-red-400 hover:bg-red-500/10"
+                    >
                       <LogOut size={18} /> Logout
                     </button>
                   </div>
@@ -226,16 +251,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               >
                 Login
               </button>
-              <button
-                onClick={() => { setModalType('signup'); setMobileMenuOpen(false); }}
-                className="w-full py-4 bg-[#FFD700] text-black font-bold rounded-xl"
-              >
-                Sign Up
-              </button>
             </div>
           ) : (
             <div className="pt-8 border-t border-white/20 space-y-4">
-              <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="block py-4 text-xl">
+              <Link 
+                href={getDashboardPath(authData.user)} 
+                onClick={() => setMobileMenuOpen(false)} 
+                className="block py-4 text-xl"
+              >
+                My Dashboard
+              </Link>
+              <Link 
+                href="/profile" 
+                onClick={() => setMobileMenuOpen(false)} 
+                className="block py-4 text-xl"
+              >
                 My Profile
               </Link>
               <button onClick={handleLogout} className="w-full text-left py-4 text-xl text-red-400">

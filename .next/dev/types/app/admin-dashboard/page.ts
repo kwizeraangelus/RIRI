@@ -1,10 +1,10 @@
-// File: C:\Users\wolflegend\Desktop\RIRI\frontend\src\app\forgot-password\page.tsx
-import * as entry from '../../../../../src/app/forgot-password/page.js'
+// File: C:\Users\wolflegend\Desktop\RIRI\frontend\src\app\admin-dashboard\page.tsx
+import * as entry from '../../../../../src/app/admin-dashboard/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
 import type { InstantConfigForTypeCheckInternal } from 'next/dist/build/segment-config/app/app-segment-config.js'
 
-type TEntry = typeof import('../../../../../src/app/forgot-password/page.js')
+type TEntry = typeof import('../../../../../src/app/admin-dashboard/page.js')
 
 type SegmentParams<T extends Object = any> = T extends Record<string, any>
   ? { [K in keyof T]: T[K] extends string ? string | string[] | undefined : never }

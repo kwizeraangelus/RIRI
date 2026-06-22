@@ -147,15 +147,16 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
         }
 
         localStorage.setItem('user', JSON.stringify(user));
-        const redirectPath = loginResponse.redirect || '';
+        
+        // ✅ NO AUTO REDIRECT
         onAuthSuccess();
-        notifySuccess(`Welcome back, ${user.username}!`);
+        notifySuccess(`Welcome back, ${user.username || user.email}!`);
         onClose();
-        if (redirectPath) setTimeout(() => router.push(redirectPath), 100);
+        
       } else {
         await registerUser();
-        notifySuccess('Account created! Please log in.');
-        onClose('login');
+        notifySuccess('Account created successfully!');
+        onClose('login');   // Switch to login modal
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
@@ -206,55 +207,12 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
 
           {!isLogin && (
             <>
-              <input
-                type="text"
-                placeholder="First Name"
-                value={formData.first_name}
-                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500"
-                disabled={loading}
-              />
-              <input
-                type="text"
-                placeholder="Last Name"
-                value={formData.last_name}
-                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500"
-                disabled={loading}
-              />
-              <input
-                type="text"
-                placeholder="Username"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                required
-                className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500"
-                disabled={loading}
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-                className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500"
-                disabled={loading}
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={formData.phone_number}
-                onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
-                className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500"
-                disabled={loading}
-              />
-              <select
-                value={formData.user_category}
-                onChange={(e) => setFormData({ ...formData, user_category: e.target.value })}
-                required
-                className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 bg-white"
-                disabled={loading}
-              >
+              <input type="text" placeholder="First Name" value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500" disabled={loading} />
+              <input type="text" placeholder="Last Name" value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500" disabled={loading} />
+              <input type="text" placeholder="Username" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} required className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500" disabled={loading} />
+              <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500" disabled={loading} />
+              <input type="tel" placeholder="Phone Number" value={formData.phone_number} onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })} className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500" disabled={loading} />
+              <select value={formData.user_category} onChange={(e) => setFormData({ ...formData, user_category: e.target.value })} required className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 bg-white" disabled={loading}>
                 <option value="" disabled>Select Account Type</option>
                 <option value="innovator">Innovator</option>
                 <option value="researcher">Researcher</option>
@@ -287,15 +245,11 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
             disabled={loading}
           />
 
-          {/* ✅ Forgot Password link — only shown on login */}
           {isLogin && (
             <div className="text-right -mt-2">
               <button
                 type="button"
-                onClick={() => {
-                  onClose();
-                  router.push('/forgot-password');
-                }}
+                onClick={() => { onClose(); router.push('/forgot-password'); }}
                 className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors"
               >
                 Forgot password?
@@ -319,9 +273,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
             type="submit"
             disabled={loading}
             className={`w-full py-4 font-bold text-lg rounded-xl transition-all ${
-              isLogin
-                ? 'bg-[#FFD700] hover:bg-yellow-400 text-black'
-                : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+              isLogin ? 'bg-[#FFD700] hover:bg-yellow-400 text-black' : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
             }`}
           >
             {loading ? (
@@ -330,6 +282,19 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
               </span>
             ) : isLogin ? 'Log In' : 'Create Account'}
           </button>
+
+          {isLogin && (
+            <p className="text-center text-sm text-gray-600 mt-4">
+              Don't have an account?{' '}
+              <button
+                type="button"
+                onClick={() => onClose('signup')}
+                className="text-[#FFD700] font-semibold hover:underline"
+              >
+                Sign up
+              </button>
+            </p>
+          )}
         </div>
       </form>
     </div>
