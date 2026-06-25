@@ -127,22 +127,17 @@ export default function PublicResearcherProfile() {
 
                         {/* DOI & Links */}
                         <div className="mt-5 flex flex-wrap gap-4 text-sm">
-                          {pub.doi && (
-                            <span className="font-mono text-blue-600">
-                              DOI: {pub.doi}
-                            </span>
-                          )}
-                          {pub.url && (
-                            <a 
-                              href={pub.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-indigo-600 hover:underline font-medium"
-                            >
-                              View Publication →
-                            </a>
-                          )}
-                        </div>
+  {pub.doi && (
+    <a 
+      href={`https://doi.org/${pub.doi}`} 
+      target="_blank"
+      rel="noopener noreferrer"
+      className="font-mono text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+    >
+      DOI: {pub.doi}
+    </a>
+  )}
+</div>
 
                         {/* Action Buttons */}
                         <div className="flex gap-3 mt-6">

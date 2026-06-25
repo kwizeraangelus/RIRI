@@ -13,8 +13,8 @@ const poppins = Poppins({ subsets: ['latin'], weight: ['300', '400', '600', '700
 const navLinks = [
   { name: 'home', href: '/' },
   { name: 'researchers', href: '/researchers' },
-  { name: 'theses', href: '/publications' },
-  { name: 'publications', href: '/researches' },
+  { name: 'theses', href: '/theses' },
+  { name: 'publications', href: '/publications' },
   { name: 'expert', href: '/experts' },
   { name: 'innovation', href: '/innovation' },
   { name: 'about', href: '/about' },
@@ -74,15 +74,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
-
     const timer = setTimeout(() => {
       const storedUserStr = localStorage.getItem('user');
       const storedToken = localStorage.getItem('access_token');
       const user = safeParseUser(storedUserStr);
-
       setAuthData({ user: user && storedToken ? user : null, loading: false });
     }, 10);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -92,16 +89,18 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // ✅ NO AUTO REDIRECTION - User stays on current page
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileMenuOpen]);
+
   const handleAuthSuccess = useCallback(() => {
     const storedUserStr = localStorage.getItem('user');
     const storedToken = localStorage.getItem('access_token');
     const user = safeParseUser(storedUserStr);
-
     if (user && storedToken) {
       setAuthData({ user, loading: false });
       setModalType(null);
-      // No router.push() - stays on the same page
     }
   }, []);
 
@@ -115,11 +114,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   const getDashboardPath = (user: UserData | null): string => {
     if (!user) return '/dashboard';
-
-    if (user.user_category === 'ADMIN' || user.is_staff) {
-      return '/admin-dashboard';
-    }
-
+    if (user.user_category === 'ADMIN' || user.is_staff) return '/admin-dashboard';
     switch (user.user_category?.toUpperCase()) {
       case 'UNIVERSITY': return '/university';
       case 'RESEARCHER': return '/researcher';
@@ -145,7 +140,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className={`${poppins.variable} font-sans text-white`}>
-      <nav className={`fixed inset-x-0 top-0 z-50 flex justify-between items-center px-8 lg:px-[50px] py-6 transition-all duration-300 ${scrolled ? 'bg-[#0c1e30ee] backdrop-blur-xl shadow-2xl py-4' : 'bg-transparent'}`}>
+      {/* NAV BAR — exactly your original styling */}
+      <nav className={`fixed inset-x-0 top-0 z-[9999] flex justify-between items-center px-8 lg:px-[50px] py-6 transition-all duration-300 ${scrolled ? 'bg-[#0c1e30ee] backdrop-blur-xl shadow-2xl py-4' : 'bg-transparent'}`}>
         <Link href="/" className="text-[40px] font-bold uppercase italic tracking-[3px] hover:text-[#FFD700]">
           RIRI
         </Link>
@@ -166,8 +162,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <div className="flex items-center gap-6">
           {!isLoggedIn ? (
             <div className="hidden md:flex gap-4">
-              <button 
-                onClick={() => setModalType('login')} 
+              <button
+                onClick={() => setModalType('login')}
                 className="px-6 py-2 border border-white/30 rounded-full hover:bg-white/10 transition"
               >
                 Login
@@ -175,8 +171,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             </div>
           ) : (
             <div className="relative">
-              <button 
-                onClick={() => setDropdownOpen(!dropdownOpen)} 
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
                 className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition ${getInitialColor(userInitial)}`}
               >
                 <span className="text-white font-bold text-xl">{userInitial}</span>
@@ -196,26 +192,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     </div>
                   </div>
                   <div className="py-2">
-                    <Link 
-                      href={getDashboardPath(authData.user)} 
-                      onClick={() => setDropdownOpen(false)} 
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-white/10"
-                    >
+                    <Link href={getDashboardPath(authData.user)} onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/10">
                       <User size={20} /> My Dashboard
                     </Link>
-
-                    <Link 
-                      href="/profile" 
-                      onClick={() => setDropdownOpen(false)} 
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-white/10"
-                    >
+                    <Link href="/profile" onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/10">
                       <User size={20} /> My Profile
                     </Link>
-
-                    <button 
-                      onClick={handleLogout} 
-                      className="w-full text-left flex items-center gap-3 px-5 py-3 text-red-400 hover:bg-red-500/10"
-                    >
+                    <button onClick={handleLogout} className="w-full text-left flex items-center gap-3 px-5 py-3 text-red-400 hover:bg-red-500/10">
                       <LogOut size={18} /> Logout
                     </button>
                   </div>
@@ -224,20 +207,25 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             </div>
           )}
 
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden">
+          {/* Hamburger button — your original, just with relative z-index to sit above hero */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden relative z-[10000]"
+          >
             {mobileMenuOpen ? <X size={34} /> : <Menu size={34} />}
           </button>
         </div>
       </nav>
 
+      {/* MOBILE MENU OVERLAY */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-[#0c1e30] pt-24 px-8 space-y-6 lg:hidden">
+        <div className="fixed inset-0 z-[9998] bg-[#0c1e30] pt-24 px-8 space-y-6 lg:hidden overflow-y-auto">
           {navLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="block text-2xl capitalize"
+              className="block text-2xl capitalize py-2"
             >
               {link.name}
             </Link>
@@ -247,25 +235,17 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <div className="pt-8 border-t border-white/20 space-y-4">
               <button
                 onClick={() => { setModalType('login'); setMobileMenuOpen(false); }}
-                className="w-full py-4 border rounded-xl"
+                className="w-full py-4 border border-white/30 rounded-xl text-lg font-medium"
               >
                 Login
               </button>
             </div>
           ) : (
             <div className="pt-8 border-t border-white/20 space-y-4">
-              <Link 
-                href={getDashboardPath(authData.user)} 
-                onClick={() => setMobileMenuOpen(false)} 
-                className="block py-4 text-xl"
-              >
+              <Link href={getDashboardPath(authData.user)} onClick={() => setMobileMenuOpen(false)} className="block py-4 text-xl">
                 My Dashboard
               </Link>
-              <Link 
-                href="/profile" 
-                onClick={() => setMobileMenuOpen(false)} 
-                className="block py-4 text-xl"
-              >
+              <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="block py-4 text-xl">
                 My Profile
               </Link>
               <button onClick={handleLogout} className="w-full text-left py-4 text-xl text-red-400">

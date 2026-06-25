@@ -1,483 +1,231 @@
 'use client';
-
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useMemo, ReactNode } from 'react';
 import { getApiUrl } from '@/utils/api';
 
-// ──────────────────────────────────────────────────────
-// Types & Constants (unchanged)
-// ──────────────────────────────────────────────────────
+interface User {
+  username?: string;
+}
+
 interface Publication {
-  id: number;
-  title: string;
-  status: string;
-  authors: string;
-  description: string;
-  file_url: string;
-  supervisor_name?: string;
-  submission_type?: string;
-  degree_type?: 'thesis' | 'dissertation';
-  university?: string;
+  id: string;
+  title?: string;
+  authors?: string | string[];
+  journal_name?: string;
+  publisher?: string;
+  publication_type?: string;
+  doi?: string;
+  url?: string;
+  user?: User;
 }
 
-interface Counts {
-  thesis: number;
-  dissertation: number;
-  engineering: number;
-  medicine_health_sciences: number;
-  arts_humanities: number;
-  natural_sciences: number;
-  social_sciences: number;
-  business_economics: number;
-  computer_science_it: number;
-  education: number;
-}
+export default function PublicationsPage() {
+  const [publications, setPublications] = useState<Publication[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [query, setQuery] = useState<string>('');
 
-const CORE_FIELDS = [
-  'Engineering',
-  'Medicine/Health Sciences',
-  'Arts & Humanities',
-  'Natural Sciences',
-  'Social Sciences',
-  'Business & Economics',
-  'Computer Science/IT',
-  'Education',
-];
+  useEffect(() => {
+    const fetchPubs = async () => {
+      try {
+        const res = await fetch(getApiUrl('/api/publications/public'));
+        if (res.ok) setPublications(await res.json());
+      } catch (err) {
+        console.error('Fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPubs();
+  }, []);
 
-const FIELD_TO_KEY: Record<string, keyof Counts> = {
-  'Engineering': 'engineering',
-  'Medicine/Health Sciences': 'medicine_health_sciences',
-  'Arts & Humanities': 'arts_humanities',
-  'Natural Sciences': 'natural_sciences',
-  'Social Sciences': 'social_sciences',
-  'Business & Economics': 'business_economics',
-  'Computer Science/IT': 'computer_science_it',
-  'Education': 'education',
-};
+  const toggle = (id: string) => setOpenId(prev => (prev === id ? null : id));
 
-const FIELD_KEYWORDS: Record<string, string[]> = {
-  'Engineering': ['engineering', 'electrical', 'mechanical', 'civil', 'iot', 'robotics'],
-  'Medicine/Health Sciences': ['medicine', 'health', 'nursing', 'pharmacy', 'clinical', 'public health'],
-  'Arts & Humanities': ['law', 'literature', 'philosophy', 'history', 'arts', 'humanities', 'language'],
-  'Natural Sciences': ['biology', 'chemistry', 'physics', 'mathematics', 'geology', 'environment'],
-  'Social Sciences': ['sociology', 'psychology', 'anthropology', 'political', 'social', 'development'],
-  'Business & Economics': ['business', 'economics', 'finance', 'management', 'accounting', 'marketing'],
-  'Computer Science/IT': ['computer', 'it', 'informatics', 'ai', 'software', 'data', 'cyber'],
-  'Education': ['education', 'pedagogy', 'teaching', 'curriculum', 'learning'],
-};
+  const filtered = useMemo<Publication[]>(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return publications;
+    return publications.filter((pub) => {
+      const authors = Array.isArray(pub.authors) ? pub.authors.join(', ') : pub.authors || '';
+      return (
+        (pub.title || '').toLowerCase().includes(q) ||
+        authors.toLowerCase().includes(q) ||
+        (pub.journal_name || '').toLowerCase().includes(q) ||
+        (pub.publisher || '').toLowerCase().includes(q) ||
+        (pub.publication_type || '').toLowerCase().includes(q)
+      );
+    });
+  }, [query, publications]);
 
-const formatFieldName = (submissionType?: string): string => {
-  if (!submissionType) return 'Unknown Field';
-  return submissionType
-    .replace('thesis-', '')
-    .replace('dissertation-', '')
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
-
-// ──────────────────────────────────────────────────────
-// Mini Card for search dropdown (box style)
-// ──────────────────────────────────────────────────────
-const MiniPublicationCard: React.FC<Publication & { onClick: () => void }> = ({
-  id, title, authors, university, degree_type, onClick
-}) => {
-  return (
-    <div
-      onClick={onClick}
-      className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden border border-gray-200 cursor-pointer flex flex-col h-full min-h-[120px] sm:min-h-[140px]"
-    >
-      {/* Small colored header bar */}
-      <div className={`h-2 ${degree_type === 'thesis' ? 'bg-blue-500' : 'bg-purple-500'}`} />
-
-      <div className="p-3 flex flex-col flex-1">
-        {/* Title */}
-        <h4 className="font-semibold text-gray-900 text-sm sm:text-base leading-tight line-clamp-2 group-hover:text-blue-700 mb-2">
-          {title}
-        </h4>
-
-        {/* Meta */}
-        <div className="mt-auto space-y-1 text-xs">
-          <p className="text-gray-700 line-clamp-1">
-            <span className="text-gray-500">By:</span> {authors}
-          </p>
-          {university && (
-            <p className="text-gray-600 line-clamp-1">
-              {university}
-            </p>
-          )}
-        </div>
-
-        {/* Degree badge at bottom */}
-        {degree_type && (
-          <div className="mt-2">
-            <span
-              className={`inline-block px-2.5 py-1 rounded text-[10px] font-medium text-white uppercase tracking-wide ${
-                degree_type === 'thesis' ? 'bg-blue-600' : 'bg-purple-600'
-              }`}
-            >
-              {degree_type === 'thesis' ? 'Thesis' : 'Dissertation'}
-            </span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// ──────────────────────────────────────────────────────
-// Full Publication Card (unchanged)
-// ──────────────────────────────────────────────────────
-const PublicationCard: React.FC<Publication> = ({
-  id, title, authors, description,
-  supervisor_name, university, degree_type, submission_type
-}) => {
-  const router = useRouter();
-  const fieldName = formatFieldName(submission_type);
-
-  const handleUniversityClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (university) {
-      router.push(`/university/${encodeURIComponent(university)}`);
-    }
+  const highlight = (text: string, q: string): ReactNode => {
+    if (!q.trim() || !text) return text;
+    const parts = text.split(new RegExp(`(${q.trim()})`, 'gi'));
+    return parts.map((part, i) =>
+      part.toLowerCase() === q.trim().toLowerCase()
+        ? <mark key={i} className="bg-yellow-200 text-yellow-900 rounded px-0.5">{part}</mark>
+        : part
+    );
   };
 
   return (
-    <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 cursor-pointer flex flex-col h-full">
-      <div className="h-10 bg-gradient-to-br from-blue-50 to-indigo-50 relative overflow-hidden">
-        {degree_type && (
-          <div className="absolute top-3 right-3">
-            <span
-              className={`px-5 py-2 rounded-full text-xs font-bold text-white shadow-lg uppercase tracking-wider ${
-                degree_type === 'thesis' ? 'bg-blue-600' : 'bg-purple-600'
-              }`}
-            >
-              {degree_type === 'thesis' ? 'Thesis' : 'Dissertation'}
-            </span>
-          </div>
-        )}
-      </div>
+    <div className="min-h-screen bg-[#E0F2FE] text-gray-900">
+      <div className="h-28 bg-[#050A14]" />
 
-      <div className="p-6 flex flex-col flex-1">
-        <h3 className="text-2xl font-bold text-gray-900 mb-4 line-clamp-2 group-hover:text-blue-700 transition">
-          {title}
-        </h3>
-
-        <div className="space-y-4 text-base flex-1">
-          {university && (
-            <button
-              onClick={handleUniversityClick}
-              className="font-semibold text-green-700 hover:underline text-left p-0 bg-transparent border-none cursor-pointer"
-            >
-              <span className="text-gray-500 font-medium">University: </span>{university}
-            </button>
-          )}
-          <p className="text-gray-700">
-            <span className="text-gray-500 font-medium">Author:</span> {authors}
-          </p>
-          {supervisor_name && (
-            <p className="text-gray-700">
-              <span className="text-gray-500 font-medium">Supervisor:</span> {supervisor_name}
-            </p>
-          )}
-          {submission_type && (
-            <p className="text-indigo-700 font-semibold">
-              <span className="text-gray-500 font-medium">Field:</span> {fieldName}
-            </p>
-          )}
-
-          <p className="text-gray-600 line-clamp-3 text-base mt-6 leading-relaxed">
-            {description || 'No description available.'}
-          </p>
-        </div>
-
-        <div className="mt-8">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              router.push(`/books/${id}`);
-            }}
-            className="inline-flex items-center px-6 py-3 bg-gradient-to-br from-blue-50 to-indigo-70 text-black font-bold rounded-full hover:bg-yellow-400 transition-all shadow-md hover:shadow-lg transform hover:scale-105"
-          >
-            Abstract
-            <svg className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ──────────────────────────────────────────────────────
-// Main Component
-// ──────────────────────────────────────────────────────
-export default function PublicationsPage() {
-  const [publications, setPublications] = useState<Publication[]>([]);
-  const [counts, setCounts] = useState<Counts>({
-    thesis: 0, dissertation: 0,
-    engineering: 0, medicine_health_sciences: 0, arts_humanities: 0,
-    natural_sciences: 0, social_sciences: 0, business_economics: 0,
-    computer_science_it: 0, education: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [degreeFilter, setDegreeFilter] = useState<'all' | 'thesis' | 'dissertation'>('all');
-  const [selectedField, setSelectedField] = useState<string | null>(null);
-  const [showSearchResults, setShowSearchResults] = useState(false);
-
-  const router = useRouter();
-  const MAX_QUICK_RESULTS = 6;
-
-  // Debounced search
-  const debouncedSearchTerm = useMemo(() => {
-    let timeout: NodeJS.Timeout;
-    return (term: string) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => setSearchTerm(term), 400);
-    };
-  }, []);
-
-  const buildApiUrl = useCallback(() => {
-    const params = new URLSearchParams();
-    if (searchTerm.trim()) params.append('search', searchTerm.trim());
-    if (degreeFilter !== 'all') params.append('degree_type', degreeFilter);
-    if (selectedField && FIELD_KEYWORDS[selectedField]) {
-      params.append('field_keywords', FIELD_KEYWORDS[selectedField].join(','));
-    }
-    const base = getApiUrl('/api/innovations/public-list/');
-    return params.toString() ? `${base}?${params.toString()}` : base;
-  }, [searchTerm, degreeFilter, selectedField]);
-
-  const fetchPublications = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const url = buildApiUrl();
-      const res = await fetch(url, { cache: 'no-store' });
-      if (res.ok) {
-        const data: Publication[] = await res.json();
-        setPublications(data.filter(p => p.status === 'approved'));
-      }
-    } catch (err) {
-      console.error('Fetch error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [buildApiUrl]);
-
-  const fetchCounts = useCallback(async () => {
-    let url = getApiUrl('/api/innovations/public-counts/');
-    if (degreeFilter !== 'all') url += `?degree_type=${degreeFilter}`;
-    try {
-      const res = await fetch(url);
-      if (res.ok) {
-        const data: Partial<Counts> = await res.json();
-        setCounts(prev => ({ ...prev, ...data }));
-      }
-    } catch (err) {
-      console.error('Counts error:', err);
-    }
-  }, [degreeFilter]);
-
-  useEffect(() => {
-    fetchPublications();
-  }, [fetchPublications]);
-
-  useEffect(() => {
-    fetchCounts();
-  }, [degreeFilter]);
-
-  const isSearching = searchTerm.trim().length > 1;
-
-  return (
-    <div className="min-h-screen bg-[#E0F2FE] text-gray-900 relative overflow-x-hidden">
-      <div className="h-28 bg-[#050A14]" aria-hidden="true" />
-
+      {/* HERO */}
       <section className="relative -mt-28 pt-36 pb-20 text-center">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-[#050A14] mb-6">
-            Browse Research <span className="text-[#FFD700]">Publications</span>
+        <div className="max-w-4xl mx-auto px-6">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-[#050A14] mb-6">
+            Explore Research <span className="text-[#FFD700]">Library</span>
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-gray-700 max-w-2xl mx-auto">
-            Explore peer-reviewed theses and dissertations from Rwanda academic community.
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto mb-10">
+            Explore the latest journals, books, and innovations from Rwanda&apos;s leading researchers.
           </p>
-        </div>
-      </section>
 
-      <section className="py-10 sm:py-12 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Search + Dropdown with mini cards grid */}
-          <div className="relative flex justify-center mb-12 z-30">
-            <div className="w-full max-w-2xl relative">
+          {/* SEARCH BAR */}
+          <div className="max-w-xl mx-auto">
+            <div className="flex items-center bg-white rounded-2xl shadow-lg border border-gray-200 px-4 py-3 gap-3">
+              <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+              </svg>
               <input
                 type="text"
-                placeholder="Search by title, author, supervisor, university, field..."
-                value={searchTerm}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  debouncedSearchTerm(val);
-                  setShowSearchResults(val.trim().length > 1);
-                }}
-                onFocus={() => {
-                  if (searchTerm.trim().length > 1) setShowSearchResults(true);
-                }}
-                onBlur={() => setTimeout(() => setShowSearchResults(false), 180)}
-                className="w-full pl-14 pr-12 py-5 rounded-full bg-white border-2 border-gray-200 text-gray-800 placeholder-gray-500 focus:outline-none focus:border-[#FFD700] focus:shadow-xl transition-all text-lg shadow-lg"
+                value={query}
+                onChange={e => { setQuery(e.target.value); setOpenId(null); }}
+                placeholder="Search by title, author, journal, type…"
+                className="flex-1 text-base text-gray-800 placeholder-gray-400 outline-none bg-transparent"
               />
-              <svg className="absolute left-5 top-3 sm:top-5 w-5 h-5 sm:w-7 sm:h-7 text-[#050A14]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              {searchTerm && (
+              {query && (
                 <button
-                  onClick={() => {
-                    setSearchTerm('');
-                    setShowSearchResults(false);
-                  }}
-                  className="absolute right-5 top-6 text-[#050A14] hover:text-red-600"
+                  onClick={() => { setQuery(''); setOpenId(null); }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+                  aria-label="Clear search"
                 >
-                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               )}
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Floating Results Panel – now with grid of mini cards */}
-            {showSearchResults && isSearching && (
-              <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-2xl border border-gray-200 max-h-[70vh] overflow-y-auto z-40">
-                {isLoading ? (
-                  <div className="p-8 text-center text-gray-500">Loading...</div>
-                ) : publications.length === 0 ? (
-                  <div className="p-10 text-center text-gray-600">
-                    No matches found for <strong>{searchTerm}</strong>
-                  </div>
-                ) : (
-                  <>
-                    <div className="p-3 sm:p-4 border-b border-gray-100 bg-gray-50 sticky top-0 z-10 flex justify-between items-center">
-                      <p className="text-sm font-medium text-gray-600">
-                        {publications.length} result{publications.length !== 1 ? 's' : ''} found
-                        {publications.length > MAX_QUICK_RESULTS && ` – showing first ${MAX_QUICK_RESULTS}`}
-                      </p>
-                    </div>
+      {/* LIST */}
+      <section className="py-16 px-6 -mt-10">
+        <div className="max-w-4xl mx-auto">
 
-                    <div className="p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {publications.slice(0, MAX_QUICK_RESULTS).map((pub) => (
-                        <MiniPublicationCard
-                          key={pub.id}
-                          {...pub}
-                          onClick={() => router.push(`/books/${pub.id}`)}
-                        />
-                      ))}
-                    </div>
-
-                    {publications.length > MAX_QUICK_RESULTS && (
-                      <div className="p-5 text-center border-t border-gray-100">
-                        <button
-                          onClick={() => setShowSearchResults(false)}
-                          className="text-blue-600 hover:underline font-medium"
-                        >
-                          See all {publications.length} results ↓
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-[#050A14]">
+              {query.trim() ? `Results for "${query.trim()}"` : 'Research Library'}
+            </h2>
+            {!loading && (
+              <span className="text-sm text-gray-500 bg-white border border-gray-200 rounded-full px-3 py-1">
+                {filtered.length} {query.trim() ? 'found' : 'items'}
+              </span>
             )}
           </div>
 
-          {/* Filters + Full Grid – hidden during active search */}
-          {!showSearchResults && (
-            <>
-              <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 mb-12">
-                <button
-                  onClick={() => setDegreeFilter(degreeFilter === 'thesis' ? 'all' : 'thesis')}
-                  className={`px-6 sm:px-10 py-3 sm:py-4 text-base sm:text-lg md:text-xl rounded-full text-2xl font-bold transition-all shadow-2xl flex items-center gap-4 ${
-                    degreeFilter === 'thesis'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-800 text-white scale-105'
-                      : 'bg-white text-blue-700 border-4 border-blue-400 hover:border-blue-700'
-                  }`}
-                >
-                  Theses <span className="text-lg font-normal opacity-90">({counts.thesis})</span>
-                </button>
-
-                <button
-                  onClick={() => setDegreeFilter(degreeFilter === 'dissertation' ? 'all' : 'dissertation')}
-                  className={`px-16 py-4 sm:py-6 rounded-full text-2xl font-bold transition-all shadow-2xl flex items-center gap-4 ${
-                    degreeFilter === 'dissertation'
-                      ? 'bg-gradient-to-r from-purple-600 to-purple-800 text-white scale-105'
-                      : 'bg-white text-purple-700 border-4 border-purple-400 hover:border-purple-700'
-                  }`}
-                >
-                  Dissertations <span className="text-lg font-normal opacity-90">({counts.dissertation})</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 gap-6 mb-16">
-                {CORE_FIELDS.map((field) => {
-                  const key = FIELD_TO_KEY[field];
-                  const count = counts[key] || 0;
-                  return (
-                    <button
-                      key={field}
-                      onClick={() => setSelectedField(prev => prev === field ? null : field)}
-                      disabled={count === 0}
-                      className={`py-4 sm:py-6 rounded-2xl font-bold text-sm uppercase tracking-wide transition-all shadow-xl flex flex-col items-center ${
-                        selectedField === field
-                          ? 'bg-[#050A14] text-[#FFD700] scale-105 shadow-2xl'
-                          : count === 0
-                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed opacity-60'
-                          : 'bg-white text-[#050A14] border-4 border-gray-300 hover:border-[#FFD700] hover:scale-105'
-                      }`}
-                    >
-                      <span>{field}</span>
-                      <span className="text-xs mt-2 opacity-80">{count} items</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {isLoading ? (
-                <div className="text-center py-32">
-                  <div className="inline-block animate-spin rounded-full h-16 w-16 border-8 border-[#FFD700] border-t-transparent"></div>
-                  <p className="mt-6 text-xl text-[#050A14] font-medium">Loading publications...</p>
+          {loading ? (
+            <div className="flex flex-col gap-2">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="bg-white rounded-xl border border-gray-100 shadow-sm flex items-center justify-between px-6 py-4 gap-4">
+                  <div className="h-4 bg-gray-100 rounded animate-pulse w-2/3" />
+                  <div className="h-3 bg-gray-100 rounded animate-pulse w-1/4" />
                 </div>
-              ) : publications.length === 0 ? (
-                <div className="text-center py-32 bg-white/90 rounded-3xl shadow-2xl">
-                  <p className="text-3xl font-bold text-gray-600">No publications found</p>
-                  <p className="text-gray-500 mt-4">Try adjusting your search or filters.</p>
-                </div>
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-24 bg-white rounded-2xl border border-gray-100 shadow-sm">
+              {query.trim() ? (
+                <>
+                  <svg className="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                  </svg>
+                  <p className="text-gray-400 italic text-base">No results for &ldquo;{query}&rdquo;</p>
+                  <button onClick={() => setQuery('')} className="mt-3 text-sm text-blue-600 hover:underline">
+                    Clear search
+                  </button>
+                </>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 gap-8">
-                  {publications.map((pub) => (
-                    <PublicationCard key={pub.id} {...pub} />
-                  ))}
-                </div>
+                <p className="text-gray-400 italic text-base">No approved publications found.</p>
               )}
-            </>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {filtered.map((pub) => {
+                const isOpen = openId === pub.id;
+                const authors = Array.isArray(pub.authors) ? pub.authors.join(', ') : pub.authors || 'Unknown';
+                const shortAuthors = authors.length > 40 ? authors.slice(0, 40) + '…' : authors;
+                const q = query.trim().toLowerCase();
+
+                return (
+                  <div
+                    key={pub.id}
+                    className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden transition-shadow hover:shadow-md"
+                  >
+                    {/* ROW */}
+                    <button
+                      onClick={() => toggle(pub.id)}
+                      className="w-full flex items-center justify-between px-6 py-5 gap-4 text-left hover:bg-gray-50 transition-colors"
+                    >
+                      <span className="font-medium text-[#050A14] text-base sm:text-lg flex-1">
+                        {highlight(pub.title || 'Untitled', q)}
+                      </span>
+                      <span className="text-gray-500 text-sm italic flex-shrink-0 hidden sm:block">
+                        {highlight(shortAuthors, q)}
+                      </span>
+                      <svg
+                        className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {/* EXPANDED DETAIL */}
+                    {isOpen && (
+                      <div className="px-6 pb-6 pt-3 bg-gray-50 border-t border-gray-100 text-base text-gray-600 space-y-3">
+                        {pub.publication_type && (
+                          <span className="inline-block text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-3 py-1 rounded">
+                            {pub.publication_type}
+                          </span>
+                        )}
+                        <p><span className="text-gray-400">Authors:</span> {highlight(authors, q)}</p>
+                        {(pub.journal_name || pub.publisher) && (
+                          <p>
+                            <span className="text-gray-400">Journal / Publisher:</span>{' '}
+                            {highlight(pub.journal_name || pub.publisher || '', q)}
+                          </p>
+                        )}
+                        {pub.doi && (
+                          <p><span className="text-gray-400">DOI:</span> <span className="font-mono text-blue-600">{pub.doi}</span></p>
+                        )}
+                        <p><span className="text-gray-400">Uploaded by:</span> {pub.user?.username || 'Researcher'}</p>
+                        {pub.url && (
+                          <a
+                            href={pub.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[#050A14] font-semibold hover:underline mt-2 text-base"
+                          >
+                            Read full work
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       </section>
 
-      <Link
-        href="/login"
-        className="fixed right-4 sm:right-6 bottom-4 sm:bottom-6 z-50 flex items-center gap-2 sm:gap-3 bg-[#FFD700] text-[#050A14] px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-2xl hover:scale-110 transition-all font-bold text-xs sm:text-sm uppercase"
-      >
-        Upload Book
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-        </svg>
-      </Link>
-
-      <footer className="bg-[#050A14] text-white py-16 mt-32">
-        <div className="max-w-7xl mx-auto text-6xl text-center">
-          <div className="text-6xl font-bold uppercase italic tracking-wider mb-4">RIRI</div>
-          <p className="text-gray-300 text-lg">Rwanda Innovation & Research Institute</p>
-          <p className="text-sm text-gray-500 mt-8">© 2026 RIRI • All rights reserved</p>
-        </div>
+      {/* FOOTER */}
+      <footer className="bg-[#050A14] text-white py-12 mt-20 text-center">
+        <p className="text-[#FFD700] font-bold text-5xl italic mb-2">RIRI</p>
+        <p className="text-gray-400 text-base">Rwanda Innovation & Research Institute</p>
       </footer>
     </div>
   );

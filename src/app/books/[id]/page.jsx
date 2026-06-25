@@ -205,9 +205,7 @@ export default function BookDetailPage() {
     }
   };
 
-  const goBack = () => {
-    router.back();
-  };
+
 
   if (loading) return (
     <div className="min-h-screen bg-[#E0F2FE] flex items-center justify-center">
@@ -222,13 +220,7 @@ export default function BookDetailPage() {
     <div className="min-h-screen bg-[#E0F2FE] flex items-center justify-center p-4">
       <div className="text-center">
         <p className="text-red-600 text-xl mb-4">{error}</p>
-        <button 
-          onClick={goBack}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2 mx-auto"
-        >
-          <ChevronLeft size={20} />
-          Go Back
-        </button>
+        
       </div>
     </div>
   );
@@ -244,15 +236,9 @@ export default function BookDetailPage() {
       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
         {/* Header with Back Button */}
         <header className="p-8 bg-gradient-to-b from-gray-50 to-white text-center border-b-4 border-double border-gray-400 relative">
-          <button
-            onClick={goBack}
-            className="absolute left-8 top-8 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition"
-          >
-            <ChevronLeft size={24} />
-            <span className="hidden sm:inline">Back</span>
-          </button>
           
-          <p className="text-sm uppercase tracking-widest text-gray-500 font-bold">Research Publication</p>
+          
+          <p className="text-sm uppercase tracking-widest text-gray-500 font-bold"></p>
           <h1 className="mt-2 text-4xl md:text-5xl font-bold text-gray-900">{book.title}</h1>
           <p className="mt-3 text-lg text-gray-600 italic">
             By <span className="font-semibold text-gray-800">{book.authors || 'Unknown'}</span>
@@ -328,7 +314,7 @@ export default function BookDetailPage() {
               {book.views_count && (
                 <span>{book.views_count.toLocaleString()} views • </span>
               )}
-              <span>Shared via URL</span>
+             
             </div>
           </div>
         </section>

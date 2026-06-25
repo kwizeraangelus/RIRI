@@ -1,7 +1,8 @@
 {
+  "/books/[id]/page": "app/books/[id]/page.js",
   "/[id]/page": "app/[id]/page.js",
-  "/(main)/page": "app/(main)/page.js",
-  "/(main)/events/page": "app/(main)/events/page.js",
-  "/(main)/about/page": "app/(main)/about/page.js",
-  "/(main)/contact/page": "app/(main)/contact/page.js"
+  "/(main)/publications/page": "app/(main)/publications/page.js",
+  "/(main)/experts/page": "app/(main)/experts/page.js",
+  "/(main)/researchers/page": "app/(main)/researchers/page.js",
+  "/(main)/about/page": "app/(main)/about/page.js"
 }
