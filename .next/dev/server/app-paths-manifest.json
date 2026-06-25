@@ -1,7 +1,7 @@
 {
-  "/(main)/researchers/page": "app/(main)/researchers/page.js",
-  "/(main)/about/page": "app/(main)/about/page.js",
+  "/login/page": "app/login/page.js",
   "/(main)/researchers/[id]/page": "app/(main)/researchers/[id]/page.js",
   "/(main)/page": "app/(main)/page.js",
-  "/(main)/researcher/page": "app/(main)/researcher/page.js"
+  "/(main)/researcher/page": "app/(main)/researcher/page.js",
+  "/(main)/researchers/page": "app/(main)/researchers/page.js"
 }

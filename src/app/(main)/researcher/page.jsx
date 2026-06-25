@@ -539,10 +539,10 @@ export default function ResearcherDashboard() {
                   <div className="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-100">
                     {user?.profile_image ? (
                       <img 
-                        src={getApiUrl(user.profile_image)} 
-                        alt="Profile" 
-                        className="w-full h-full object-cover"
-                      />
+  src={user.profile_image || '/default-avatar.png'}
+  alt="Profile" 
+  className="w-full h-full object-cover"
+/>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-4xl text-slate-400">
                         👤

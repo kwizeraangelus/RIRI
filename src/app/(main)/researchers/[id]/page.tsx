@@ -183,7 +183,7 @@ export default function PublicResearcherProfile() {
             <div className="flex justify-center">
               <div className="w-48 h-48 border-4 border-white shadow-lg overflow-hidden bg-gray-100 rounded-xl">
                 <img
-                  src={getApiUrl(researcher.image)}
+                  src={researcher.image}
                   alt={researcher.name}
                   className="w-full h-full object-cover"
                 />
