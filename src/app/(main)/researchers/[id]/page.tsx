@@ -11,7 +11,8 @@ type ResearcherDetail = {
   email: string;
   contact: string;
   Position: string;
-  Field:string;
+  ResearchArea: string;
+  Field: string;
   bio: string;
   image: string;
   orcid?: string;
@@ -196,6 +197,10 @@ export default function PublicResearcherProfile() {
   Position <span className="text-gray-400 text-sm">(current Occupation)</span>
 </p>
                 <p className="text-gray-600 mt-1">{researcher.Position}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-700">Research Area</p>
+                <p className="text-gray-600 mt-1">{researcher.ResearchArea}</p>
               </div>
               <div>
                 <p className="font-semibold text-gray-700">Field</p>

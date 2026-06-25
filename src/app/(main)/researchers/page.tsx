@@ -12,6 +12,8 @@ type Researcher = {
   email: string;
   contact: string;
   Position: string;
+  Field: string;
+  ResearchArea: string;
   image: string;
 };
 
@@ -125,11 +127,15 @@ export default function ResearchersPage() {
                       <span className="font-medium text-gray-700">E-Mail ID:</span>{' '}
                       <a href={`mailto:${person.email}`} className="text-blue-600 hover:underline">{person.email}</a>
                     </div>
-                    <div className="text-gray-500">
-                      <span className="font-medium text-gray-700">Contact Number:</span> {person.contact}
-                    </div>
+                    
                     <div className="text-gray-500">
                       <span className="font-medium text-gray-700">Position:</span> {person.Position}
+                    </div>
+                    <div className="text-gray-500">
+                      <span className="font-medium text-gray-700">Research Area:</span> {person.ResearchArea}
+                    </div>
+                    <div className="text-gray-500">
+                      <span className="font-medium text-gray-700">Field:</span> {person.Field}
                     </div>
                   </div>
                 </div>

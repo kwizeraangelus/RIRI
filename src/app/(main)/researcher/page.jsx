@@ -25,6 +25,7 @@ export default function ResearcherDashboard() {
   const [Field, setField] = useState('');
   
   const [Position, setPosition] = useState('');
+  const [ResearchArea, setResearchArea]= useState('');
 
   // Profile edit
   const [showEditProfile, setShowEditProfile] = useState(false);
@@ -186,6 +187,7 @@ export default function ResearcherDashboard() {
   formData.append('qualification', qualification || '');
   formData.append('Field', Field || '');
   formData.append('Position', Position || '');
+  formData.append('ResearchArea', ResearchArea || '');
 
   if (profileImage) {
     formData.append('profile_image', profileImage);   // ← No [0], it's already a File
@@ -611,13 +613,13 @@ export default function ResearcherDashboard() {
                     placeholder="Ph.D. in Computer Science"
                   />
                 </div>
-                 {/* Field - NEW */}
+                 {/* Research Area - NEW */}
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Field </label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Research Area</label>
                   <input
                     type="text"
-                    value={Field}
-                    onChange={(e) => setField(e.target.value)}
+                    value={ResearchArea}
+                    onChange={(e) => setResearchArea(e.target.value)}
                     className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none"
                     placeholder="teaching AI intergation"
                   />
@@ -633,6 +635,18 @@ export default function ResearcherDashboard() {
                     className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none"
                     placeholder="UNILAK"
                   />
+
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Field</label>
+                  <input
+                    type="text"
+                    value={Field}
+                    onChange={(e) => setField(e.target.value)}
+                    className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none"
+                    placeholder="science and technology"
+                  />
+
                 </div>
 
                 {/* Picture Upload */}
