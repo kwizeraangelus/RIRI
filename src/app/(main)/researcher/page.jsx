@@ -578,11 +578,19 @@ export default function ResearcherDashboard() {
               </div>
 
               <button
-                onClick={() => setIsEditing(true)}
-                className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition shadow-md"
-              >
-                Edit Profile
-              </button>
+  onClick={() => {
+    setBio(user?.bio || '');
+    setPlatformId(user?.orcid || '');
+    setQualification(user?.qualification || '');
+    setField(user?.Field || '');
+    setPosition(user?.Position || '');
+    setResearchArea(user?.ResearchArea || '');
+    setIsEditing(true);
+  }}
+  className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition shadow-md"
+>
+  Edit Profile
+</button>
             </div>
           ) : (
             /* Edit Mode */

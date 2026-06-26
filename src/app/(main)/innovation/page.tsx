@@ -32,8 +32,8 @@ const InnovationCard: React.FC<Innovation> = ({
   id, name, description, photo, sponsorship_needed
 }) => {
  const imageSrc = photo 
-    ? `http://localhost:8000${photo}` 
-    : 'https://placehold.co/600x400/E0E7FF/1E40AF?text=No+Photo';
+    ? getApiUrl(photo) 
+    : `http://localhost:8000${photo}`;
 
   const sponsorshipInfo = SPONSORSHIP_OPTIONS.find(opt => opt.value === sponsorship_needed);
 
@@ -97,7 +97,7 @@ export default function InnovationsPage() {
       params.append('sponsorship_needed', selectedSponsorship);
     }
 
-    const base = 'http://localhost:8000/api/innovations/public-lists';
+    const base = getApiUrl('/api/innovations/public-lists');
     return params.toString() ? `${base}?${params.toString()}` : base;
   }, [searchTerm, selectedSponsorship]);
 
@@ -142,7 +142,7 @@ export default function InnovationsPage() {
   }
 }, [buildApiUrl]);
   const fetchCounts = useCallback(async () => {
-    const url = 'http://localhost:8000/api/innovations/public-countss';
+    const url = getApiUrl('/api/innovations/public-countss');
     try {
       const res = await fetch(url);
       if (res.ok) {
