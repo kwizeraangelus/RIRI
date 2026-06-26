@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { format } from 'date-fns';
 import { getApiUrl } from '@/utils/api';
 
 const ACADEMIC_FIELDS = [
@@ -10,32 +11,34 @@ const ACADEMIC_FIELDS = [
   'Business & Economics', 'Computer Science/IT', 'Medicine', 'Agriculture', 'Education', 'IOT'
 ];
 
-export default function ResearcherDashboard() {
+export default function UniversityDashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [uploads, setUploads] = useState([]);
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [showUploadForm, setShowUploadForm] = useState(false);
+  const [activeTab, setActiveTab] = useState('research'); // 'research' or 'events'
 
-  // Step-by-step upload states
-  const [degreeType, setDegreeType] = useState(''); // 'thesis' or 'dissertation'
+  // Research Upload States
+  const [showUploadForm, setShowUploadForm] = useState(false);
+  const [degreeType, setDegreeType] = useState('');
   const [selectedField, setSelectedField] = useState('');
   const [showOtherField, setShowOtherField] = useState(false);
 
-  // Profile edit
-  const [showEditProfile, setShowEditProfile] = useState(false);
-  const [profileForm, setProfileForm] = useState({
-    profile_image: null,
-    age: '',
-    phone_number: '',
-    location: '',
-    university: '',
-    details: ''
+  // Edit Upload States
+  const [showEditUpload, setShowEditUpload] = useState(false);
+  const [editingUpload, setEditingUpload] = useState(null);
+  const [editForm, setEditForm] = useState({
+    title: '',
+    authors: '',
+    description: '',
+    supervisor_name: '',
+    year: '',
+    file: null
   });
-  const [imagePreview, setImagePreview] = useState(null);
 
-  // Form data for submission
+  // Research Form Data
   const [formData, setFormData] = useState({
     submission_type: '',
     university_name: '',
@@ -48,42 +51,74 @@ export default function ResearcherDashboard() {
     other_field: ''
   });
 
+  // Event States
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [eventFormData, setEventFormData] = useState({
+    title: '',
+    description: '',
+    date: '',
+    location: '',
+    link: '',
+    photo: null,
+    icon: 'Calendar'
+  });
+  const [eventPhotoPreview, setEventPhotoPreview] = useState(null);
+
+  // Profile Edit
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    profile_image: null,
+    age: '',
+    phone_number: '',
+    location: '',
+    university: '',
+    details: ''
+  });
+  const [imagePreview, setImagePreview] = useState(null);
+
   useEffect(() => {
-    fetchUserAndUploads();
+    fetchUserAndData();
   }, []);
 
-  const fetchUserAndUploads = async () => {
-     const token = localStorage.getItem('token');
+  const fetchUserAndData = async () => {
+    const token = localStorage.getItem('token');
 
-  // 2. If no token exists, don't even try to fetch
-  if (!token) {
-    router.push('/login');
-    return;
-  }
-     
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
     try {
-      const [userRes, uploadsRes] = await Promise.all([
-        fetch(getApiUrl('/api/me/'), { //credentials: 'include',
-          headers: { 'Authorization': `Bearer ${token}`}
-
-         }),
-        fetch(getApiUrl('/api/my-uploads/'), {// credentials: 'include',   
-        headers: { 'Authorization': `Bearer ${token}`} })
+      const [userRes, uploadsRes, eventsRes] = await Promise.all([
+        fetch(getApiUrl('/api/me/'), {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(getApiUrl('/api/my-uploads/'), {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(getApiUrl('/api/my-events/'), {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
       ]);
+
       if (!userRes.ok) throw new Error('Unauthorized');
       const userData = await userRes.json();
       const uploadsData = await uploadsRes.json();
+      const eventsData = eventsRes.ok ? await eventsRes.json() : [];
+
       setUser(userData);
       setUploads(uploadsData);
+      setEvents(eventsData);
     } catch (err) {
       console.error("Auth failed, redirecting...", err);
-        localStorage.removeItem('token'); 
+      localStorage.removeItem('token');
       router.push('/login');
     } finally {
       setLoading(false);
     }
   };
 
+  // ============= RESEARCH HANDLERS =============
   const handleFieldChange = (value) => {
     setSelectedField(value);
     setShowOtherField(value === 'other');
@@ -97,7 +132,14 @@ export default function ResearcherDashboard() {
     }));
   };
 
-  // Auto-generate submission_type
+  const handleEditInputChange = (e) => {
+    const { name, value, files } = e.target;
+    setEditForm(prev => ({
+      ...prev,
+      [name]: files ? files[0] : value
+    }));
+  };
+
   useEffect(() => {
     if (degreeType && selectedField && selectedField !== 'other') {
       const cleanField = selectedField.toLowerCase().replace(/\s+/g, '_');
@@ -131,15 +173,13 @@ export default function ResearcherDashboard() {
     data.append('description', formData.description);
     data.append('supervisor_name', formData.supervisor_name);
     if (formData.file) data.append('file', formData.file);
-    const token = localStorage.getItem('token')
+
+    const token = localStorage.getItem('token');
 
     try {
       const res = await fetch(getApiUrl('/api/upload/'), {
         method: 'POST',
-        //credentials: 'include',
-        headers: { 
-          'Authorization': `Bearer ${token}` // <--- MUST be inside 'headers'
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: data,
       });
 
@@ -149,6 +189,58 @@ export default function ResearcherDashboard() {
         setShowUploadForm(false);
         resetForm();
         alert('Research submitted successfully!');
+      } else {
+        const err = await res.json();
+        alert('Error: ' + JSON.stringify(err));
+      }
+    } catch {
+      alert('Network error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const openEditUpload = (upload) => {
+    setEditingUpload(upload);
+    setEditForm({
+      title: upload.title,
+      authors: upload.authors,
+      description: upload.description,
+      supervisor_name: upload.supervisor_name,
+      year: upload.year.toString(),
+      file: null
+    });
+    setShowEditUpload(true);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingUpload) return;
+
+    setUploading(true);
+    const data = new FormData();
+    data.append('title', editForm.title);
+    data.append('authors', editForm.authors);
+    data.append('description', editForm.description);
+    data.append('supervisor_name', editForm.supervisor_name);
+    data.append('year', editForm.year);
+    if (editForm.file) data.append('file', editForm.file);
+
+    const token = localStorage.getItem('token');
+
+    try {
+      const res = await fetch(getApiUrl(`/api/upload/${editingUpload.id}`), {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: data,
+      });
+
+      if (res.ok) {
+        const updatedUpload = await res.json();
+        setUploads(prev => prev.map(u => u.id === updatedUpload.id ? updatedUpload : u));
+        setShowEditUpload(false);
+        setEditingUpload(null);
+        alert('Research updated successfully!');
       } else {
         const err = await res.json();
         alert('Error: ' + JSON.stringify(err));
@@ -170,6 +262,61 @@ export default function ResearcherDashboard() {
     });
   };
 
+  // ============= EVENT HANDLERS =============
+  const handleEventInputChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === 'photo') {
+      const file = files[0];
+      setEventFormData(prev => ({ ...prev, photo: file }));
+      setEventPhotoPreview(file ? URL.createObjectURL(file) : null);
+    } else {
+      setEventFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleEventSubmit = async (e) => {
+    e.preventDefault();
+    setUploading(true);
+
+    const data = new FormData();
+    data.append('title', eventFormData.title);
+    data.append('description', eventFormData.description);
+    data.append('date', eventFormData.date);
+    data.append('location', eventFormData.location);
+    data.append('link', eventFormData.link);
+    data.append('icon', eventFormData.icon);
+
+    if (eventFormData.photo) {
+      data.append('photo', eventFormData.photo);
+    }
+
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(getApiUrl('/api/events/create/'), {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: data,
+      });
+
+      if (res.ok) {
+        const newEvent = await res.json();
+        setEvents(prev => [newEvent, ...prev]);
+        setShowEventForm(false);
+        setEventFormData({ title: '', description: '', date: '', location: '', link: '', photo: null, icon: 'Calendar' });
+        setEventPhotoPreview(null);
+        alert('Event created successfully!');
+      } else {
+        const err = await res.json();
+        alert('Error: ' + JSON.stringify(err));
+      }
+    } catch (err) {
+      alert('Network error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // ============= PROFILE HANDLERS =============
   const openEditProfile = () => {
     setProfileForm({
       profile_image: null,
@@ -193,10 +340,7 @@ export default function ResearcherDashboard() {
 
     const res = await fetch(getApiUrl('/api/update/'), {
       method: 'PATCH',
-      //credentials: 'include',
-      headers: { 
-      'Authorization': `Bearer ${token}` // ADD THIS HEADER
-    },
+      headers: { 'Authorization': `Bearer ${token}` },
       body: data,
     });
 
@@ -233,7 +377,7 @@ export default function ResearcherDashboard() {
         <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full shadow-lg"></div>
-            <h1 className="text-2xl font-bold text-gray-800">Research Portal</h1>
+            <h1 className="text-2xl font-bold text-gray-800">University Portal</h1>
           </div>
           <div className="bg-blue-50 text-blue-700 px-5 py-2 rounded-full font-medium">
             {user?.user?.username}
@@ -243,162 +387,294 @@ export default function ResearcherDashboard() {
 
       {/* Main Layout */}
       <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Main Content - Scrollable */}
+        {/* Main Content with Tabs */}
         <div className="lg:col-span-2 space-y-10">
-          {/* Guidelines */}
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8">
-            <h3 className="text-xl font-bold text-amber-900 mb-3">Important Guidelines</h3>
-            <p className="text-amber-800 leading-relaxed">
-              Submit original work only. Include Abstract, Introduction, Methodology, Results, Conclusion & References. Review within 48 hours.
-            </p>
+          {/* Tab Buttons */}
+          <div className="flex gap-4">
+            <button
+              onClick={() => setActiveTab('research')}
+              className={`flex-1 py-4 px-6 font-bold rounded-2xl transition ${
+                activeTab === 'research'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                  : 'bg-white text-gray-800 border-2 border-blue-200 hover:border-blue-600'
+              }`}
+            >
+              🎓 Research
+            </button>
+            <button
+              onClick={() => setActiveTab('events')}
+              className={`flex-1 py-4 px-6 font-bold rounded-2xl transition ${
+                activeTab === 'events'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                  : 'bg-white text-gray-800 border-2 border-blue-200 hover:border-blue-600'
+              }`}
+            >
+              📅 Events
+            </button>
           </div>
 
-          {/* Upload Button */}
-          <button
-            onClick={() => {
-              setShowUploadForm(!showUploadForm);
-              if (!showUploadForm) resetForm();
-            }}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xl py-6 rounded-2xl shadow-xl transition transform hover:scale-105 flex items-center justify-center gap-3"
-          >
-            <span className="text-3xl">🎓</span> {showUploadForm ? 'Cancel Upload' : 'Upload New Research'}
-          </button>
+          {/* ============= RESEARCH TAB ============= */}
+          {activeTab === 'research' && (
+            <>
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8">
+                <h3 className="text-xl font-bold text-amber-900 mb-3">Important Guidelines</h3>
+                <p className="text-amber-800 leading-relaxed">
+                  Submit original work only. Include Abstract, Introduction, Methodology, Results, Conclusion & References. Review within 48 hours.
+                </p>
+              </div>
 
-          {/* Smart Upload Form */}
-          {showUploadForm && (
-            <div className="bg-white rounded-2xl shadow-2xl border-2 border-blue-100 p-8 max-h-[70vh] overflow-hidden">
-              <h3 className="text-2xl font-bold text-gray-800 text-center mb-10">Submit Your Research</h3>
+              <button
+                onClick={() => {
+                  setShowUploadForm(!showUploadForm);
+                  if (!showUploadForm) resetForm();
+                }}
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xl py-6 rounded-2xl shadow-xl transition transform hover:scale-105 flex items-center justify-center gap-3"
+              >
+                <span className="text-3xl">🎓</span> {showUploadForm ? 'Cancel Upload' : 'Upload New Research'}
+              </button>
 
-              {/* Step 1: Degree Type */}
-              {!degreeType && (
-                <div className="text-center mb-12">
-                  <p className="text-xl font-semibold text-gray-700 mb-8">What type of academic work are you submitting?</p>
-                  <div className="grid grid-cols-2 gap-8 max-w-md mx-auto">
-                    <button onClick={() => setDegreeType('thesis')} className="py-8 bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold text-2xl rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition">
-                      Thesis
-                    </button>
-                    <button onClick={() => setDegreeType('dissertation')} className="py-8 bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-2xl rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition">
-                      Dissertation
-                    </button>
-                  </div>
+              {showUploadForm && (
+                <div className="bg-white rounded-2xl shadow-2xl border-2 border-blue-100 p-8 max-h-[70vh] overflow-hidden">
+                  <h3 className="text-2xl font-bold text-gray-800 text-center mb-10">Submit Your Research</h3>
+
+                  {!degreeType && (
+                    <div className="text-center mb-12">
+                      <p className="text-xl font-semibold text-gray-700 mb-8">What type of academic work are you submitting?</p>
+                      <div className="grid grid-cols-2 gap-8 max-w-md mx-auto">
+                        <button onClick={() => setDegreeType('thesis')} className="py-8 bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold text-2xl rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition">
+                          Thesis
+                        </button>
+                        <button onClick={() => setDegreeType('dissertation')} className="py-8 bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-2xl rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition">
+                          Dissertation
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {degreeType && !selectedField && (
+                    <div className="text-center overflow-y-auto max-h-96 pb-4">
+                      <p className="text-xl font-semibold text-gray-700 mb-8">Select your field of study</p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                        {ACADEMIC_FIELDS.map(field => (
+                          <button
+                            key={field}
+                            onClick={() => handleFieldChange(field.toLowerCase().replace(/\s+/g, '_'))}
+                            className="py-6 bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 hover:border-blue-500 text-blue-800 font-bold rounded-xl transition transform hover:scale-105 shadow-md"
+                          >
+                            {field}
+                          </button>
+                        ))}
+                        <button
+                          onClick={() => handleFieldChange('other')}
+                          className="py-6 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 hover:border-gray-500 font-bold rounded-xl transition hover:scale-105"
+                        >
+                          Other
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {showOtherField && !formData.other_field && (
+                    <div className="max-w-md mx-auto mt-8">
+                      <input
+                        type="text"
+                        placeholder="Enter your field (e.g., Psychology)"
+                        className="w-full p-5 text-lg border-2 border-blue-300 rounded-xl focus:border-blue-600 outline-none"
+                        onChange={(e) => setFormData(prev => ({ ...prev, other_field: e.target.value }))}
+                      />
+                    </div>
+                  )}
+
+                  {formData.submission_type && (
+                    <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+                      <div className="mt-10 space-y-6 max-h-[50vh] overflow-y-auto pr-2 -mr-2">
+                        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center sticky top-0 bg-white z-10">
+                          <p className="text-sm text-blue-600">Selected Category</p>
+                          <p className="text-2xl font-bold text-blue-900">
+                            {degreeType.charAt(0).toUpperCase() + degreeType.slice(1)} -{' '}
+                            {selectedField === 'other' ? formData.other_field : selectedField.replace(/_/g, ' ')}
+                          </p>
+                        </div>
+
+                        <input name="university_name" placeholder="University Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
+                        <input name="title" placeholder="Title *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
+                        <input name="authors" placeholder="Authors *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
+                        <input name="supervisor_name" placeholder="Supervisor Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl bg-blue-50" />
+                        <input name="year" type="number" placeholder="Year *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
+                        <textarea name="description" placeholder="Brief description / Abstract *" rows={4} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none" />
+                        <input type="file" name="file" accept=".pdf,.doc,.docx" onChange={handleInputChange} required className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg" />
+
+                        <button type="submit" disabled={uploading} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-5 rounded-xl text-lg shadow-lg disabled:opacity-70">
+                          {uploading ? 'Submitting...' : 'Submit Research'}
+                        </button>
+                      </div>
+                    </form>
+                  )}
                 </div>
               )}
 
-              {/* Step 2: Field Selection */}
-              {degreeType && !selectedField && (
-                <div className="text-center overflow-y-auto max-h-96 pb-4">
-                  <p className="text-xl font-semibold text-gray-700 mb-8">Select your field of study</p>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                    {ACADEMIC_FIELDS.map(field => (
-                      <button
-                        key={field}
-                        onClick={() => handleFieldChange(field.toLowerCase().replace(/\s+/g, '_'))}
-                        className="py-6 bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 hover:border-blue-500 text-blue-800 font-bold rounded-xl transition transform hover:scale-105 shadow-md"
-                      >
-                        {field}
-                      </button>
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <h3 className="text-3xl font-bold text-gray-800 text-center mb-10">My Uploads</h3>
+                {uploads.length === 0 ? (
+                  <p className="text-center text-gray-500 py-16 text-lg">No uploads yet. Start sharing your research!</p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {uploads.map(upload => (
+                      <div key={upload.id} className="transform transition-all hover:scale-105">
+                        <div
+                          className="rounded-2xl overflow-hidden shadow-xl border-2 bg-gradient-to-br from-blue-50 to-indigo-50 relative cursor-pointer"
+                          style={{ borderColor: upload.status === 'approved' ? '#10b981' : upload.status === 'rejected' ? '#ef4444' : '#f59e0b' }}
+                          onClick={() => router.push(`/book/${upload.id}`)}
+                        >
+                          <div className="h-64 flex flex-col items-center justify-center">
+                            <span className="text-9xl">🎓</span>
+                            <p className="text-2xl font-medium text-gray-600 mt-4">THESIS</p>
+                          </div>
+                          <div className={`absolute top-4 right-4 px-5 py-2 rounded-full text-sm font-bold text-white shadow-lg ${getStatusBadge(upload.status)}`}>
+                            {upload.status.charAt(0).toUpperCase() + upload.status.slice(1)}
+                          </div>
+                        </div>
+
+                        <div className="mt-6">
+                          <h4 className="font-bold text-gray-800 text-lg line-clamp-2 text-center">{upload.title}</h4>
+                          <p className="text-gray-600 mt-1 text-center">{upload.year}</p>
+                          {upload.supervisor_name && <p className="text-sm text-blue-700 mt-2 text-center">Supervisor: {upload.supervisor_name}</p>}
+
+                          {upload.feedback && (
+                            <div className={`mt-4 p-4 rounded-xl text-sm font-medium border-l-4 ${upload.status === 'rejected' ? 'bg-red-50 border-red-500 text-red-800' : 'bg-amber-50 border-amber-500 text-amber-800'}`}>
+                              <p className="font-bold">{upload.status === 'rejected' ? 'Reason:' : 'Note:'}</p>
+                              <p className="mt-1 whitespace-pre-wrap">{upload.feedback}</p>
+                            </div>
+                          )}
+
+                          {upload.status === 'approved' && !upload.feedback && (
+                            <div className="mt-4 p-4 rounded-xl bg-emerald-50 border-l-4 border-emerald-500 text-emerald-800 text-sm text-center">
+                              Congratulations! Your work is now public.
+                            </div>
+                          )}
+
+                          <button
+                            onClick={() => openEditUpload(upload)}
+                            className="mt-6 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 rounded-xl transition"
+                          >
+                            ✏️ Edit
+                          </button>
+                        </div>
+                      </div>
                     ))}
-                    <button
-                      onClick={() => handleFieldChange('other')}
-                      className="py-6 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 hover:border-gray-500 font-bold rounded-xl transition hover:scale-105"
-                    >
-                      Other
-                    </button>
                   </div>
-                </div>
-              )}
-
-              {/* Step 3: Custom Field */}
-              {showOtherField && !formData.other_field && (
-                <div className="max-w-md mx-auto mt-8">
-                  <input
-                    type="text"
-                    placeholder="Enter your field (e.g., Psychology)"
-                    className="w-full p-5 text-lg border-2 border-blue-300 rounded-xl focus:border-blue-600 outline-none"
-                    onChange={(e) => setFormData(prev => ({ ...prev, other_field: e.target.value }))}
-                  />
-                </div>
-              )}
-
-              {/* Final Form - SCROLLABLE CONTAINER */}
-              {formData.submission_type && (
-                <form onSubmit={handleSubmit} className="mt-10 space-y-6">
-                <div className="mt-10 space-y-6 max-h-[50vh] overflow-y-auto pr-2 -mr-2">
-                  <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center sticky top-0 bg-white z-10">
-                    <p className="text-sm text-blue-600">Selected Category</p>
-                    <p className="text-2xl font-bold text-blue-900">
-                      {degreeType.charAt(0).toUpperCase() + degreeType.slice(1)} -{' '}
-                      {selectedField === 'other' ? formData.other_field : selectedField.replace(/_/g, ' ')}
-                    </p>
-                  </div>
-
-                  <input name="university_name" placeholder="University Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
-                  <input name="title" placeholder="Title *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
-                  <input name="authors" placeholder="Authors *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
-                  <input name="supervisor_name" placeholder="Supervisor Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl bg-blue-50" />
-                  <input name="year" type="number" placeholder="Year *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
-                  <textarea name="description" placeholder="Brief description / Abstract *" rows={4} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none" />
-                  <input type="file" name="file" accept=".pdf,.doc,.docx" onChange={handleInputChange} required className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg" />
-
-                  <button type="submit" disabled={uploading} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-5 rounded-xl text-lg shadow-lg disabled:opacity-70">
-                    {uploading ? 'Submitting...' : 'Submit Research'}
-                  </button>
-                </div>
-                </form>
-              )}
-            </div>
+                )}
+              </div>
+            </>
           )}
 
-          {/* My Uploads - With Feedback Support */}
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h3 className="text-3xl font-bold text-gray-800 text-center mb-10">My Uploads</h3>
-            {uploads.length === 0 ? (
-              <p className="text-center text-gray-500 py-16 text-lg">No uploads yet. Start sharing your research!</p>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {uploads.map(upload => (
-                  <div
-                    key={upload.id}
-                    onClick={() => router.push(`/book/${upload.id}`)}
-                    className="cursor-pointer group transform transition-all hover:scale-105"
-                  >
-                    <div
-                      className="rounded-2xl overflow-hidden shadow-xl border-2 bg-gradient-to-br from-blue-50 to-indigo-50 relative"
-                      style={{ borderColor: upload.status === 'approved' ? '#10b981' : upload.status === 'rejected' ? '#ef4444' : '#f59e0b' }}
-                    >
-                      <div className="h-64 flex flex-col items-center justify-center">
-                        <span className="text-9xl">🎓</span>
-                        <p className="text-2xl font-medium text-gray-600 mt-4">THESIS</p>
-                      </div>
-                      <div className={`absolute top-4 right-4 px-5 py-2 rounded-full text-sm font-bold text-white shadow-lg ${getStatusBadge(upload.status)}`}>
-                        {upload.status.charAt(0).toUpperCase() + upload.status.slice(1)}
-                      </div>
-                    </div>
-
-                    <div className="mt-6 text-center">
-                      <h4 className="font-bold text-gray-800 text-lg line-clamp-2">{upload.title}</h4>
-                      <p className="text-gray-600 mt-1">{upload.year}</p>
-                      {upload.supervisor_name && <p className="text-sm text-blue-700 mt-2">Supervisor: {upload.supervisor_name}</p>}
-
-                      {/* Feedback Box */}
-                      {upload.feedback && (
-                        <div className={`mt-4 p-4 rounded-xl text-sm font-medium border-l-4 ${upload.status === 'rejected' ? 'bg-red-50 border-red-500 text-red-800' : 'bg-amber-50 border-amber-500 text-amber-800'}`}>
-                          <p className="font-bold">{upload.status === 'rejected' ? 'Reason:' : 'Note:'}</p>
-                          <p className="mt-1 whitespace-pre-wrap">{upload.feedback}</p>
-                        </div>
-                      )}
-
-                      {upload.status === 'approved' && !upload.feedback && (
-                        <div className="mt-4 p-4 rounded-xl bg-emerald-50 border-l-4 border-emerald-500 text-emerald-800 text-sm">
-                          Congratulations! Your work is now public.
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
+          {/* ============= EVENTS TAB ============= */}
+          {activeTab === 'events' && (
+            <>
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8">
+                <h3 className="text-xl font-bold text-amber-900 mb-3">Create Amazing Events</h3>
+                <p className="text-amber-800 leading-relaxed">
+                  Workshops, conferences, meetups, webinars — share them all with the community!
+                </p>
               </div>
-            )}
-          </div>
+
+              <button
+                onClick={() => setShowEventForm(!showEventForm)}
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xl py-6 rounded-2xl shadow-xl transition transform hover:scale-105 flex items-center justify-center gap-3"
+              >
+                {showEventForm ? 'Cancel' : 'Create New Event'}
+              </button>
+
+              {showEventForm && (
+                <div className="bg-white rounded-2xl shadow-2xl border-2 border-blue-100 p-8">
+                  <h3 className="text-2xl font-bold text-gray-800 text-center mb-10">Create New Event</h3>
+
+                  {eventPhotoPreview && (
+                    <div className="flex justify-center mb-6">
+                      <img src={eventPhotoPreview} alt="Preview" className="w-full max-w-lg h-64 object-cover rounded-xl shadow-lg" />
+                    </div>
+                  )}
+
+                  <form onSubmit={handleEventSubmit} className="space-y-6">
+                    <input name="title" placeholder="Event Title *" value={eventFormData.title} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
+                    <textarea name="description" placeholder="Description *" rows="5" value={eventFormData.description} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none" />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <input type="datetime-local" name="date" value={eventFormData.date} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
+                      <input name="location" placeholder="Location (e.g. Zoom, Kigali)" value={eventFormData.location} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
+                    </div>
+
+                    <input name="link" placeholder="Registration Link (optional)" value={eventFormData.link} onChange={handleEventInputChange} className="w-full p-4 border border-gray-300 rounded-xl" />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <select name="icon" value={eventFormData.icon} onChange={handleEventInputChange} className="p-4 border border-gray-300 rounded-xl">
+                        <option>Calendar</option>
+                        <option>Laptop</option>
+                        <option>Users</option>
+                        <option>GraduationCap</option>
+                        <option>Presentation</option>
+                      </select>
+                      <input type="file" name="photo" accept="image/*" onChange={handleEventInputChange} className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg" />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={uploading}
+                      className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-5 rounded-xl text-lg shadow-lg disabled:opacity-70"
+                    >
+                      {uploading ? 'Creating...' : 'Publish Event'}
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <h3 className="text-3xl font-bold text-gray-800 text-center mb-10">My Events</h3>
+
+                {events.length === 0 ? (
+                  <p className="text-center text-gray-500 py-16 text-lg">No events yet. Create your first one!</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {events.map(event => {
+                      const status = event.status || 'pending';
+                      const statusDisplay = event.status_display ||
+                        (status === 'pending' ? 'Pending' :
+                          status === 'approved' ? 'Approved' :
+                            status === 'rejected' ? 'Rejected' : 'Pending');
+
+                      return (
+                        <div key={event.id} className="group bg-white border-2 border-blue-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition transform hover:scale-105 cursor-pointer relative">
+                          {event.photo ? (
+                            <img src={getApiUrl(event.photo)} alt={event.title} className="w-full h-48 object-cover" />
+                          ) : (
+                            <div className="bg-gradient-to-br from-blue-400 to-indigo-500 h-48 flex items-center justify-center text-6xl text-white">
+                              {event.icon || 'Calendar'}
+                            </div>
+                          )}
+
+                          <div className={`absolute top-4 right-4 px-5 py-2 rounded-full text-sm font-bold text-white shadow-lg
+                            ${status === 'approved' ? 'bg-emerald-600' :
+                              status === 'rejected' ? 'bg-red-600' :
+                                'bg-amber-600'}`}
+                          >
+                            {statusDisplay}
+                          </div>
+
+                          <div className="p-6">
+                            <h4 className="font-bold text-xl text-gray-800 line-clamp-2">{event.title}</h4>
+                            <p className="text-sm text-gray-600 mt-2">
+                              {event.date ? format(new Date(event.date), 'PPP • p') : 'No date'}
+                            </p>
+                            <p className="text-gray-700">{event.location || 'No location'}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Profile Sidebar */}
@@ -406,13 +682,13 @@ export default function ResearcherDashboard() {
           <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">My Profile</h3>
           <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-blue-500 shadow-xl">
             {user?.profile_image ? (
-              <Image 
-                src={getApiUrl(user?.profile_image || user?.user?.profile_image)} 
-                alt="Profile" 
-                width={128} 
-                height={128} 
-                className="w-full h-full object-cover" 
-                unoptimized 
+              <Image
+                src={getApiUrl(user?.profile_image || user?.user?.profile_image)}
+                alt="Profile"
+                width={128}
+                height={128}
+                className="w-full h-full object-cover"
+                unoptimized
               />
             ) : (
               <div className="bg-gradient-to-br from-blue-400 to-indigo-500 w-full h-full flex items-center justify-center text-white text-5xl font-bold">
@@ -478,7 +754,7 @@ export default function ResearcherDashboard() {
 
               <input type="number" placeholder="Age" value={profileForm.age} onChange={e => setProfileForm(p => ({ ...p, age: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" />
               <input type="tel" placeholder="Phone" value={profileForm.phone_number} onChange={e => setProfileForm(p => ({ ...p, phone_number: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" />
-              <input type="text" placeholder="Location" value={profileForm.location} onChange={e => setProfileForm(p => ({ ...p, location: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" required />
+              <input type="text" placeholder="Location" value={profileForm.location} onChange={e => setProfileForm(p => ({ ...p, location: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" />
               <input type="text" placeholder="University" value={profileForm.university} onChange={e => setProfileForm(p => ({ ...p, university: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" />
               <textarea
                 placeholder="Short bio (optional)"
@@ -491,6 +767,113 @@ export default function ResearcherDashboard() {
               <div className="flex gap-4 pt-4">
                 <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl">Save Changes</button>
                 <button type="button" onClick={() => setShowEditProfile(false)} className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 rounded-xl">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Upload Modal */}
+      {showEditUpload && editingUpload && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
+            <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Update Research</h3>
+            <form onSubmit={handleEditSubmit} className="space-y-6">
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center">
+                <p className="text-sm text-blue-600">Editing</p>
+                <p className="text-xl font-bold text-blue-900 line-clamp-2">{editingUpload.title}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Title *</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={editForm.title}
+                  onChange={handleEditInputChange}
+                  required
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Authors *</label>
+                <input
+                  type="text"
+                  name="authors"
+                  value={editForm.authors}
+                  onChange={handleEditInputChange}
+                  required
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Supervisor Name *</label>
+                <input
+                  type="text"
+                  name="supervisor_name"
+                  value={editForm.supervisor_name}
+                  onChange={handleEditInputChange}
+                  required
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none bg-blue-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Year *</label>
+                <input
+                  type="number"
+                  name="year"
+                  value={editForm.year}
+                  onChange={handleEditInputChange}
+                  required
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Description / Abstract *</label>
+                <textarea
+                  name="description"
+                  value={editForm.description}
+                  onChange={handleEditInputChange}
+                  required
+                  rows={6}
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Update File (optional)</label>
+                <input
+                  type="file"
+                  name="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleEditInputChange}
+                  className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg"
+                />
+                <p className="text-xs text-gray-500 mt-2">Leave empty to keep current file</p>
+              </div>
+
+              <div className="flex gap-4 pt-6">
+                <button
+                  type="submit"
+                  disabled={uploading}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-70 text-white font-bold py-4 rounded-xl transition"
+                >
+                  {uploading ? 'Updating...' : 'Save Changes'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditUpload(false);
+                    setEditingUpload(null);
+                  }}
+                  className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 rounded-xl"
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>

@@ -9,6 +9,7 @@
   "/(main)/innovator/page": "/innovator",
   "/(main)/page": "/",
   "/(main)/profile/page": "/profile",
+  "/(main)/publications/page": "/publications",
   "/(main)/researcher/page": "/researcher",
   "/(main)/researchers/[id]/page": "/researchers/[id]",
   "/(main)/researchers/page": "/researchers",
@@ -36,7 +37,6 @@
   "/loginbook/page": "/loginbook",
   "/organizer/page": "/organizer",
   "/profile-form/page": "/profile-form",
-  "/publication/page": "/publication",
   "/reader/[id]/page": "/reader/[id]",
   "/register/page": "/register",
   "/reset-password/page": "/reset-password"

@@ -60,6 +60,12 @@
       "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
       "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
     ],
+    "[project]/src/app/(main)/publications/page": [
+      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
+      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
+      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
+      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
+    ],
     "[project]/src/app/(main)/researcher/page": [
       "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
       "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
@@ -205,12 +211,6 @@
       "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
     ],
     "[project]/src/app/profile-form/page": [
-      "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
-      "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
-      "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",
-      "static/media/47fe1b7cd6e6ed85-s.p.0~mcdl10zdfb3.woff2"
-    ],
-    "[project]/src/app/publication/page": [
       "static/media/c875c6f5d3e977ac-s.p.0g_ng0t~d_b9n.woff2",
       "static/media/a218039a3287bcfd-s.p.17-1enzs_j91b.woff2",
       "static/media/e2334d715941921e-s.p.12skym0rqknxy.woff2",

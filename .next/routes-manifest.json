@@ -239,10 +239,10 @@
       "namedRegex": "^/profile\\-form(?:/)?$"
     },
     {
-      "page": "/publication",
-      "regex": "^/publication(?:/)?$",
+      "page": "/publications",
+      "regex": "^/publications(?:/)?$",
       "routeKeys": {},
-      "namedRegex": "^/publication(?:/)?$"
+      "namedRegex": "^/publications(?:/)?$"
     },
     {
       "page": "/register",

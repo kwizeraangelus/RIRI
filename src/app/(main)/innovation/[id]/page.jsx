@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { use } from 'react';
 import Link from 'next/link';
+import { getApiUrl } from '@/utils/api';
 
 export default function InnovationDetailPage({ params }) {
   const resolvedParams = use(params);
@@ -93,19 +94,24 @@ const [loading, setLoading] = useState(true);
           <div className="md:col-span-1">
             <div className="sticky top-8">
               {innovation.photo ? (
-                <Image
-                  src={innovation.photo}
-                  alt={innovation.name}
-                  width={500}
-                  height={600}
-                  className="w-full h-auto rounded-2xl shadow-2xl border-8 border-white object-cover"
-                  unoptimized
-                />
-              ) : (
-                <div className="bg-gradient-to-br from-gray-200 to-gray-300 border-8 border-dashed border-gray-400 rounded-2xl w-full h-96 flex items-center justify-center shadow-xl">
-                  <span className="text-gray-600 text-2xl font-bold">No Photo</span>
-                </div>
-              )}
+  <Image
+    src={
+      getApiUrl 
+        ? getApiUrl(innovation.photo) 
+        : `http://localhost:8000${innovation.photo}`
+    }   // ← Full backend URL
+    alt={innovation.name}
+    width={500}
+    height={600}
+    className="w-full h-auto rounded-2xl shadow-2xl border-8 border-white object-cover"
+    unoptimized
+    priority
+  />
+) : (
+  <div className="bg-gradient-to-br from-gray-200 to-gray-300 border-8 border-dashed border-gray-400 rounded-2xl w-full h-96 flex items-center justify-center shadow-xl">
+    <span className="text-gray-600 text-2xl font-bold">No Photo</span>
+  </div>
+)}
             </div>
           </div>
 
@@ -147,11 +153,16 @@ const [loading, setLoading] = useState(true);
 
 
               <div className="md:col-span-2">
-                <strong className="text-[#050A14] text-lg">Submitted by:</strong>{' '}
-                <span className="text-[#050A14] font-medium text-lg">
-                  {innovation.innovator_username || innovation.innovator || 'Anonymous'}
-                </span>
-              </div>
+  <strong className="text-[#050A14] text-lg">Submitted by:</strong>{' '}
+  <span className="text-[#050A14] font-medium text-lg">
+    {innovation?.user?.first_name 
+      ? `${innovation.user.first_name} ${innovation.user.second_name || ''}`.trim()
+      : innovation?.user?.username !== "Anonymous" 
+        ? innovation?.user?.username 
+        : "Undefined"
+    }
+  </span>
+</div>
             </div>
 
             {/* Optional CTA Section */}

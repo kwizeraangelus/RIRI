@@ -41,10 +41,10 @@ export default function EventsPage() {
   return (
     <div className="min-h-screen bg-[#E0F2FE] text-gray-900">
       {/* DARK NAVY BAND — same color as before, but no navigation */}
-      <div className="h-32 bg-[#050A14]" aria-hidden="true" />
+      <div className="h-32 bg-[#0a1f3d]" aria-hidden="true" />
 
       {/* HERO — overlaps the dark band beautifully */}
-      <section className="relative -mt-32 pt-40 pb-24 bg-gradient-to-b from-[#050A14] via-blue-950 to-[#0a1f3d] text-white">
+      <section className="relative -mt-32 pt-40 pb-24 bg-gradient-to-b from-[#466ab0] via-blue-950 to-[#0c1e30ee] text-white">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
             Upcoming <span className="text-[#FFD700]">Events</span>

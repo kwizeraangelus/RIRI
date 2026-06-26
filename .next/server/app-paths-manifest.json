@@ -9,6 +9,7 @@
   "/(main)/innovator/page": "app/(main)/innovator/page.js",
   "/(main)/page": "app/(main)/page.js",
   "/(main)/profile/page": "app/(main)/profile/page.js",
+  "/(main)/publications/page": "app/(main)/publications/page.js",
   "/(main)/researcher/page": "app/(main)/researcher/page.js",
   "/(main)/researchers/[id]/page": "app/(main)/researchers/[id]/page.js",
   "/(main)/researchers/page": "app/(main)/researchers/page.js",
@@ -36,7 +37,6 @@
   "/loginbook/page": "app/loginbook/page.js",
   "/organizer/page": "app/organizer/page.js",
   "/profile-form/page": "app/profile-form/page.js",
-  "/publication/page": "app/publication/page.js",
   "/reader/[id]/page": "app/reader/[id]/page.js",
   "/register/page": "app/register/page.js",
   "/reset-password/page": "app/reset-password/page.js"
