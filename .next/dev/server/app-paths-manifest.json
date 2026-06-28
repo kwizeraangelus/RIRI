@@ -1,7 +1,7 @@
 {
-  "/admin-dashboard/pending-events/page": "app/admin-dashboard/pending-events/page.js",
-  "/(main)/researcher/page": "app/(main)/researcher/page.js",
+  "/admin-dashboard/page": "app/admin-dashboard/page.js",
+  "/admin-dashboard/pending-publication/page": "app/admin-dashboard/pending-publication/page.js",
   "/(main)/researchers/page": "app/(main)/researchers/page.js",
-  "/(main)/publications/page": "app/(main)/publications/page.js",
-  "/(main)/researchers/[id]/page": "app/(main)/researchers/[id]/page.js"
+  "/(main)/researchers/[id]/page": "app/(main)/researchers/[id]/page.js",
+  "/(main)/page": "app/(main)/page.js"
 }

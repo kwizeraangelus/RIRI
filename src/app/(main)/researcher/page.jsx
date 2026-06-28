@@ -24,11 +24,14 @@ export default function ResearcherDashboard() {
   // ── Publications ──────────────────────────────────────────────────────────
   const [publications, setPublications] = useState([]);
   const [showAddPublication, setShowAddPublication] = useState(false);
+  const [showAbstractField, setShowAbstractField] = useState(false);
+  const [openAbstractId, setOpenAbstractId] = useState(null); // NEW: track which abstract is open
   const [publicationForm, setPublicationForm] = useState({
     title: '', authors: [''], journal_name: '', conference_info: '',
     doi: '', display_doi: '', url: '', publisher: '',
     book_title: '', patent_title: '', Conference_title: '',
     symposium_title: '', publication_type: 'journal',
+    abstract: '',
   });
 
   // ── Innovations ───────────────────────────────────────────────────────────
@@ -109,12 +112,16 @@ export default function ResearcherDashboard() {
     const { name, value } = e.target;
     setPublicationForm(p => ({ ...p, [name]: value }));
   };
-  const resetPubForm = () => setPublicationForm({
-    title: '', authors: [''], journal_name: '', conference_info: '',
-    doi: '', display_doi: '', url: '', publisher: '',
-    book_title: '', patent_title: '', Conference_title: '',
-    symposium_title: '', publication_type: 'journal',
-  });
+  const resetPubForm = () => {
+    setPublicationForm({
+      title: '', authors: [''], journal_name: '', conference_info: '',
+      doi: '', display_doi: '', url: '', publisher: '',
+      book_title: '', patent_title: '', Conference_title: '',
+      symposium_title: '', publication_type: 'journal',
+      abstract: '',
+    });
+    setShowAbstractField(false);
+  };
   const handleSubmitPublication = async (e) => {
     e.preventDefault();
     const body = { ...publicationForm, authors: publicationForm.authors.filter(a => a.trim()) };
@@ -443,8 +450,18 @@ export default function ResearcherDashboard() {
                             {pub.publisher       && <span className="px-2.5 py-1 bg-green-100 rounded-full text-green-700 text-xs">📍 {pub.publisher}</span>}
                           </div>
                           {pub.doi && <p className="mt-2 font-mono text-blue-600 text-xs">DOI: {pub.doi}</p>}
+
                           <div className="flex gap-2 mt-3">
-                            <button onClick={() => alert(pub.abstract)} className="text-xs px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-md font-medium transition-colors">📄 Abstract</button>
+                            {/* ── Abstract toggle button ── */}
+                            {pub.abstract && (
+                              <button
+                                onClick={() => setOpenAbstractId(openAbstractId === pub.id ? null : pub.id)}
+                                className="text-xs px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-gray-700 rounded-md font-medium transition-colors flex items-center gap-1"
+                              >
+                                📄 Abstract
+                                <span className="text-blue-500">{openAbstractId === pub.id ? '▲' : '▼'}</span>
+                              </button>
+                            )}
                             {(pub.doi || pub.url) && (
                               <a href={pub.url || `https://doi.org/${pub.doi}`} target="_blank"
                                 className="text-xs px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md font-medium transition-colors">🌐 HTML</a>
@@ -454,6 +471,14 @@ export default function ResearcherDashboard() {
                                 className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors">📑 PDF</a>
                             )}
                           </div>
+
+                          {/* ── Inline abstract paragraph ── */}
+                          {openAbstractId === pub.id && pub.abstract && (
+                            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                              <p className="text-xs font-semibold text-gray-900 mb-1">Abstract</p>
+                              <p className="text-xs text-gray-700 leading-relaxed">{pub.abstract}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -461,7 +486,7 @@ export default function ResearcherDashboard() {
                 </div>
               </div>
 
-              {/* Add Publication Form */}
+              {/* ============= ADD PUBLICATION FORM ============= */}
               {showAddPublication && (
                 <div className="bg-white rounded-2xl shadow-xl border-2 border-blue-100 p-8">
                   <h3 className="text-2xl font-bold text-slate-800 mb-1">Add New Publication</h3>
@@ -502,6 +527,7 @@ export default function ResearcherDashboard() {
                         ))}
                       </div>
                     </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {publicationForm.publication_type === 'journal' && (
                         <div>
@@ -519,6 +545,49 @@ export default function ResearcherDashboard() {
                         </div>
                       ))}
                     </div>
+
+                    {/* ============= ABSTRACT TOGGLE BUTTON ============= */}
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => setShowAbstractField(!showAbstractField)}
+                        className={`w-full px-4 py-3 rounded-lg font-semibold text-sm transition-all flex items-center justify-between ${
+                          showAbstractField
+                            ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="text-lg">{showAbstractField ? '▼' : '▶'}</span>
+                          Add Abstract
+                        </span>
+                        {publicationForm.abstract && (
+                          <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full font-bold">Added</span>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* ============= ABSTRACT FIELD (COLLAPSIBLE) ============= */}
+                    {showAbstractField && (
+                      <div className="animate-in fade-in slide-in-from-top-2 duration-300 bg-blue-50 border-2 border-blue-200 rounded-lg p-5">
+                        <label className="block text-sm font-semibold text-slate-700 mb-3">Abstract</label>
+                        <textarea
+                          name="abstract"
+                          value={publicationForm.abstract}
+                          onChange={handlePubInput}
+                          placeholder="Write a brief summary of your publication…"
+                          rows={5}
+                          className="w-full p-4 border-2 border-blue-300 rounded-lg focus:border-blue-500 focus:shadow-lg focus:ring-2 focus:ring-blue-200 outline-none resize-none transition-all text-sm"
+                        />
+                        <p className="text-xs text-slate-600 mt-2 flex items-center gap-1">
+                          <span>💡</span> Help readers understand your research at a glance
+                        </p>
+                        <div className="text-xs text-slate-500 mt-2 text-right">
+                          {publicationForm.abstract.length} characters
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex gap-4 pt-2">
                       <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md transition hover:from-blue-700 hover:to-indigo-700">Save Publication</button>
                       <button type="button" onClick={() => setShowAddPublication(false)} className="flex-1 bg-slate-200 text-slate-700 font-semibold py-3 rounded-lg hover:bg-slate-300 transition">Cancel</button>

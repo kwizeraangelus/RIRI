@@ -360,14 +360,14 @@ export default function InnovationDashboard() {
                   )}
                   <form onSubmit={handleSubmitInnovation} className="space-y-5">
                     <input name="name" placeholder="Name of Innovation *" value={innovationForm.name} onChange={handleInnovationInput} required
-                      className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500" />
+                      className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500 text-gray-900" />
                     <textarea name="description" placeholder="Detailed Description *" rows={5} value={innovationForm.description} onChange={handleInnovationInput} required
-                      className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500 resize-none" />
+                      className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500 resize-none   text-gray-900" />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">Sponsorship Needed?</label>
                         <select name="sponsorship_needed" value={innovationForm.sponsorship_needed} onChange={handleInnovationInput}
-                          className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500">
+                          className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500 text-gray-900">
                           <option value="no-need">No Need</option>
                           <option value="unsponsored">Seeking Sponsor</option>
                           <option value="sponsored">Already Sponsored</option>
@@ -376,7 +376,7 @@ export default function InnovationDashboard() {
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">Innovation Photo</label>
                         <input type="file" name="photo" accept="image/*" onChange={handleInnovationInput}
-                          className="w-full p-3 border-2 border-dashed border-purple-300 rounded-xl bg-purple-50 file:bg-purple-600 file:text-white file:py-2 file:px-6 file:rounded-lg file:border-0" />
+                          className="w-full p-3 border-2 border-dashed border-purple-300 rounded-xl bg-purple-50 file:bg-purple-600 file:text-white file:py-2 file:px-6 file:rounded-lg file:border-0 text-gray-900" />
                       </div>
                     </div>
                     <button type="submit" disabled={uploadingInnovation}
@@ -485,14 +485,14 @@ export default function InnovationDashboard() {
                   )}
                   <form onSubmit={handleSubmitEvent} className="space-y-5">
                     <input name="title" placeholder="Event Title *" value={eventForm.title} onChange={handleEventInput} required
-                      className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500" />
+                      className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500 text-gray-900" />
                     <textarea name="description" placeholder="Description *" rows={4} value={eventForm.description} onChange={handleEventInput} required
-                      className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500 resize-none" />
+                      className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500 resize-none text-gray-900" />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">Date & Time *</label>
                         <input type="datetime-local" name="date" value={eventForm.date} onChange={handleEventInput} required
-                          className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500" />
+                          className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500 text-gray-900" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">Location *</label>
@@ -501,19 +501,19 @@ export default function InnovationDashboard() {
                       </div>
                     </div>
                     <input name="link" placeholder="Registration Link (optional)" value={eventForm.link} onChange={handleEventInput}
-                      className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500" />
+                      className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500 text-gray-900" />
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">Icon</label>
                         <select name="icon" value={eventForm.icon} onChange={handleEventInput}
-                          className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500">
+                          className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500 text-gray-900">
                           {['Calendar','Laptop','Users','GraduationCap','Presentation'].map(i => <option key={i}>{i}</option>)}
                         </select>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">Event Photo</label>
                         <input type="file" name="photo" accept="image/*" onChange={handleEventInput}
-                          className="w-full p-3 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-2 file:px-5 file:rounded-lg file:border-0" />
+                          className="w-full p-3 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-2 file:px-5 file:rounded-lg file:border-0 text-gray-900" />
                       </div>
                     </div>
                     <button type="submit" disabled={uploadingEvent}
@@ -597,7 +597,7 @@ export default function InnovationDashboard() {
                   value={editInnovationForm.name}
                   onChange={handleEditInnovationInput}
                   required
-                  className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500"
+                  className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500 text-gray-900"
                 />
               </div>
 
@@ -609,7 +609,7 @@ export default function InnovationDashboard() {
                   onChange={handleEditInnovationInput}
                   required
                   rows={5}
-                  className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500 resize-none"
+                  className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500 resize-none text-gray-900"
                 />
               </div>
 
@@ -620,7 +620,7 @@ export default function InnovationDashboard() {
                     name="sponsorship_needed"
                     value={editInnovationForm.sponsorship_needed}
                     onChange={handleEditInnovationInput}
-                    className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500"
+                    className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500 text-gray-900"
                   >
                     <option value="no-need">No Need</option>
                     <option value="unsponsored">Seeking Sponsor</option>
@@ -634,7 +634,7 @@ export default function InnovationDashboard() {
                     name="photo"
                     accept="image/*"
                     onChange={handleEditInnovationInput}
-                    className="w-full p-3 border-2 border-dashed border-purple-300 rounded-xl bg-purple-50 file:bg-purple-600 file:text-white file:py-2 file:px-6 file:rounded-lg file:border-0"
+                    className="w-full p-3 border-2 border-dashed border-purple-300 rounded-xl bg-purple-50 file:bg-purple-600 file:text-white file:py-2 file:px-6 file:rounded-lg file:border-0 text-gray-900"
                   />
                 </div>
               </div>

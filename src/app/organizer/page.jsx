@@ -14,14 +14,32 @@ export default function EventDashboard() {
   const [uploading, setUploading] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
 
+  // Edit Event States
+  const [showEditEvent, setShowEditEvent] = useState(false);
+  const [editingEventId, setEditingEventId] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    title: '',
+    description: '',
+    date: '',
+    location: '',
+    link: '',
+    photo: null,
+    icon: 'Calendar'
+  });
+  const [editPhotoPreview, setEditPhotoPreview] = useState(null);
+
+  // Delete Confirmation State
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingEventId, setDeletingEventId] = useState(null);
+
   // Edit Profile States
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
-     profile_image: null, 
-  age: '',
-  location: '',
-  details: '',
-  phone: '',
+    profile_image: null,
+    age: '',
+    location: '',
+    details: '',
+    phone: '',
   });
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -45,12 +63,12 @@ export default function EventDashboard() {
   const fetchUserAndEvents = async () => {
     const token = localStorage.getItem('token');
     try {
-       const [userRes, eventsRes] = await Promise.all([
-        fetch(getApiUrl('/api/me/'), { 
-          headers: { 'Authorization': `Bearer ${token}` } 
+      const [userRes, eventsRes] = await Promise.all([
+        fetch(getApiUrl('/api/me/'), {
+          headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(getApiUrl('/api/my-events/'), { 
-          headers: { 'Authorization': `Bearer ${token}` } 
+        fetch(getApiUrl('/api/my-events/'), {
+          headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
 
@@ -77,91 +95,189 @@ export default function EventDashboard() {
     }
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setUploading(true);
-
-  const data = new FormData();
-  
-  // Append text fields manually to be safe
-  data.append('title', formData.title);
-  data.append('description', formData.description);
-  data.append('date', formData.date);
-  data.append('location', formData.location);
-  data.append('link', formData.link);
-  data.append('icon', formData.icon);
-
-  // Append the FILE with the EXACT name 'photo'
-  if (formData.photo) {
-    data.append('photo', formData.photo); 
-  }
-
-  const token = localStorage.getItem('token');
-  try {
-    const res = await fetch(getApiUrl('/api/events/create/'), {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` },
-      body: data,
-    });
-
-    if (res.ok) {
-      const newEvent = await res.json();
-      setEvents(prev => [newEvent, ...prev]);
-      setShowUploadForm(false);
-      setFormData({ title: '', description: '', date: '', location: '', link: '', photo: null, icon: 'Calendar' });
-      setPhotoPreview(null);
-      alert('Event created successfully!');
+  const handleEditInputChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === 'photo') {
+      const file = files[0];
+      setEditFormData(prev => ({ ...prev, photo: file }));
+      setEditPhotoPreview(file ? URL.createObjectURL(file) : null);
     } else {
-      const err = await res.json();
-      alert('Error: ' + JSON.stringify(err));
+      setEditFormData(prev => ({ ...prev, [name]: value }));
     }
-  } catch (err) {
-    alert('Network error');
-  } finally {
-    setUploading(false);
-  }
-};
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setUploading(true);
+
+    const data = new FormData();
+
+    // Append text fields manually to be safe
+    data.append('title', formData.title);
+    data.append('description', formData.description);
+    data.append('date', formData.date);
+    data.append('location', formData.location);
+    data.append('link', formData.link);
+    data.append('icon', formData.icon);
+
+    // Append the FILE with the EXACT name 'photo'
+    if (formData.photo) {
+      data.append('photo', formData.photo);
+    }
+
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(getApiUrl('/api/events/create/'), {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: data,
+      });
+
+      if (res.ok) {
+        const newEvent = await res.json();
+        setEvents(prev => [newEvent, ...prev]);
+        setShowUploadForm(false);
+        setFormData({ title: '', description: '', date: '', location: '', link: '', photo: null, icon: 'Calendar' });
+        setPhotoPreview(null);
+        alert('Event created successfully!');
+      } else {
+        const err = await res.json();
+        alert('Error: ' + JSON.stringify(err));
+      }
+    } catch (err) {
+      alert('Network error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // ============= OPEN EDIT EVENT =============
+  const openEditEvent = (event) => {
+    setEditingEventId(event.id);
+    setEditFormData({
+      title: event.title,
+      description: event.description,
+      date: event.date,
+      location: event.location,
+      link: event.link || '',
+      photo: null,
+      icon: event.icon || 'Calendar'
+    });
+    setEditPhotoPreview(event.photo ? getApiUrl(event.photo) : null);
+    setShowEditEvent(true);
+  };
+
+  // ============= SAVE UPDATED EVENT =============
+  const handleUpdateEvent = async (e) => {
+    e.preventDefault();
+    setUploading(true);
+
+    const data = new FormData();
+
+    data.append('title', editFormData.title);
+    data.append('description', editFormData.description);
+    data.append('date', editFormData.date);
+    data.append('location', editFormData.location);
+    data.append('link', editFormData.link);
+    data.append('icon', editFormData.icon);
+
+    if (editFormData.photo) {
+      data.append('photo', editFormData.photo);
+    }
+
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(getApiUrl(`/api/events/${editingEventId}`), {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: data,
+      });
+
+      if (res.ok) {
+        const updatedEvent = await res.json();
+        setEvents(prev =>
+          prev.map(e => e.id === editingEventId ? updatedEvent : e)
+        );
+        setShowEditEvent(false);
+        setEditingEventId(null);
+        alert('Event updated successfully!');
+      } else {
+        const err = await res.json();
+        alert('Error updating event: ' + JSON.stringify(err));
+      }
+    } catch (err) {
+      alert('Network error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // ============= DELETE EVENT =============
+  const handleDeleteEvent = async () => {
+    setUploading(true);
+    const token = localStorage.getItem('token');
+
+    try {
+      const res = await fetch(getApiUrl(`/api/events/${deletingEventId}`), {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        setEvents(prev => prev.filter(e => e.id !== deletingEventId));
+        setShowDeleteConfirm(false);
+        setDeletingEventId(null);
+        alert('Event deleted successfully!');
+      } else {
+        alert('Error deleting event');
+      }
+    } catch (err) {
+      alert('Network error');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // Edit Profile Functions
   const openEditProfile = () => {
     setProfileForm({
       profile_image: null,
-      profile_image: null,
-    age: user?.age || '',
-    location: user?.location || '',
-    details: user?.details || '',
+      age: user?.age || '',
+      location: user?.location || '',
+      details: user?.details || '',
+      phone: user?.phone || '',
     });
     setImagePreview(user?.profile_image ? getApiUrl(user.profile_image) : null);
     setShowEditProfile(true);
   };
 
- const saveProfile = async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem('token');
-  const data = new FormData();
+  const saveProfile = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    const data = new FormData();
 
-  // Only append fields that match your @Column names
-  if (profileForm.profile_image) data.append('profile_image', profileForm.profile_image);
-  data.append('age', profileForm.age);
-  data.append('location', profileForm.location);
-  data.append('details', profileForm.details);
+    // Only append fields that match your @Column names
+    if (profileForm.profile_image) data.append('profile_image', profileForm.profile_image);
+    data.append('age', profileForm.age);
+    data.append('location', profileForm.location);
+    data.append('details', profileForm.details);
+    data.append('phone', profileForm.phone);
 
-  const res = await fetch(getApiUrl('/api/update/'), {
-    method: 'PATCH',
-    headers: { 'Authorization': `Bearer ${token}` },
-    body: data,
-  });
+    const res = await fetch(getApiUrl('/api/update/'), {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: data,
+    });
 
-  if (res.ok) {
-    const updated = await res.json();
-    setUser(updated);
-    setShowEditProfile(false);
-    alert('Profile updated!');
-  } else {
-    alert('Update failed. Check backend console.');
-  }
-};
-
+    if (res.ok) {
+      const updated = await res.json();
+      setUser(updated);
+      setShowEditProfile(false);
+      alert('Profile updated!');
+    } else {
+      alert('Update failed. Check backend console.');
+    }
+  };
 
   if (loading) return (
     <div className="min-h-screen bg-[#E0F2FE] flex items-center justify-center">
@@ -218,13 +334,13 @@ export default function EventDashboard() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <input name="title" placeholder="Event Title *" value={formData.title} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
                 <textarea name="description" placeholder="Description *" rows="5" value={formData.description} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none" />
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <input type="datetime-local" name="date" value={formData.date} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
                   <input name="location" placeholder="Location (e.g. Zoom, Nairobi)" value={formData.location} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
                 </div>
 
-                <input name="link"  placeholder="Registration Link (optional)" value={formData.link} onChange={handleInputChange} className="w-full p-4 border border-gray-300 rounded-xl" />
+                <input name="link" placeholder="Registration Link (optional)" value={formData.link} onChange={handleInputChange} className="w-full p-4 border border-gray-300 rounded-xl" />
 
                 <div className="grid grid-cols-2 gap-4">
                   <select name="icon" value={formData.icon} onChange={handleInputChange} className="p-4 border border-gray-300 rounded-xl">
@@ -251,7 +367,7 @@ export default function EventDashboard() {
           {/* My Events */}
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <h3 className="text-3xl font-bold text-gray-800 text-center mb-10">My Events</h3>
-            
+
             {events.length === 0 ? (
               <p className="text-center text-gray-500 py-16 text-lg">No events yet. Create your first one!</p>
             ) : (
@@ -259,13 +375,13 @@ export default function EventDashboard() {
                 {events.map(event => {
                   // Safe fallback if status is missing
                   const status = event.status || 'pending';
-                  const statusDisplay = event.status_display || 
-                    (status === 'pending' ? 'Pending' : 
-                     status === 'approved' ? 'Approved' : 
-                     status === 'rejected' ? 'Rejected' : 'Pending');
+                  const statusDisplay = event.status_display ||
+                    (status === 'pending' ? 'Pending' :
+                      status === 'approved' ? 'Approved' :
+                        status === 'rejected' ? 'Rejected' : 'Pending');
 
                   return (
-                    <div key={event.id} className="group bg-white border-2 border-blue-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition transform hover:scale-105 cursor-pointer relative">
+                    <div key={event.id} className="group bg-white border-2 border-blue-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition transform hover:scale-105 relative">
                       {event.photo ? (
                         <img src={getApiUrl(event.photo)} alt={event.title} className="w-full h-48 object-cover" />
                       ) : (
@@ -276,9 +392,9 @@ export default function EventDashboard() {
 
                       {/* Status Badge - Now 100% safe */}
                       <div className={`absolute top-4 right-4 px-5 py-2 rounded-full text-sm font-bold text-white shadow-lg
-                        ${status === 'approved' ? 'bg-emerald-600' : 
-                          status === 'rejected' ? 'bg-red-600' : 
-                          'bg-amber-600'}`}
+                        ${status === 'approved' ? 'bg-emerald-600' :
+                          status === 'rejected' ? 'bg-red-600' :
+                            'bg-amber-600'}`}
                       >
                         {statusDisplay}
                       </div>
@@ -289,6 +405,25 @@ export default function EventDashboard() {
                           {event.date ? format(new Date(event.date), 'PPP • p') : 'No date'}
                         </p>
                         <p className="text-gray-700">{event.location || 'No location'}</p>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-3 mt-6">
+                          <button
+                            onClick={() => openEditEvent(event)}
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition text-sm"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => {
+                              setDeletingEventId(event.id);
+                              setShowDeleteConfirm(true);
+                            }}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg transition text-sm"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
@@ -303,37 +438,170 @@ export default function EventDashboard() {
           <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">My Profile</h3>
           <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-blue-500 shadow-xl">
             {user?.profile_image ? (
-              <Image 
-  
-src={getApiUrl(user?.profile_image || user?.user?.profile_image)}
- 
-  alt="Profile" 
-  width={128} 
-  height={128} 
-  className="w-full h-full object-cover" 
-  unoptimized 
-/>
+              <Image
+                src={getApiUrl(user?.profile_image || user?.user?.profile_image)}
+                alt="Profile"
+                width={128}
+                height={128}
+                className="w-full h-full object-cover"
+                unoptimized
+              />
             ) : (
               <div className="bg-gradient-to-br from-blue-400 to-indigo-500 w-full h-full flex items-center justify-center text-white text-5xl font-bold">
-                {user?.user?.username?.[0]?.toUpperCase()}
+                {user?.username?.[0]?.toUpperCase()}
               </div>
             )}
           </div>
           <div className="space-y-4 text-gray-700">
-            <div><strong>Name:</strong> {user?.user?.username}</div>
-            <div><strong>Email:</strong> {user?.user?.email}</div>
+            <div><strong>Name:</strong> {user?.username}</div>
+            <div><strong>Email:</strong> {user?.email}</div>
             {user?.age && <div><strong>Age:</strong> {user.age}</div>}
-           
             {user?.phone && <div><strong>Phone:</strong> {user.phone}</div>}
             {user?.location && <div><strong>Location:</strong> {user.location}</div>}
-           
-            {user?.details  && <div><strong>details :</strong> {user.details }</div>}
+            {user?.details && <div><strong>Details:</strong> {user.details}</div>}
           </div>
           <button onClick={openEditProfile} className="mt-8 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg transition">
             Edit Profile
           </button>
         </div>
       </div>
+
+      {/* ============= EDIT EVENT MODAL ============= */}
+      {showEditEvent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Edit Event</h3>
+
+            {editPhotoPreview && (
+              <div className="flex justify-center mb-6">
+                <img src={editPhotoPreview} alt="Preview" className="w-full max-w-sm h-48 object-cover rounded-xl shadow-lg" />
+              </div>
+            )}
+
+            <form onSubmit={handleUpdateEvent} className="space-y-6">
+              <input
+                type="text"
+                name="title"
+                placeholder="Event Title"
+                value={editFormData.title}
+                onChange={handleEditInputChange}
+                required
+                className="w-full p-4 border border-gray-300 rounded-xl"
+              />
+              <textarea
+                name="description"
+                placeholder="Description"
+                rows="4"
+                value={editFormData.description}
+                onChange={handleEditInputChange}
+                required
+                className="w-full p-4 border border-gray-300 rounded-xl resize-none"
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input
+                  type="datetime-local"
+                  name="date"
+                  value={editFormData.date}
+                  onChange={handleEditInputChange}
+                  required
+                  className="w-full p-4 border border-gray-300 rounded-xl"
+                />
+                <input
+                  type="text"
+                  name="location"
+                  placeholder="Location"
+                  value={editFormData.location}
+                  onChange={handleEditInputChange}
+                  required
+                  className="w-full p-4 border border-gray-300 rounded-xl"
+                />
+              </div>
+
+              <input
+                type="url"
+                name="link"
+                placeholder="Registration Link (optional)"
+                value={editFormData.link}
+                onChange={handleEditInputChange}
+                className="w-full p-4 border border-gray-300 rounded-xl"
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <select
+                  name="icon"
+                  value={editFormData.icon}
+                  onChange={handleEditInputChange}
+                  className="p-4 border border-gray-300 rounded-xl"
+                >
+                  <option>Calendar</option>
+                  <option>Laptop</option>
+                  <option>Users</option>
+                  <option>GraduationCap</option>
+                  <option>Presentation</option>
+                </select>
+                <input
+                  type="file"
+                  name="photo"
+                  accept="image/*"
+                  onChange={handleEditInputChange}
+                  className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button
+                  type="submit"
+                  disabled={uploading}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl disabled:opacity-70"
+                >
+                  {uploading ? 'Updating...' : 'Save Changes'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditEvent(false);
+                    setEditingEventId(null);
+                  }}
+                  className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 rounded-xl"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============= DELETE CONFIRMATION MODAL ============= */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">Delete Event?</h3>
+            <p className="text-gray-600 text-center mb-8">
+              Are you sure you want to delete this event? This action cannot be undone.
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={handleDeleteEvent}
+                disabled={uploading}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl disabled:opacity-70"
+              >
+                {uploading ? 'Deleting...' : 'Delete'}
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setDeletingEventId(null);
+                }}
+                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 rounded-xl"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit Profile Modal - 100% Same as Original */}
       {showEditProfile && (
@@ -351,17 +619,17 @@ src={getApiUrl(user?.profile_image || user?.user?.profile_image)}
                   <input type="file" accept="image/*" onChange={e => {
                     const file = e.target.files[0];
                     if (file) {
-                      setProfileForm({...profileForm, profile_image: file});
+                      setProfileForm({ ...profileForm, profile_image: file });
                       setImagePreview(URL.createObjectURL(file));
                     }
                   }} className="hidden" />
                 </label>
               </div>
-              
-              <input type="number" placeholder="Age" value={profileForm.age} onChange={e => setProfileForm(p => ({...p, age: e.target.value}))} className="w-full p-4 border border-gray-300 rounded-xl" />
-              <input type="tel" placeholder="Phone" value={profileForm.phone} onChange={e => setProfileForm(p => ({...p, phone: e.target.value}))} className="w-full p-4 border border-gray-300 rounded-xl" />
-              <input type="text" placeholder="work space" value={profileForm.location} onChange={e => setProfileForm(p => ({...p, location: e.target.value}))} className="w-full p-4 border border-gray-300 rounded-xl" />
-              <input type="text" placeholder="Details" value={profileForm.details} onChange={e => setProfileForm(p => ({...p, details: e.target.value}))} className="w-full p-4 border border-gray-300 rounded-xl" />
+
+              <input type="number" placeholder="Age" value={profileForm.age} onChange={e => setProfileForm(p => ({ ...p, age: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" />
+              <input type="tel" placeholder="Phone" value={profileForm.phone} onChange={e => setProfileForm(p => ({ ...p, phone: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" />
+              <input type="text" placeholder="work space" value={profileForm.location} onChange={e => setProfileForm(p => ({ ...p, location: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" />
+              <input type="text" placeholder="Details" value={profileForm.details} onChange={e => setProfileForm(p => ({ ...p, details: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" />
               <div className="flex gap-4 pt-4">
                 <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl">Save</button>
                 <button type="button" onClick={() => setShowEditProfile(false)} className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 rounded-xl">Cancel</button>

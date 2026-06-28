@@ -23,6 +23,7 @@ export default function PublicResearcherProfile() {
   const { id } = useParams();
   const [researcher, setResearcher] = useState<ResearcherDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [openAbstractId, setOpenAbstractId] = useState<string | null>(null); // NEW: track open abstract
 
   useEffect(() => {
     if (!id) return;
@@ -77,7 +78,7 @@ export default function PublicResearcherProfile() {
             </div>
           </div>
 
-          {/* Publications Section - Professional & Clean */}
+          {/* Publications Section */}
           <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
             <h2 className="text-2xl font-bold text-slate-800 mb-6">Publications</h2>
 
@@ -111,7 +112,7 @@ export default function PublicResearcherProfile() {
                         <div className="flex flex-wrap gap-3 mt-4">
                           {pub.journal_name && (
                             <span className="px-4 py-1.5 bg-slate-100 rounded-full text-slate-700 text-sm flex items-center gap-1">
-                              📍  {pub.journal_name}
+                              📍 {pub.journal_name}
                             </span>
                           )}
                           {pub.conference_info && (
@@ -126,28 +127,40 @@ export default function PublicResearcherProfile() {
                           )}
                         </div>
 
-                        {/* DOI & Links */}
+                        {/* DOI */}
                         <div className="mt-5 flex flex-wrap gap-4 text-sm">
-  {pub.doi && (
-    <a 
-      href={`https://doi.org/${pub.doi}`} 
-      target="_blank"
-      rel="noopener noreferrer"
-      className="font-mono text-blue-600 hover:text-blue-700 hover:underline transition-colors"
-    >
-      DOI: {pub.doi}
-    </a>
-  )}
-</div>
+                          {pub.doi && (
+                            <a 
+                              href={`https://doi.org/${pub.doi}`} 
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-mono text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+                            >
+                              DOI: {pub.doi}
+                            </a>
+                          )}
+                        </div>
 
                         {/* Action Buttons */}
                         <div className="flex gap-3 mt-6">
-                          <button 
-                            onClick={() => alert(pub.abstract || "Abstract not available.")}
-                            className="text-xs px-5 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium transition"
-                          >
-                            📄 Abstract
-                          </button>
+                          {/* Abstract toggle button */}
+                          {pub.abstract && (
+                            <button
+                              onClick={() => setOpenAbstractId(openAbstractId === pub.id ? null : pub.id)}
+                              className="text-xs px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-medium transition flex items-center gap-1.5"
+                            >
+                              📄 Abstract
+                              <span className="text-slate-300 text-xs">{openAbstractId === pub.id ? '▲' : '▼'}</span>
+                            </button>
+                          )}
+                          {!pub.abstract && (
+                            <button
+                              disabled
+                              className="text-xs px-5 py-2 bg-slate-100 text-slate-400 rounded-lg font-medium cursor-not-allowed"
+                            >
+                              📄 Abstract
+                            </button>
+                          )}
                           {pub.url && (
                             <a 
                               href={pub.url} 
@@ -167,6 +180,14 @@ export default function PublicResearcherProfile() {
                             </a>
                           )}
                         </div>
+
+                        {/* Inline abstract paragraph */}
+                        {openAbstractId === pub.id && pub.abstract && (
+                          <div className="mt-4 p-4 bg-slate-900 border border-slate-700 rounded-lg">
+                            <p className="text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">Abstract</p>
+                            <p className="text-xs text-slate-100 leading-relaxed">{pub.abstract}</p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -176,7 +197,7 @@ export default function PublicResearcherProfile() {
           </div>
         </div>
 
-        {/* Right Sidebar - Square Image + Info */}
+        {/* Right Sidebar */}
         <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 h-fit sticky top-24">
           <div className="space-y-6">
             {/* Square Profile Image */}
@@ -194,8 +215,8 @@ export default function PublicResearcherProfile() {
             <div className="space-y-5 text-sm">
               <div>
                 <p className="font-semibold text-gray-700">
-  Position <span className="text-gray-400 text-sm">(current Occupation)</span>
-</p>
+                  Position <span className="text-gray-400 text-sm">(current Occupation)</span>
+                </p>
                 <p className="text-gray-600 mt-1">{researcher.Position}</p>
               </div>
               <div>
@@ -206,24 +227,20 @@ export default function PublicResearcherProfile() {
                 <p className="font-semibold text-gray-700">Field</p>
                 <p className="text-gray-600 mt-1">{researcher.Field}</p>
               </div>
-
               <div>
                 <p className="font-semibold text-gray-700">Email</p>
                 <a href={`mailto:${researcher.email}`} className="text-blue-600 hover:underline break-all">
                   {researcher.email}
                 </a>
               </div>
-
               <div>
                 <p className="font-semibold text-gray-700">Contact Number</p>
                 <p className="text-gray-600">{researcher.contact}</p>
               </div>
-
               <div>
                 <p className="font-semibold text-gray-700">Qualification</p>
                 <p className="text-gray-600">{researcher.qualification}</p>
               </div>
-
               {researcher.orcid && (
                 <div>
                   <p className="font-semibold text-gray-700">ORCID</p>

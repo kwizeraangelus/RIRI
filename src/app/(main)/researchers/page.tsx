@@ -46,10 +46,16 @@ export default function ResearchersPage() {
     }
   };
 
-  const filtered = researchers.filter(r =>
-    r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (r.Position && r.Position.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filtered = researchers.filter(r => {
+    const term = searchTerm.toLowerCase();
+    return (
+      r.name.toLowerCase().includes(term) ||
+      (r.qualification && r.qualification.toLowerCase().includes(term)) ||
+      (r.Position && r.Position.toLowerCase().includes(term)) ||
+      (r.ResearchArea && r.ResearchArea.toLowerCase().includes(term)) ||
+      (r.Field && r.Field.toLowerCase().includes(term))
+    );
+  });
 
   if (loading) return <div className="text-center py-20 text-2xl">Loading Researchers...</div>;
   if (error) return <div className="text-center py-20 text-red-600 text-2xl">Error: {error}</div>;
@@ -76,15 +82,20 @@ export default function ResearchersPage() {
           </div>
           <input
             type="text"
-            placeholder="Search by Name or Position..."
+            placeholder="Search by Name, Qualification, Position, Research Area, Field..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-14 pr-6 py-4 bg-white border border-gray-300 rounded-2xl text-xl focus:outline-none focus:border-[#FFD700] shadow-sm"
+            className="w-full pl-14 pr-6 py-4 bg-white border border-gray-300 rounded-2xl text-base focus:outline-none focus:border-[#FFD700] shadow-sm"
           />
         </div>
+        {searchTerm && (
+          <p className="text-center text-sm text-slate-500 mt-3">
+            {filtered.length} result{filtered.length !== 1 ? 's' : ''} for <span className="font-semibold text-slate-700">"{searchTerm}"</span>
+          </p>
+        )}
       </div>
 
-      {/* MAIN CONTENT - Centered */}
+      {/* MAIN CONTENT */}
       <div className="max-w-5xl mx-auto px-6">
         <div className="space-y-8">
           {filtered.length === 0 ? (
@@ -95,7 +106,7 @@ export default function ResearchersPage() {
                 key={person.id} 
                 className="flex flex-col md:flex-row gap-8 border-b border-gray-200 pb-10 last:border-none bg-white rounded-2xl p-6 shadow-sm"
               >
-                {/* Left Column: Image + Button (Stacked) */}
+                {/* Left Column: Image + Button */}
                 <div className="flex flex-col items-center md:items-start w-full md:w-48 flex-shrink-0">
                   <div className="w-32 h-40 bg-gray-100 rounded-xl overflow-hidden mb-4">
                     <img 
@@ -127,7 +138,6 @@ export default function ResearchersPage() {
                       <span className="font-medium text-gray-700">E-Mail ID:</span>{' '}
                       <a href={`mailto:${person.email}`} className="text-blue-600 hover:underline">{person.email}</a>
                     </div>
-                    
                     <div className="text-gray-500">
                       <span className="font-medium text-gray-700">Position:</span> {person.Position}
                     </div>

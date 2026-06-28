@@ -479,7 +479,7 @@ export default function UniversityDashboard() {
                       <input
                         type="text"
                         placeholder="Enter your field (e.g., Psychology)"
-                        className="w-full p-5 text-lg border-2 border-blue-300 rounded-xl focus:border-blue-600 outline-none"
+                        className="w-full p-5 text-lg border-2 border-blue-300 rounded-xl focus:border-blue-600 outline-none text-gray-900"
                         onChange={(e) => setFormData(prev => ({ ...prev, other_field: e.target.value }))}
                       />
                     </div>
@@ -496,12 +496,12 @@ export default function UniversityDashboard() {
                           </p>
                         </div>
 
-                        <input name="university_name" placeholder="University Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
-                        <input name="title" placeholder="Title *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
-                        <input name="authors" placeholder="Authors *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
-                        <input name="supervisor_name" placeholder="Supervisor Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl bg-blue-50" />
-                        <input name="year" type="number" placeholder="Year *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
-                        <textarea name="description" placeholder="Brief description / Abstract *" rows={4} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none" />
+                        <input name="university_name" placeholder="University Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                        <input name="title" placeholder="Title *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                        <input name="authors" placeholder="Authors *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                        <input name="supervisor_name" placeholder="Supervisor Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl bg-blue-50 text-gray-900" />
+                        <input name="year" type="number" placeholder="Year *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                        <textarea name="description" placeholder="Brief description / Abstract *" rows={4} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none text-gray-900" />
                         <input type="file" name="file" accept=".pdf,.doc,.docx" onChange={handleInputChange} required className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg" />
 
                         <button type="submit" disabled={uploading} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-5 rounded-xl text-lg shadow-lg disabled:opacity-70">
@@ -596,25 +596,25 @@ export default function UniversityDashboard() {
                   )}
 
                   <form onSubmit={handleEventSubmit} className="space-y-6">
-                    <input name="title" placeholder="Event Title *" value={eventFormData.title} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
-                    <textarea name="description" placeholder="Description *" rows="5" value={eventFormData.description} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none" />
+                    <input name="title" placeholder="Event Title *" value={eventFormData.title} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                    <textarea name="description" placeholder="Description *" rows="5" value={eventFormData.description} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none text-gray-900" />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <input type="datetime-local" name="date" value={eventFormData.date} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
-                      <input name="location" placeholder="Location (e.g. Zoom, Kigali)" value={eventFormData.location} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl" />
+                      <input type="datetime-local" name="date" value={eventFormData.date} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                      <input name="location" placeholder="Location (e.g. Zoom, Kigali)" value={eventFormData.location} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
                     </div>
 
-                    <input name="link" placeholder="Registration Link (optional)" value={eventFormData.link} onChange={handleEventInputChange} className="w-full p-4 border border-gray-300 rounded-xl" />
+                    <input name="link" placeholder="Registration Link (optional)" value={eventFormData.link} onChange={handleEventInputChange} className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
 
                     <div className="grid grid-cols-2 gap-4">
-                      <select name="icon" value={eventFormData.icon} onChange={handleEventInputChange} className="p-4 border border-gray-300 rounded-xl">
+                      <select name="icon" value={eventFormData.icon} onChange={handleEventInputChange} className="p-4 border border-gray-300 rounded-xl text-gray-900">
                         <option>Calendar</option>
                         <option>Laptop</option>
                         <option>Users</option>
                         <option>GraduationCap</option>
                         <option>Presentation</option>
                       </select>
-                      <input type="file" name="photo" accept="image/*" onChange={handleEventInputChange} className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg" />
+                      <input type="file" name="photo" accept="image/*" onChange={handleEventInputChange} className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg text-gray-900" />
                     </div>
 
                     <button
@@ -752,10 +752,10 @@ export default function UniversityDashboard() {
                 </label>
               </div>
 
-              <input type="number" placeholder="Age" value={profileForm.age} onChange={e => setProfileForm(p => ({ ...p, age: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" />
-              <input type="tel" placeholder="Phone" value={profileForm.phone_number} onChange={e => setProfileForm(p => ({ ...p, phone_number: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" />
-              <input type="text" placeholder="Location" value={profileForm.location} onChange={e => setProfileForm(p => ({ ...p, location: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" />
-              <input type="text" placeholder="University" value={profileForm.university} onChange={e => setProfileForm(p => ({ ...p, university: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl" />
+              <input type="number" placeholder="Age" value={profileForm.age} onChange={e => setProfileForm(p => ({ ...p, age: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+              <input type="tel" placeholder="Phone" value={profileForm.phone_number} onChange={e => setProfileForm(p => ({ ...p, phone_number: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+              <input type="text" placeholder="Location" value={profileForm.location} onChange={e => setProfileForm(p => ({ ...p, location: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+              <input type="text" placeholder="University" value={profileForm.university} onChange={e => setProfileForm(p => ({ ...p, university: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
               <textarea
                 placeholder="Short bio (optional)"
                 rows={4}
@@ -792,19 +792,19 @@ export default function UniversityDashboard() {
                   value={editForm.title}
                   onChange={handleEditInputChange}
                   required
-                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none"
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none text-gray-900"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Authors *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2 ">Authors *</label>
                 <input
                   type="text"
                   name="authors"
                   value={editForm.authors}
                   onChange={handleEditInputChange}
                   required
-                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none"
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none text-gray-900"
                 />
               </div>
 
@@ -816,7 +816,7 @@ export default function UniversityDashboard() {
                   value={editForm.supervisor_name}
                   onChange={handleEditInputChange}
                   required
-                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none bg-blue-50"
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none bg-blue-50 text-gray-900"
                 />
               </div>
 
@@ -828,7 +828,7 @@ export default function UniversityDashboard() {
                   value={editForm.year}
                   onChange={handleEditInputChange}
                   required
-                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none"
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none text-gray-900"
                 />
               </div>
 
@@ -840,7 +840,7 @@ export default function UniversityDashboard() {
                   onChange={handleEditInputChange}
                   required
                   rows={6}
-                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none resize-none"
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:border-blue-600 outline-none resize-none text-gray-900"
                 />
               </div>
 
@@ -851,7 +851,7 @@ export default function UniversityDashboard() {
                   name="file"
                   accept=".pdf,.doc,.docx"
                   onChange={handleEditInputChange}
-                  className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg"
+                  className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg text-gray-900"
                 />
                 <p className="text-xs text-gray-500 mt-2">Leave empty to keep current file</p>
               </div>
