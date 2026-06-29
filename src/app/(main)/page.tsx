@@ -53,33 +53,22 @@ export default function HomePage() {
 
   return (
     <>
-      {/* HERO SLIDER
-          THE FIX: The original had `isolate` + `z-[-10]` which created a new
-          stacking context that sat BELOW the document root — meaning the hero
-          was literally rendered on top of (in front of) the fixed nav in the
-          browser's paint order on mobile, blocking the hamburger button from
-          being tapped.
-
-          Solution: remove `isolate` and `z-[-10]`. The nav is `position:fixed`
-          with z-[9999] so it floats above everything naturally — no z tricks needed
-          on the hero. The hamburger button also gets z-[10000] in layout.tsx
-          to guarantee it's always above the hero image.
-      -->*/}
-      <header className="relative min-h-screen w-full overflow-hidden">
+      {/* HERO SLIDER — reduced height so text is always visible */}
+      <header className="relative w-full overflow-hidden" style={{ height: '70vh', minHeight: '420px' }}>
         {SLIDES.map((slide, index) => (
           <div
             key={index}
             className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 flex items-center justify-center text-center ${
               index === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
-            style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.7)), url('${slide.image}')` }}
+            style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.72)), url('${slide.image}')` }}
           >
-            <div className="px-4 sm:px-6 max-w-5xl mx-auto">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight font-bold text-white mb-6">
+            <div className="px-4 sm:px-6 max-w-4xl mx-auto">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl leading-tight font-bold text-white mb-4">
                 {slide.title}<br />
                 <span className="text-[#FFD700]">{slide.highlight}</span>
               </h1>
-              <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto">
+              <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
                 Connecting minds, empowering research, and celebrating African innovation.
               </p>
             </div>
@@ -87,13 +76,13 @@ export default function HomePage() {
         ))}
 
         {/* Slide dots */}
-        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 flex gap-3">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-3">
           {SLIDES.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentSlide ? 'bg-[#FFD700] w-10' : 'bg-white/70 hover:bg-white'
+              className={`h-3 rounded-full transition-all duration-300 ${
+                index === currentSlide ? 'bg-[#FFD700] w-10' : 'bg-white/70 hover:bg-white w-3'
               }`}
             />
           ))}
@@ -104,7 +93,7 @@ export default function HomePage() {
       <section className={`py-16 px-4 sm:px-6 ${SMOKE_WHITE_BG}`}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
-            How <span className={SOFT_ACCENT_COLOR_TEXT}>RIRI Works</span>
+            <span className={SOFT_ACCENT_COLOR_TEXT}>Our Services</span>
           </h2>
           <p className="text-center text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
             Simple steps to share knowledge and create impact
@@ -151,9 +140,9 @@ export default function HomePage() {
         </div>
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {EVENTS_DATA.map((event, i) => (
-            <div key={i} className={`${SKY_BLUE_CARD_BG} rounded-3xl p-8 hover:scale-105 transition-all shadow-md`}>
-              <h3 className="text-2xl font-bold mb-6">{event.title}</h3>
-              <p className="mb-8 text-gray-700"><strong>Location:</strong> {event.location}</p>
+            <div key={i} className={`${SKY_BLUE_CARD_BG} rounded-3xl p-8 hover:scale-105 transition-all shadow-md flex flex-col`}>
+              <h3 className="text-xl font-extrabold text-black mb-3 leading-snug">{event.title}</h3>
+              <p className="mb-8 text-gray-700 flex-1"><strong>Location:</strong> {event.location}</p>
               <Link href="/events">
                 <button className="w-full py-3 bg-[#FFD700] hover:bg-yellow-400 text-black font-bold rounded-full transition">
                   Learn More &amp; Register
@@ -192,25 +181,93 @@ export default function HomePage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-12 px-4 sm:px-6 border-t border-gray-200 text-center bg-gray-900 text-white">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
-          <div>
-            <h3 className="text-2xl font-bold mb-4">Contact Us</h3>
-            <p className="text-lg text-gray-300">info@riri.gov.rw</p>
-            <p className="text-gray-500">Kigali, Rwanda</p>
+      <footer className="bg-[#0c1e30] text-white pt-14 pb-8 px-4 sm:px-8">
+        <div className="max-w-6xl mx-auto">
+
+          {/* Top grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-10 border-b border-white/10">
+
+            {/* Brand col */}
+            <div className="lg:col-span-1">
+              <p
+                className="font-bold uppercase text-white mb-1"
+                style={{ fontFamily: "'Bell MT', 'Palatino Linotype', Georgia, serif", fontSize: '38px', letterSpacing: '4px', fontStyle: 'italic', lineHeight: 1 }}
+              >
+                RIRI
+              </p>
+              <p className="text-[#FFD700] text-[9px] uppercase tracking-widest mb-4">Discover · Innovate · Inspire</p>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Rwanda's premier platform connecting researchers, innovators, and knowledge seekers.
+              </p>
+            </div>
+
+            {/* Quick links */}
+            <div>
+              <h4 className="text-[#FFD700] font-bold uppercase tracking-widest text-xs mb-5">Quick Links</h4>
+              <ul className="space-y-3">
+                {['Researchers', 'Theses', 'Publications', 'Innovations', 'Events'].map((item) => (
+                  <li key={item}>
+                    <Link href={`/${item.toLowerCase()}`} className="text-gray-300 hover:text-[#FFD700] transition text-sm">
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="text-[#FFD700] font-bold uppercase tracking-widest text-xs mb-5">Contact Us</h4>
+              <ul className="space-y-3 text-sm text-gray-300">
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-[#FFD700]">✉</span>
+                  <span>info@riri.gov.rw</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-[#FFD700]">📍</span>
+                  <span>Kigali, Rwanda</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-[#FFD700]">📞</span>
+                  <span>+250 000 000 000</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Social */}
+            <div>
+              <h4 className="text-[#FFD700] font-bold uppercase tracking-widest text-xs mb-5">Follow Us</h4>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { name: 'Facebook', icon: 'f' },
+                  { name: 'WhatsApp', icon: 'w' },
+                  { name: 'Instagram', icon: 'ig' },
+                  { name: 'TikTok', icon: 'tt' },
+                ].map((social) => (
+                  <button
+                    key={social.name}
+                    onClick={() => notifyInfo(social.name)}
+                    className="px-4 py-2 rounded-full border border-white/20 text-sm text-gray-300 hover:border-[#FFD700] hover:text-[#FFD700] transition"
+                  >
+                    {social.name}
+                  </button>
+                ))}
+              </div>
+              <p className="text-gray-500 text-xs mt-6 leading-relaxed">
+                Stay updated with the latest research events and innovations from Rwanda.
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-2xl font-bold mb-4">Follow Our Journey</h3>
-            <div className="flex justify-center gap-8 text-2xl">
-              {['Facebook', 'WhatsApp', 'Instagram', 'TikTok'].map((social) => (
-                <span key={social} className="cursor-pointer hover:text-[#FFD700] transition" onClick={() => notifyInfo(social)}>
-                  {social}
-                </span>
-              ))}
+
+          {/* Bottom bar */}
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+            <p>© {new Date().getFullYear()} RIRI. All Rights Reserved.</p>
+            <div className="flex gap-5">
+              <Link href="/about" className="hover:text-[#FFD700] transition">About</Link>
+              <Link href="/contact" className="hover:text-[#FFD700] transition">Contact</Link>
             </div>
           </div>
         </div>
-        <p className="mt-10 text-gray-400">© {new Date().getFullYear()} RIRI. All Rights Reserved.</p>
       </footer>
     </>
   );

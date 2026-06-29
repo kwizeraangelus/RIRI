@@ -23,7 +23,7 @@ export default function PublicResearcherProfile() {
   const { id } = useParams();
   const [researcher, setResearcher] = useState<ResearcherDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [openAbstractId, setOpenAbstractId] = useState<string | null>(null); // NEW: track open abstract
+  const [openAbstractId, setOpenAbstractId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -50,155 +50,12 @@ export default function PublicResearcherProfile() {
   return (
     <div className="min-h-screen bg-[#E0F2FE]">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg shadow-md flex items-center justify-center">
-              <span className="text-white font-bold text-xl">RP</span>
-            </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              Research Portal
-            </h1>
-          </div>
-          <div className="text-sm text-slate-500"></div>
-        </div>
-      </header>
+      
 
       <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Left Side - Bio + Publications */}
-        <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-            <h1 className="text-3xl font-bold text-slate-800 mb-2">{researcher.name}</h1>
-            <p className="text-slate-600 mb-6">{researcher.qualification}</p>
-
-            {/* Bio */}
-            <div className="prose text-gray-700 leading-relaxed">
-              <p>{researcher.bio || "No biography available for this researcher."}</p>
-            </div>
-          </div>
-
-          {/* Publications Section */}
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-            <h2 className="text-2xl font-bold text-slate-800 mb-6">Publications</h2>
-
-            {researcher.publications.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                No publications available yet.
-              </div>
-            ) : (
-              <div className="space-y-8">
-                {researcher.publications.map((pub, index) => (
-                  <div key={pub.id} className="border border-slate-200 rounded-xl p-6 hover:shadow-md transition-all">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-sm">
-                        {index + 1}
-                      </div>
-
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-slate-800 leading-tight">
-                          {pub.title}
-                        </h3>
-
-                        {/* Authors */}
-                        <p className="text-sm text-slate-600 mt-3">
-                          <span className="font-medium">Authors:</span>{' '}
-                          {Array.isArray(pub.authors) 
-                            ? pub.authors.join(' • ') 
-                            : researcher.name}
-                        </p>
-
-                        {/* Tags */}
-                        <div className="flex flex-wrap gap-3 mt-4">
-                          {pub.journal_name && (
-                            <span className="px-4 py-1.5 bg-slate-100 rounded-full text-slate-700 text-sm flex items-center gap-1">
-                              📍 {pub.journal_name}
-                            </span>
-                          )}
-                          {pub.conference_info && (
-                            <span className="px-4 py-1.5 bg-purple-100 rounded-full text-purple-700 text-sm flex items-center gap-1">
-                              🎤 {pub.conference_info}
-                            </span>
-                          )}
-                          {pub.publisher && (
-                            <span className="px-4 py-1.5 bg-green-100 rounded-full text-green-700 text-sm flex items-center gap-1">
-                              📔 {pub.publisher}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* DOI */}
-                        <div className="mt-5 flex flex-wrap gap-4 text-sm">
-                          {pub.doi && (
-                            <a 
-                              href={`https://doi.org/${pub.doi}`} 
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-mono text-blue-600 hover:text-blue-700 hover:underline transition-colors"
-                            >
-                              DOI: {pub.doi}
-                            </a>
-                          )}
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex gap-3 mt-6">
-                          {/* Abstract toggle button */}
-                          {pub.abstract && (
-                            <button
-                              onClick={() => setOpenAbstractId(openAbstractId === pub.id ? null : pub.id)}
-                              className="text-xs px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-medium transition flex items-center gap-1.5"
-                            >
-                              📄 Abstract
-                              <span className="text-slate-300 text-xs">{openAbstractId === pub.id ? '▲' : '▼'}</span>
-                            </button>
-                          )}
-                          {!pub.abstract && (
-                            <button
-                              disabled
-                              className="text-xs px-5 py-2 bg-slate-100 text-slate-400 rounded-lg font-medium cursor-not-allowed"
-                            >
-                              📄 Abstract
-                            </button>
-                          )}
-                          {pub.url && (
-                            <a 
-                              href={pub.url} 
-                              target="_blank" 
-                              className="text-xs px-5 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-medium transition"
-                            >
-                              🌐 HTML
-                            </a>
-                          )}
-                          {pub.pdf_path && (
-                            <a 
-                              href={getApiUrl(pub.pdf_path)} 
-                              target="_blank" 
-                              className="text-xs px-5 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition"
-                            >
-                              📑 PDF
-                            </a>
-                          )}
-                        </div>
-
-                        {/* Inline abstract paragraph */}
-                        {openAbstractId === pub.id && pub.abstract && (
-                          <div className="mt-4 p-4 bg-slate-900 border border-slate-700 rounded-lg">
-                            <p className="text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">Abstract</p>
-                            <p className="text-xs text-slate-100 leading-relaxed">{pub.abstract}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right Sidebar */}
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 h-fit sticky top-24">
+        {/* Right Sidebar - Appears FIRST on mobile, second on desktop */}
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 h-fit lg:sticky lg:top-24 order-first lg:order-last">
           <div className="space-y-6">
             {/* Square Profile Image */}
             <div className="flex justify-center">
@@ -248,6 +105,138 @@ export default function PublicResearcherProfile() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+        
+        {/* Left Side - Bio + Publications - Appears SECOND on mobile, first on desktop */}
+        <div className="lg:col-span-2 space-y-8 order-last lg:order-first">
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+            <h1 className="text-3xl font-bold text-slate-800 mb-2">{researcher.name}</h1>
+            <p className="text-slate-600 mb-6">{researcher.qualification}</p>
+
+            {/* Bio - with justified text */}
+            <div className="prose text-gray-700 leading-relaxed text-justify">
+              <p>{researcher.bio || "No biography available for this researcher."}</p>
+            </div>
+          </div>
+
+          {/* Publications Section */}
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+            <h2 className="text-2xl font-bold text-slate-800 mb-6">Publications</h2>
+
+            {researcher.publications.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                No publications available yet.
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {researcher.publications.map((pub, index) => (
+                  <div key={pub.id} className="border border-slate-200 rounded-xl p-6 hover:shadow-md transition-all">
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-sm">
+                          {index + 1}
+                        </div>
+
+                        <div className="flex-1">
+                          <h3 className="text-xl font-semibold text-slate-800 leading-tight">
+                            {pub.title}
+                          </h3>
+
+                          {/* Authors */}
+                          <p className="text-sm text-slate-600 mt-3">
+                            <span className="font-medium">Authors:</span>{' '}
+                            {Array.isArray(pub.authors) 
+                              ? pub.authors.join(' • ') 
+                              : researcher.name}
+                          </p>
+
+                          {/* Tags */}
+                          <div className="flex flex-wrap gap-3 mt-4">
+                            {pub.journal_name && (
+                              <span className="px-4 py-1.5 bg-slate-100 rounded-full text-slate-700 text-sm flex items-center gap-1">
+                                📍 {pub.journal_name}
+                              </span>
+                            )}
+                            {pub.conference_info && (
+                              <span className="px-4 py-1.5 bg-purple-100 rounded-full text-purple-700 text-sm flex items-center gap-1">
+                                🎤 {pub.conference_info}
+                              </span>
+                            )}
+                            {pub.publisher && (
+                              <span className="px-4 py-1.5 bg-green-100 rounded-full text-green-700 text-sm flex items-center gap-1">
+                                📔 {pub.publisher}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* DOI */}
+                          <div className="mt-5 flex flex-wrap gap-4 text-sm">
+                            {pub.doi && (
+                              <a 
+                                href={`https://doi.org/${pub.doi}`} 
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-mono text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+                              >
+                                DOI: {pub.doi}
+                              </a>
+                            )}
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex gap-3 mt-6">
+                            {pub.abstract && (
+                              <button
+                                onClick={() => setOpenAbstractId(openAbstractId === pub.id ? null : pub.id)}
+                                className="text-xs px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-medium transition flex items-center gap-1.5"
+                              >
+                                📄 Abstract
+                                <span className="text-slate-300 text-xs">{openAbstractId === pub.id ? '▲' : '▼'}</span>
+                              </button>
+                            )}
+                            {!pub.abstract && (
+                              <button
+                                disabled
+                                className="text-xs px-5 py-2 bg-slate-100 text-slate-400 rounded-lg font-medium cursor-not-allowed"
+                              >
+                                📄 Abstract
+                              </button>
+                            )}
+                            {pub.url && (
+                              <a 
+                                href={pub.url} 
+                                target="_blank" 
+                                className="text-xs px-5 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-medium transition"
+                              >
+                                🌐 HTML
+                              </a>
+                            )}
+                            {pub.pdf_path && (
+                              <a 
+                                href={getApiUrl(pub.pdf_path)} 
+                                target="_blank" 
+                                className="text-xs px-5 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition"
+                              >
+                                📑 PDF
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Full-width Abstract - Below the publication info */}
+                      {openAbstractId === pub.id && pub.abstract && (
+                        <div className="mt-2 p-6 bg-gray-100 border border-gray-300 rounded-lg w-full">
+                          <p className="text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wider">Abstract</p>
+                          <p className="text-sm text-gray-900 leading-relaxed text-justify">{pub.abstract}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

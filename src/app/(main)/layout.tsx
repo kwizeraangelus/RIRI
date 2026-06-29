@@ -15,10 +15,10 @@ const navLinks = [
   { name: 'researchers', href: '/researchers' },
   { name: 'theses', href: '/theses' },
   { name: 'publications', href: '/publications' },
-  { name: 'expert', href: '/experts' },
-  { name: 'innovation', href: '/innovation' },
-  { name: 'about', href: '/about' },
+  { name: 'experts', href: '/experts' },
+  { name: 'innovations', href: '/innovation' },
   { name: 'events', href: '/events' },
+  { name: 'about', href: '/about' },
   { name: 'contact', href: '/contact' },
 ] as const;
 
@@ -33,7 +33,6 @@ interface UserData {
 }
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalType, setModalType] = useState<'login' | 'signup' | null>(null);
@@ -81,12 +80,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       setAuthData({ user: user && storedToken ? user : null, loading: false });
     }, 10);
     return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 100);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
@@ -140,10 +133,38 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className={`${poppins.variable} font-sans text-white`}>
-      {/* NAV BAR — exactly your original styling */}
-      <nav className={`fixed inset-x-0 top-0 z-[9999] flex justify-between items-center px-8 lg:px-[50px] py-6 transition-all duration-300 ${scrolled ? 'bg-[#0c1e30ee] backdrop-blur-xl shadow-2xl py-4' : 'bg-transparent'}`}>
-        <Link href="/" className="text-[40px] font-bold uppercase italic tracking-[3px] hover:text-[#FFD700]">
-          RIRI
+      {/* NAV BAR — static, always solid blue */}
+      <nav className="w-full z-[9999] flex justify-between items-center px-8 lg:px-[50px] py-6 bg-[#0c1e30] shadow-2xl">
+        <Link href="/" className="flex flex-col leading-none group" style={{ width: 'fit-content' }}>
+          <span
+            className="font-bold uppercase group-hover:text-[#FFD700] transition"
+            style={{
+              fontFamily: "'Bell MT', 'Palatino Linotype', Georgia, serif",
+              fontSize: '68px',
+              lineHeight: '1',
+              letterSpacing: '6px',
+              fontStyle: 'italic',
+              textShadow: '2px 2px 0px rgba(255,215,0,0.15)',
+            }}
+          >
+            RIRI
+          </span>
+          <span
+            style={{
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: '8.5px',
+              letterSpacing: '0.28em',
+              color: '#FFD700',
+              textTransform: 'uppercase',
+              fontWeight: 300,
+              marginTop: '1px',
+              whiteSpace: 'nowrap',
+              display: 'block',
+              maxWidth: '100%',
+            }}
+          >
+            Discover · Innovate · Inspire
+          </span>
         </Link>
 
         <ul className="hidden lg:flex gap-10 items-center">
@@ -151,7 +172,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <li key={link.name}>
               <Link
                 href={link.href}
-                className={`text-lg capitalize transition ${pathname === link.href ? 'text-[#FFD700] font-bold border-b-2 border-[#FFD700]' : 'hover:text-[#FFD700]'}`}
+                className={`text-[17px] capitalize transition ${pathname === link.href ? 'text-[#FFD700] font-bold border-b-2 border-[#FFD700]' : 'hover:text-[#FFD700]'}`}
               >
                 {link.name}
               </Link>
@@ -207,7 +228,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             </div>
           )}
 
-          {/* Hamburger button — your original, just with relative z-index to sit above hero */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden relative z-[10000]"

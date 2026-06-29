@@ -331,26 +331,6 @@ export default function BookDetailPage() {
                 Read Online (Instant)
               </button>
             )}
-            {(book?.file_url || book?.file_path) && (
-              <a
-   // ✅ RIGHT (Clean and functional)
-href={
-  book?.file_url 
-    ? book.file_url 
-    : book?.file_path 
-      ? getApiUrl(book.file_path)
-      : '#'
-}
-
-  target="_blank"
-  rel="noopener noreferrer"
-  className="inline-flex items-center px-8 py-4 bg-green-700 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-green-800 transition transform hover:scale-105"
->
-  <Download className="w-6 h-6 mr-3" />
-  Open PDF
-</a>
-
-            )}
            {book?.external_link && (
       <a
         href={book.external_link}
@@ -369,7 +349,7 @@ href={
         {authorUploads.length > 0 && (
           <div className="bg-gray-50 p-8 border-t">
             <h3 className="text-3xl font-bold text-gray-800 text-center mb-10">
-              More Publications by this Researcher
+              More Publications by this University
             </h3>
             <div className="max-w-4xl mx-auto space-y-6">
               {authorUploads.map(upload => (
@@ -448,7 +428,7 @@ href={
                         {upload.description && (
                           <button className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium">
                             <FileText size={16} />
-                            Abstract
+                            Read
                           </button>
                         )}
                         
@@ -461,7 +441,7 @@ href={
                         
                         <button className="flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 font-medium ml-auto">
                           <ExternalLink size={16} />
-                          View Details
+                          
                         </button>
                       </div>
                       

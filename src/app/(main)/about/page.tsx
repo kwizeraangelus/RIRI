@@ -12,20 +12,15 @@ const AboutPage = () => {
   ];
 
   const academicPartners = [
-    'University of Rwanda', 'Rwanda Polytechnic', 'University of Kigali', 
-    'Carnegie Mellon University Africa', 'African Leadership University', 
-    'University of Global Health Equity', 'Akilah Institute', 'Adventist University of Central Africa'
+   
   ];
 
   const governmentPartners = [
-    'Ministry of Education', 'Rwanda Development Board', 
-    'National Council for Science & Technology', 'Private Sector Federation',
-    'Ministry of ICT & Innovation', 'Rwanda Biomedical Centre'
+   
   ];
 
   const internationalPartners = [
-    'UNESCO', 'World Bank', 'African Union', 'European Union', 
-    'British Council', 'USAID', 'World Health Organization', 'African Development Bank'
+    
   ];
 
   return (
@@ -40,7 +35,7 @@ const AboutPage = () => {
             About <span className="text-[#FFD700]">RIRI</span>
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-gray-700 max-w-2xl mx-auto">
-            Rwanda Innovation & Research Institute - Connecting research to Rwanda development
+            Research and Innovation for Rwanda Impact - Connecting research to Rwanda development
           </p>
         </div>
       </section>

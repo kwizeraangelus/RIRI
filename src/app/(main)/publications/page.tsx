@@ -67,10 +67,9 @@ export default function PublicationsPage() {
 
   return (
     <div className="min-h-screen bg-[#E0F2FE] text-gray-900">
-      <div className="h-28 bg-[#050A14]" />
 
       {/* HERO */}
-      <section className="relative -mt-28 pt-36 pb-20 text-center">
+      <section className="relative pt-20 pb-20 text-center">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-[#050A14] mb-6">
             Explore Research <span className="text-[#FFD700]">Library</span>
@@ -109,7 +108,7 @@ export default function PublicationsPage() {
       </section>
 
       {/* LIST */}
-      <section className="py-16 px-6 -mt-10">
+      <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
 
           <div className="flex items-center justify-between mb-4">
@@ -153,7 +152,6 @@ export default function PublicationsPage() {
               {filtered.map((pub) => {
                 const isOpen = openId === pub.id;
                 const authors = Array.isArray(pub.authors) ? pub.authors.join(', ') : pub.authors || 'Unknown';
-                const shortAuthors = authors.length > 40 ? authors.slice(0, 40) + '…' : authors;
                 const q = query.trim().toLowerCase();
 
                 return (
@@ -164,16 +162,18 @@ export default function PublicationsPage() {
                     {/* ROW */}
                     <button
                       onClick={() => toggle(pub.id)}
-                      className="w-full flex items-center justify-between px-6 py-5 gap-4 text-left hover:bg-gray-50 transition-colors"
+                      className="w-full flex items-start justify-between px-6 py-5 gap-4 text-left hover:bg-gray-50 transition-colors"
                     >
-                      <span className="font-medium text-[#050A14] text-base sm:text-lg flex-1">
-                        {highlight(pub.title || 'Untitled', q)}
-                      </span>
-                      <span className="text-gray-500 text-sm italic flex-shrink-0 hidden sm:block">
-                        {highlight(shortAuthors, q)}
-                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-[#050A14] text-base sm:text-lg break-words">
+                          {highlight(pub.title || 'Untitled', q)}
+                        </p>
+                        <p className="text-gray-500 text-sm italic mt-1 text-right truncate">
+                          {highlight(authors, q)}
+                        </p>
+                      </div>
                       <svg
-                        className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                        className={`w-5 h-5 text-gray-400 flex-shrink-0 mt-1 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
                         fill="none" stroke="currentColor" viewBox="0 0 24 24"
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -196,9 +196,19 @@ export default function PublicationsPage() {
                           </p>
                         )}
                         {pub.doi && (
-                          <p><span className="text-gray-400">DOI:</span> <span className="font-mono text-blue-600">{pub.doi}</span></p>
+                          <p>
+                            <span className="text-gray-400">DOI:</span>{' '}
+                            <a
+                              href={`https://doi.org/${pub.doi}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-mono text-blue-600 hover:underline"
+                            >
+                              {pub.doi}
+                            </a>
+                          </p>
                         )}
-                        <p><span className="text-gray-400">Uploaded by:</span> {pub.user?.username || 'Researcher'}</p>
+                        <p><span className="text-gray-400">read pdf:</span> {pub.user?.username || 'Researcher'}</p>
                         {pub.url && (
                           <a
                             href={pub.url}

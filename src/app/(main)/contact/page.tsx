@@ -196,7 +196,7 @@ export default function ContactClient() {
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-800">Visit Us</h3>
-                      <p className="text-gray-600">KG 7 Ave, Kigali<br />Rwanda Innovation Complex<br />Kigali, Rwanda</p>
+                      <p className="text-gray-600">KG 677 ST, Kigali<br />Gisozi-Kukibanza<br />Kigali, Rwanda</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -205,7 +205,7 @@ export default function ContactClient() {
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-800">Call Us</h3>
-                      <p className="text-gray-600">+250 788 123 456<br />+250 788 123 457</p>
+                      <p className="text-gray-600">+250 793211640<br />+250 785590020</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -214,7 +214,7 @@ export default function ContactClient() {
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-800">Email Us</h3>
-                      <p className="text-gray-600">info@riri.gov.rw<br/>support@riri.gov.rw</p>
+                      <p className="text-gray-600">info@riri.rw<br/>support@riri.rw</p>
                     </div>
                   </div>
                 </div>
