@@ -1,7 +1,8 @@
 {
-  "/books/[id]/page": "app/books/[id]/page.js",
-  "/(main)/researchers/[id]/page": "app/(main)/researchers/[id]/page.js",
+  "/admin-dashboard/page": "app/admin-dashboard/page.js",
+  "/register/page": "app/register/page.js",
   "/(main)/theses/page": "app/(main)/theses/page.js",
-  "/(main)/publications/page": "app/(main)/publications/page.js",
-  "/(main)/events/page": "app/(main)/events/page.js"
+  "/(main)/university/page": "app/(main)/university/page.js",
+  "/(main)/page": "app/(main)/page.js",
+  "/(main)/innovation/page": "app/(main)/innovation/page.js"
 }

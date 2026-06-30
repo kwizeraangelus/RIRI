@@ -168,7 +168,7 @@ export default function PublicationsPage() {
                         <p className="font-medium text-[#050A14] text-base sm:text-lg break-words">
                           {highlight(pub.title || 'Untitled', q)}
                         </p>
-                        <p className="text-gray-500 text-sm italic mt-1 text-right truncate">
+                        <p className="text-gray-500 text-sm italic mt-1 text-left truncate">
                           {highlight(authors, q)}
                         </p>
                       </div>

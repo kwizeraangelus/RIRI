@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, LogIn, UserPlus, Loader2 } from 'lucide-react';
+import { X, LogIn, UserPlus, Loader2, Eye, EyeOff } from 'lucide-react';
 import { notifySuccess } from '@/context/NotificationContext';
 import { getApiUrl } from '@/utils/api';
 
@@ -41,6 +41,8 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
   const isLogin = type === 'login';
@@ -147,7 +149,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
         }
 
         localStorage.setItem('user', JSON.stringify(user));
-        
+
         onAuthSuccess();
         notifySuccess(`Welcome back, ${user.username || user.email}!`);
         onClose();
@@ -242,7 +244,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
               />
               <input
                 type="tel"
-                placeholder="Phone Number"
+                placeholder="Phone Number(optional)"
                 value={formData.phone_number}
                 onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
                 className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
@@ -277,15 +279,26 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
             />
           )}
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            required
-            className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-blue-500 text-lg"
-            disabled={loading}
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
+              className="w-full px-5 py-4 pr-12 border rounded-xl focus:ring-4 focus:ring-blue-500 text-lg"
+              disabled={loading}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              tabIndex={-1}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+            </button>
+          </div>
 
           {isLogin && (
             <div className="text-right -mt-2">
@@ -300,15 +313,26 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
           )}
 
           {!isLogin && (
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              required
-              className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
-              disabled={loading}
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                required
+                className="w-full px-5 py-4 pr-12 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
+                disabled={loading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                tabIndex={-1}
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+              </button>
+            </div>
           )}
 
           <button

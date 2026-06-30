@@ -35,6 +35,16 @@ interface Counts {
   education: number;
 }
 
+interface AuthUser {
+  id: number;
+  username: string;
+  email: string;
+  user_category: string;
+  first_name?: string;
+  last_name?: string;
+  is_staff?: boolean;
+}
+
 // ──────────────────────────────────────────────────────
 // Constants
 // ──────────────────────────────────────────────────────
@@ -136,6 +146,38 @@ const matchesSearch = (pub: Publication, query: string): boolean => {
     pub.degree_type,
     formatFieldName(pub.submission_type),
   ].some((field) => field?.toLowerCase().includes(q));
+};
+
+/** Safely parses the stored user JSON from localStorage. */
+const safeParseUser = (str: string | null): AuthUser | null => {
+  if (!str || str === 'undefined' || str === 'null' || str === '') return null;
+  try {
+    const parsed = JSON.parse(str);
+    if (parsed && typeof parsed === 'object') {
+      return {
+        id: parsed.id || 0,
+        username: parsed.username || '',
+        email: parsed.email || '',
+        user_category: (parsed.user_category || '').toUpperCase(),
+        first_name: parsed.first_name || '',
+        last_name: parsed.last_name || '',
+        is_staff: parsed.is_staff || false,
+      };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+/** Resolves where the "Upload Book" button should send the user. */
+const getUploadDestination = (user: AuthUser | null): string => {
+  if (user && user.user_category?.toUpperCase() === 'UNIVERSITY') {
+    return '/university';
+  }else if(user && user.user_category?.toUpperCase() === 'ADMIN'){
+    return 'admin-dashboard';
+  }
+  return '/register';
 };
 
 // ──────────────────────────────────────────────────────
@@ -284,9 +326,18 @@ export default function ThesesPage() {
   const [degreeFilter, setDegreeFilter] = useState<'all' | 'thesis' | 'dissertation'>('all');
   const [selectedField, setSelectedField] = useState<string | null>(null);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const MAX_QUICK_RESULTS = 6;
+
+  // ── Read logged-in user from localStorage on mount ──
+  useEffect(() => {
+    const storedUserStr = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('access_token');
+    const user = safeParseUser(storedUserStr);
+    setAuthUser(user && storedToken ? user : null);
+  }, []);
 
   // ── API URL builder (field/degree only — search is client-side) ──
   const buildApiUrl = useCallback((): string => {
@@ -357,6 +408,9 @@ export default function ThesesPage() {
     setInputValue('');
     setShowSearchResults(false);
   };
+
+  // Where the floating "Upload Book" button should go
+  const uploadDestination = getUploadDestination(authUser);
 
   // ──────────────────────────────────────────────────────
   // Render
@@ -528,9 +582,9 @@ export default function ThesesPage() {
         </div>
       </section>
 
-      {/* Upload FAB */}
+      {/* Upload FAB — sends logged-in users to their dashboard, others to login */}
       <Link
-        href="/login"
+        href={uploadDestination}
         className="fixed right-4 sm:right-6 bottom-4 sm:bottom-6 z-50 flex items-center gap-2 sm:gap-3 bg-[#FFD700] text-[#050A14] px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-2xl hover:scale-110 transition-all font-bold text-xs sm:text-sm uppercase"
       >
         Upload Book

@@ -434,7 +434,7 @@ export default function UniversityDashboard() {
               </button>
 
               {showUploadForm && (
-                <div className="bg-white rounded-2xl shadow-2xl border-2 border-blue-100 p-8 max-h-[70vh] overflow-hidden">
+                <div className="bg-white rounded-2xl shadow-2xl border-2 border-blue-100 p-8">
                   <h3 className="text-2xl font-bold text-gray-800 text-center mb-10">Submit Your Research</h3>
 
                   {!degreeType && (
@@ -452,7 +452,7 @@ export default function UniversityDashboard() {
                   )}
 
                   {degreeType && !selectedField && (
-                    <div className="text-center overflow-y-auto max-h-96 pb-4">
+                    <div className="text-center pb-4">
                       <p className="text-xl font-semibold text-gray-700 mb-8">Select your field of study</p>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
                         {ACADEMIC_FIELDS.map(field => (
@@ -487,27 +487,25 @@ export default function UniversityDashboard() {
 
                   {formData.submission_type && (
                     <form onSubmit={handleSubmit} className="mt-10 space-y-6">
-                      <div className="mt-10 space-y-6 max-h-[50vh] overflow-y-auto pr-2 -mr-2">
-                        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center sticky top-0 bg-white z-10">
-                          <p className="text-sm text-blue-600">Selected Category</p>
-                          <p className="text-2xl font-bold text-blue-900">
-                            {degreeType.charAt(0).toUpperCase() + degreeType.slice(1)} -{' '}
-                            {selectedField === 'other' ? formData.other_field : selectedField.replace(/_/g, ' ')}
-                          </p>
-                        </div>
-
-                        <input name="university_name" placeholder="University Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
-                        <input name="title" placeholder="Title *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
-                        <input name="authors" placeholder="Authors *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
-                        <input name="supervisor_name" placeholder="Supervisor Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl bg-blue-50 text-gray-900" />
-                        <input name="year" type="number" placeholder="Year *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
-                        <textarea name="description" placeholder="Brief description / Abstract *" rows={4} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none text-gray-900" />
-                        <input type="file" name="file" accept=".pdf,.doc,.docx" onChange={handleInputChange} required className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg" />
-
-                        <button type="submit" disabled={uploading} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-5 rounded-xl text-lg shadow-lg disabled:opacity-70">
-                          {uploading ? 'Submitting...' : 'Submit Research'}
-                        </button>
+                      <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center">
+                        <p className="text-sm text-blue-600">Selected Category</p>
+                        <p className="text-2xl font-bold text-blue-900">
+                          {degreeType.charAt(0).toUpperCase() + degreeType.slice(1)} -{' '}
+                          {selectedField === 'other' ? formData.other_field : selectedField.replace(/_/g, ' ')}
+                        </p>
                       </div>
+
+                      <input name="university_name" placeholder="University Name " onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                      <input name="title" placeholder="Title " onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                      <input name="authors" placeholder="Authors " onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                      <input name="supervisor_name" placeholder="Supervisor Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl bg-blue-50 text-gray-900" />
+                      <input name="year" type="number" placeholder="Year " onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                      <textarea name="description" placeholder="Brief description / Abstract " rows={4} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none text-gray-900" />
+                      <input type="file" name="file" accept=".pdf,.doc,.docx" onChange={handleInputChange} required className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg" />
+
+                      <button type="submit" disabled={uploading} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-5 rounded-xl text-lg shadow-lg disabled:opacity-70">
+                        {uploading ? 'Submitting...' : 'Submit Research'}
+                      </button>
                     </form>
                   )}
                 </div>
@@ -692,14 +690,14 @@ export default function UniversityDashboard() {
               />
             ) : (
               <div className="bg-gradient-to-br from-blue-400 to-indigo-500 w-full h-full flex items-center justify-center text-white text-5xl font-bold">
-                {user?.user?.username?.[0]?.toUpperCase() || 'U'}
+                {user?.username?.[0]?.toUpperCase() || 'U'}
               </div>
             )}
           </div>
 
           <div className="space-y-4 text-gray-700">
-            <div><strong>Name:</strong> {user?.user?.username}</div>
-            <div><strong>Email:</strong> {user?.user?.email}</div>
+            <div><strong>Name:</strong> {user?.username}</div>
+            <div><strong>Email:</strong> {user?.email}</div>
             {user?.age && <div><strong>Age:</strong> {user.age}</div>}
             {user?.phone_number && <div><strong>Phone:</strong> {user.phone_number}</div>}
             {user?.location && <div><strong>Location:</strong> {user.location}</div>}
@@ -713,7 +711,7 @@ export default function UniversityDashboard() {
           </div>
 
           <button
-            onClick={openEditProfile}
+           onClick={() => window.location.href = `profile`}
             className="mt-8 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg transition"
           >
             Edit Profile
