@@ -90,12 +90,12 @@ export default function HomePage() {
       </header>
 
       {/* HOW RIRI WORKS */}
-      <section className={`py-16 px-4 sm:px-6 ${SMOKE_WHITE_BG}`}>
+      <section className={`py-20 px-4 sm:px-6 ${SMOKE_WHITE_BG}`}>
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-center mb-6">
             <span className={SOFT_ACCENT_COLOR_TEXT}>Our Services</span>
           </h2>
-          <p className="text-center text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-2xl md:text-3xl text-gray-600 mb-16 max-w-3xl mx-auto">
             Simple steps to share knowledge and create impact
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -104,12 +104,12 @@ export default function HomePage() {
               { step: '2', title: 'Discover & Learn', description: 'Readers explore theses, books, articles, and innovations through powerful search and categories.' },
               { step: '3', title: 'Connect & Grow', description: 'Engage with the community through events, collaborations, and networking opportunities.' }
             ].map((item) => (
-              <div key={item.step} className="bg-white rounded-3xl p-8 shadow-md hover:bg-blue-50 hover:shadow-xl transition-all duration-300 border border-blue-100 group">
-                <div className="w-14 h-14 rounded-2xl bg-[#FFD700] text-black font-bold text-3xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
+              <div key={item.step} className="bg-white rounded-3xl p-10 shadow-md hover:bg-blue-50 hover:shadow-xl transition-all duration-300 border border-blue-100 group">
+                <div className="w-20 h-20 rounded-2xl bg-[#FFD700] text-black font-bold text-5xl flex items-center justify-center mb-8 group-hover:scale-110 transition">
                   {item.step}
                 </div>
-                <h3 className="text-2xl font-bold mb-3">{item.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{item.description}</p>
+                <h3 className="text-4xl font-bold mb-4 text-gray-800">{item.title}</h3>
+                <p className="text-black leading-relaxed text-xl">{item.description}</p>
               </div>
             ))}
           </div>
@@ -117,34 +117,34 @@ export default function HomePage() {
       </section>
 
       {/* FEATURED MEDIA SECTION */}
-      <section className="py-16 px-4 sm:px-6 bg-white">
+      <section className="py-20 px-4 sm:px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-12">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-center mb-16">
             <span className={SOFT_ACCENT_COLOR_TEXT}>A Glimpse into Our Creative Community</span>
           </h2>
           <div className="relative aspect-video bg-gray-200 rounded-3xl overflow-hidden shadow-2xl">
             <Image src="/thesis.jpg" alt="Featured Media" fill className="object-cover" sizes="(max-width: 1200px) 100vw, 1200px" />
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-8">
-              <p className="text-white text-2xl md:text-3xl font-bold">Stories that go beyond the page.</p>
-              <p className="text-white/90 text-lg mt-4">Where research, creativity, and innovation come alive.</p>
+              <p className="text-white text-4xl md:text-5xl font-bold">Stories that go beyond the page.</p>
+              <p className="text-white/90 text-2xl mt-6">Where research, creativity, and innovation come alive.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* EVENTS SECTION */}
-      <section className={`py-16 px-4 sm:px-6 ${SMOKE_WHITE_BG}`}>
+      <section className={`py-20 px-4 sm:px-6 ${SMOKE_WHITE_BG}`}>
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-black">Attend Our Events</h2>
-          <p className="text-xl text-gray-600 mb-12">Join our recurring celebrations of knowledge and innovation</p>
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-black">Attend Our Events</h2>
+          <p className="text-2xl md:text-3xl text-gray-600 mb-16">Join our recurring celebrations of knowledge and innovation</p>
         </div>
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {EVENTS_DATA.map((event, i) => (
-            <div key={i} className={`${SKY_BLUE_CARD_BG} rounded-3xl p-8 hover:scale-105 transition-all shadow-md flex flex-col`}>
-              <h3 className="text-xl font-extrabold text-black mb-3 leading-snug">{event.title}</h3>
-              <p className="mb-8 text-gray-700 flex-1"><strong>Location:</strong> {event.location}</p>
+            <div key={i} className={`${SKY_BLUE_CARD_BG} rounded-3xl p-10 hover:scale-105 transition-all shadow-md flex flex-col`}>
+              <h3 className="text-3xl font-extrabold text-black mb-4 leading-snug">{event.title}</h3>
+              <p className="mb-10 text-gray-700 flex-1 text-xl"><strong>Location:</strong> {event.location}</p>
               <Link href="/events">
-                <button className="w-full py-3 bg-[#FFD700] hover:bg-yellow-400 text-black font-bold rounded-full transition">
+                <button className="w-full py-4 bg-[#FFD700] hover:bg-yellow-400 text-black font-bold rounded-full transition text-xl">
                   Learn More &amp; Register
                 </button>
               </Link>
@@ -154,26 +154,26 @@ export default function HomePage() {
       </section>
 
       {/* OUR PARTNERS */}
-      <section className="py-16 px-4 sm:px-6 bg-white">
+      <section className="py-20 px-4 sm:px-6 bg-white">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-black">Our Partners</h2>
-          <p className="text-xl text-gray-600 mb-12">Collaborating with leading institutions and organizations</p>
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-black">Our Partners</h2>
+          <p className="text-2xl md:text-3xl text-black mb-16">Collaborating with leading institutions and organizations</p>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="bg-white rounded-3xl p-8 shadow-md">
-              <h3 className="text-2xl font-bold mb-6 text-[#FFD700]">Academic Institutions</h3>
-              <p className="text-gray-600">Leading universities and research centers across Rwanda and Africa</p>
+            <div className="bg-white rounded-3xl p-10 shadow-md">
+              <h3 className="text-3xl font-bold mb-6 text-[#FFD700]">Academic Institutions</h3>
+              <p className="text-black text-xl">Leading universities and research centers across Rwanda and Africa</p>
             </div>
-            <div className="bg-white rounded-3xl p-8 shadow-md">
-              <h3 className="text-2xl font-bold mb-6 text-[#FFD700]">Government &amp; Industry</h3>
-              <p className="text-gray-600">Strategic partnerships with ministries and private sector leaders</p>
+            <div className="bg-white rounded-3xl p-10 shadow-md">
+              <h3 className="text-3xl font-bold mb-6 text-[#FFD700]">Government &amp; Industry</h3>
+              <p className="text-black text-xl">Strategic partnerships with ministries and private sector leaders</p>
             </div>
-            <div className="bg-white rounded-3xl p-8 shadow-md">
-              <h3 className="text-2xl font-bold mb-6 text-[#FFD700]">International Collaborations</h3>
-              <p className="text-gray-600">Global organizations supporting knowledge development</p>
+            <div className="bg-white rounded-3xl p-10 shadow-md">
+              <h3 className="text-3xl font-bold mb-6 text-[#FFD700]">International Collaborations</h3>
+              <p className="text-black text-xl">Global organizations supporting knowledge development</p>
             </div>
           </div>
-          <Link href="/about" className="inline-block mt-10">
-            <button className="px-10 py-4 bg-[#FFD700] hover:bg-yellow-400 text-black font-bold rounded-full text-lg transition">
+          <Link href="/about" className="inline-block mt-12">
+            <button className="px-12 py-5 bg-[#FFD700] hover:bg-yellow-400 text-black font-bold rounded-full text-2xl transition">
               Learn More About Our Partners
             </button>
           </Link>

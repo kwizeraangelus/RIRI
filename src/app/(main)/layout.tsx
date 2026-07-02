@@ -152,12 +152,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <span
             style={{
               fontFamily: 'Poppins, sans-serif',
-              fontSize: '8.5px',
-              letterSpacing: '0.28em',
+              fontSize: '13px',
+              letterSpacing: '0.18em',
               color: '#FFD700',
               textTransform: 'uppercase',
-              fontWeight: 300,
-              marginTop: '1px',
+              fontWeight: 400,
+              marginTop: '2px',
               whiteSpace: 'nowrap',
               display: 'block',
               maxWidth: '100%',
@@ -172,7 +172,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <li key={link.name}>
               <Link
                 href={link.href}
-                className={`text-[17px] capitalize transition ${pathname === link.href ? 'text-[#FFD700] font-bold border-b-2 border-[#FFD700]' : 'hover:text-[#FFD700]'}`}
+                className={`text-[21px] capitalize transition ${pathname === link.href ? 'text-[#FFD700] font-bold border-b-2 border-[#FFD700]' : 'hover:text-[#FFD700]'}`}
               >
                 {link.name}
               </Link>
@@ -185,7 +185,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <div className="hidden md:flex gap-4">
               <button
                 onClick={() => setModalType('login')}
-                className="px-6 py-2 border border-white/30 rounded-full hover:bg-white/10 transition"
+                className="px-7 py-2.5 border border-white/30 rounded-full hover:bg-white/10 transition text-[19px] font-medium"
               >
                 Login
               </button>
@@ -194,33 +194,33 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition ${getInitialColor(userInitial)}`}
+                className={`w-11 h-11 md:w-13 md:h-13 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition ${getInitialColor(userInitial)}`}
               >
-                <span className="text-white font-bold text-xl">{userInitial}</span>
+                <span className="text-white font-bold text-2xl">{userInitial}</span>
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 mt-3 w-64 bg-[#0f2238] backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl overflow-hidden z-50">
+                <div className="absolute right-0 mt-3 w-72 bg-[#0f2238] backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl overflow-hidden z-50">
                   <div className="px-5 py-4 border-b border-white/10">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getInitialColor(userInitial)}`}>
-                        <span className="text-white font-bold text-xl">{userInitial}</span>
+                      <div className={`w-11 h-11 rounded-full flex items-center justify-center ${getInitialColor(userInitial)}`}>
+                        <span className="text-white font-bold text-2xl">{userInitial}</span>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-400">Signed in as</p>
-                        <p className="font-semibold text-[#FFD700]">{authData.user?.username || authData.user?.email}</p>
+                        <p className="text-base text-gray-400">Signed in as</p>
+                        <p className="font-semibold text-[#FFD700] text-lg">{authData.user?.username || authData.user?.email}</p>
                       </div>
                     </div>
                   </div>
                   <div className="py-2">
-                    <Link href={getDashboardPath(authData.user)} onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/10">
-                      <User size={20} /> My Dashboard
+                    <Link href={getDashboardPath(authData.user)} onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/10 text-[18px]">
+                      <User size={22} /> My Dashboard
                     </Link>
-                    <Link href="/profile" onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/10">
-                      <User size={20} /> My Profile
+                    <Link href="/profile" onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/10 text-[18px]">
+                      <User size={22} /> My Profile
                     </Link>
-                    <button onClick={handleLogout} className="w-full text-left flex items-center gap-3 px-5 py-3 text-red-400 hover:bg-red-500/10">
-                      <LogOut size={18} /> Logout
+                    <button onClick={handleLogout} className="w-full text-left flex items-center gap-3 px-5 py-3 text-red-400 hover:bg-red-500/10 text-[18px]">
+                      <LogOut size={20} /> Logout
                     </button>
                   </div>
                 </div>
@@ -232,7 +232,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden relative z-[10000]"
           >
-            {mobileMenuOpen ? <X size={34} /> : <Menu size={34} />}
+            {mobileMenuOpen ? <X size={36} /> : <Menu size={36} />}
           </button>
         </div>
       </nav>
@@ -245,7 +245,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               key={link.name}
               href={link.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="block text-2xl capitalize py-2"
+              className="block text-[26px] capitalize py-2"
             >
               {link.name}
             </Link>
@@ -255,20 +255,20 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <div className="pt-8 border-t border-white/20 space-y-4">
               <button
                 onClick={() => { setModalType('login'); setMobileMenuOpen(false); }}
-                className="w-full py-4 border border-white/30 rounded-xl text-lg font-medium"
+                className="w-full py-4 border border-white/30 rounded-xl text-xl font-medium"
               >
                 Login
               </button>
             </div>
           ) : (
             <div className="pt-8 border-t border-white/20 space-y-4">
-              <Link href={getDashboardPath(authData.user)} onClick={() => setMobileMenuOpen(false)} className="block py-4 text-xl">
+              <Link href={getDashboardPath(authData.user)} onClick={() => setMobileMenuOpen(false)} className="block py-4 text-2xl">
                 My Dashboard
               </Link>
-              <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="block py-4 text-xl">
+              <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="block py-4 text-2xl">
                 My Profile
               </Link>
-              <button onClick={handleLogout} className="w-full text-left py-4 text-xl text-red-400">
+              <button onClick={handleLogout} className="w-full text-left py-4 text-2xl text-red-400">
                 Logout
               </button>
             </div>

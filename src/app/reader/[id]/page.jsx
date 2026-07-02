@@ -124,12 +124,17 @@ console.log("Final PDF URL for iframe:", pdfUrl);
     localStorage.removeItem(`rating_prompt_count_${id}`);
 
     try {
-      await fetch(getApiUrl(`/api/university/rate/${id}/`), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rating }),
-      });
-    } catch (e) { /* fail silently */ }
+  const res = await fetch(getApiUrl(`/api/university/rate/${id}/`), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rating }),
+  });
+  if (!res.ok) {
+    console.error('Rating save failed:', res.status, await res.text());
+  }
+} catch (e) {
+  console.error('Rating save error:', e);
+}
   };
 
   // Handle rating

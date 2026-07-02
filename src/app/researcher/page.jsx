@@ -25,13 +25,14 @@ export default function ResearcherDashboard() {
   const [publications, setPublications] = useState([]);
   const [showAddPublication, setShowAddPublication] = useState(false);
   const [showAbstractField, setShowAbstractField] = useState(false);
-  const [openAbstractId, setOpenAbstractId] = useState(null); // NEW: track which abstract is open
+  const [openAbstractId, setOpenAbstractId] = useState(null); // track which abstract is open
+  const [editingPublicationId, setEditingPublicationId] = useState(null);
   const [publicationForm, setPublicationForm] = useState({
     title: '', authors: [''], journal_name: '', conference_info: '',
     doi: '', display_doi: '', url: '', publisher: '',
     book_title: '', patent_title: '', Conference_title: '',
     symposium_title: '', publication_type: 'journal',
-    abstract: '',
+    abstract: '',pdf: null,
   });
 
   // ── Innovations ───────────────────────────────────────────────────────────
@@ -43,6 +44,19 @@ export default function ResearcherDashboard() {
   });
   const [innovationPhotoPreview, setInnovationPhotoPreview] = useState(null);
 
+  // ── Edit Innovation ──────────────────────────────────────────────────────
+  const [showEditInnovation, setShowEditInnovation] = useState(false);
+  const [editingInnovation, setEditingInnovation] = useState(null);
+  const [editInnovationForm, setEditInnovationForm] = useState({
+    name: '', description: '', photo: null, sponsorship_needed: 'no-need',
+  });
+  const [editInnovationPhotoPreview, setEditInnovationPhotoPreview] = useState(null);
+
+  // ── Delete Innovation ────────────────────────────────────────────────────
+  const [showDeleteInnovationConfirm, setShowDeleteInnovationConfirm] = useState(false);
+  const [deletingInnovationId, setDeletingInnovationId] = useState(null);
+  const [isDeletingInnovation, setIsDeletingInnovation] = useState(false);
+
   // ── Events ────────────────────────────────────────────────────────────────
   const [events, setEvents]               = useState([]);
   const [showEventForm, setShowEventForm] = useState(false);
@@ -52,6 +66,20 @@ export default function ResearcherDashboard() {
     link: '', photo: null, icon: 'Calendar',
   });
   const [eventPhotoPreview, setEventPhotoPreview] = useState(null);
+
+  // ── Edit Event ───────────────────────────────────────────────────────────
+  const [showEditEvent, setShowEditEvent] = useState(false);
+  const [editingEventId, setEditingEventId] = useState(null);
+  const [editEventForm, setEditEventForm] = useState({
+    title: '', description: '', date: '', location: '',
+    link: '', photo: null, icon: 'Calendar',
+  });
+  const [editEventPhotoPreview, setEditEventPhotoPreview] = useState(null);
+
+  // ── Delete Event ─────────────────────────────────────────────────────────
+  const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(false);
+  const [deletingEventId, setDeletingEventId] = useState(null);
+  const [isDeletingEvent, setIsDeletingEvent] = useState(false);
 
   // ── Profile edit ──────────────────────────────────────────────────────────
   const [isEditing, setIsEditing]     = useState(false);
@@ -109,9 +137,14 @@ export default function ResearcherDashboard() {
       setPublicationForm(p => ({ ...p, authors: p.authors.filter((_, idx) => idx !== i) }));
   };
   const handlePubInput = (e) => {
-    const { name, value } = e.target;
+  const { name, value, files } = e.target;
+  if (name === 'pdf') {
+    setPublicationForm(p => ({ ...p, pdf: files[0] }));
+  } else {
     setPublicationForm(p => ({ ...p, [name]: value }));
-  };
+  }
+};
+
   const resetPubForm = () => {
     setPublicationForm({
       title: '', authors: [''], journal_name: '', conference_info: '',
@@ -121,23 +154,95 @@ export default function ResearcherDashboard() {
       abstract: '',
     });
     setShowAbstractField(false);
+    setEditingPublicationId(null);
   };
+
+  const handleEditClick = (pub) => {
+    setPublicationForm({
+      title: pub.title || '',
+      authors: Array.isArray(pub.authors) && pub.authors.length ? pub.authors : [''],
+      journal_name: pub.journal_name || '',
+      conference_info: pub.conference_info || '',
+      doi: pub.doi || '',
+      display_doi: pub.display_doi || '',
+      url: pub.url || '',
+      publisher: pub.publisher || '',
+      book_title: pub.book_title || '',
+      patent_title: pub.patent_title || '',
+      Conference_title: pub.Conference_title || '',
+      symposium_title: pub.symposium_title || '',
+      publication_type: pub.publication_type || 'journal',
+      abstract: pub.abstract || '',
+    });
+    setShowAbstractField(!!pub.abstract);
+    setEditingPublicationId(pub.id);
+    setShowAddPublication(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleSubmitPublication = async (e) => {
-    e.preventDefault();
-    const body = { ...publicationForm, authors: publicationForm.authors.filter(a => a.trim()) };
+  e.preventDefault();
+  const isEditing = !!editingPublicationId;
+  const url = isEditing
+    ? getApiUrl(`/api/researches/${editingPublicationId}/`)
+    : getApiUrl('/api/researches/');
+
+  const fd = new FormData();
+  Object.entries(publicationForm).forEach(([key, value]) => {
+    if (key === 'authors') {
+      publicationForm.authors.filter(a => a.trim()).forEach(a => fd.append('authors', a));
+    } else if (key === 'pdf') {
+      if (value) fd.append('pdf', value);
+    } else if (value !== null && value !== undefined) {
+      fd.append(key, value);
+    }
+  });
+
+  try {
+    const res = await fetch(url, {
+      method: isEditing ? 'PATCH' : 'POST',
+      headers: authHeaders(), // 👈 don't set Content-Type — browser sets multipart boundary
+      body: fd,
+    });
+    if (res.ok) {
+      const savedPub = await res.json();
+      if (isEditing) {
+        setPublications(p => p.map(pub => (pub.id === savedPub.id ? savedPub : pub)));
+        alert('Publication updated!');
+      } else {
+        setPublications(p => [savedPub, ...p]);
+        alert('Publication added!');
+      }
+      setShowAddPublication(false);
+      resetPubForm();
+    } else {
+      alert('Error: ' + JSON.stringify(await res.json()));
+    }
+  } catch {
+    alert('Network error');
+  }
+};
+
+  const handleDeletePublication = async (pubId) => {
+    if (!confirm('you really want delete this publication')) return;
     try {
-      const res = await fetch(getApiUrl('/api/researches/'), {
-        method: 'POST',
-        headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+      const res = await fetch(getApiUrl(`/api/researches/${pubId}/`), {
+        method: 'DELETE',
+        headers: authHeaders(),
       });
       if (res.ok) {
-        const newPub = await res.json();
-        setPublications(p => [newPub, ...p]);
-        setShowAddPublication(false); resetPubForm();
-        alert('Publication added!');
-      } else { alert('Error: ' + JSON.stringify(await res.json())); }
-    } catch { alert('Network error'); }
+        setPublications(p => p.filter(pub => pub.id !== pubId));
+        if (openAbstractId === pubId) setOpenAbstractId(null);
+        if (editingPublicationId === pubId) {
+          setShowAddPublication(false);
+          resetPubForm();
+        }
+      } else {
+        alert('Error deleting: ' + JSON.stringify(await res.json()));
+      }
+    } catch {
+      alert('Network error');
+    }
   };
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -173,6 +278,92 @@ export default function ResearcherDashboard() {
       } else { alert('Error: ' + JSON.stringify(await res.json())); }
     } catch { alert('Network error'); }
     finally { setUploadingInnovation(false); }
+  };
+
+  // ── EDIT INNOVATION ──
+  const openEditInnovation = (inv) => {
+    setEditingInnovation(inv);
+    setEditInnovationForm({
+      name: inv.name || '',
+      description: inv.description || '',
+      photo: null,
+      sponsorship_needed: inv.sponsorship_needed || 'no-need',
+    });
+    setEditInnovationPhotoPreview(inv.photo ? getApiUrl(inv.photo) : null);
+    setShowEditInnovation(true);
+  };
+
+  const handleEditInnovationInput = (e) => {
+    const { name, value, files } = e.target;
+    if (name === 'photo') {
+      const f = files[0];
+      setEditInnovationForm(p => ({ ...p, photo: f }));
+      setEditInnovationPhotoPreview(f ? URL.createObjectURL(f) : null);
+    } else {
+      setEditInnovationForm(p => ({ ...p, [name]: value }));
+    }
+  };
+
+  const handleSubmitEditInnovation = async (e) => {
+    e.preventDefault();
+    if (!editingInnovation) return;
+
+    setUploadingInnovation(true);
+    const data = new FormData();
+    data.append('name', editInnovationForm.name);
+    data.append('description', editInnovationForm.description);
+    data.append('sponsorship_needed', editInnovationForm.sponsorship_needed);
+    if (editInnovationForm.photo) data.append('photo', editInnovationForm.photo);
+
+    try {
+      const res = await fetch(getApiUrl(`/api/innovations/${editingInnovation.id}`), {
+        method: 'PATCH', headers: authHeaders(), body: data,
+      });
+      if (res.ok) {
+        const updatedInv = await res.json();
+        setInnovations(p => p.map(inv => inv.id === updatedInv.id ? updatedInv : inv));
+        setShowEditInnovation(false);
+        setEditingInnovation(null);
+        alert('Innovation updated successfully!');
+      } else {
+        alert('Error: ' + JSON.stringify(await res.json()));
+      }
+    } catch {
+      alert('Network error');
+    } finally {
+      setUploadingInnovation(false);
+    }
+  };
+
+  // ── DELETE INNOVATION ──
+  const openDeleteInnovationConfirm = (inv) => {
+    setDeletingInnovationId(inv.id);
+    setShowDeleteInnovationConfirm(true);
+  };
+
+  const handleDeleteInnovation = async () => {
+    if (!deletingInnovationId) return;
+
+    setIsDeletingInnovation(true);
+    try {
+      const res = await fetch(getApiUrl(`/api/innovations/${deletingInnovationId}`), {
+        method: 'DELETE',
+        headers: authHeaders(),
+      });
+
+      if (res.ok) {
+        setInnovations(p => p.filter(inv => inv.id !== deletingInnovationId));
+        setShowDeleteInnovationConfirm(false);
+        setDeletingInnovationId(null);
+        alert('Innovation deleted successfully!');
+      } else {
+        alert('Error deleting innovation');
+      }
+    } catch {
+      alert('Network error');
+    } finally {
+      setIsDeletingInnovation(false);
+    }
   };
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -212,6 +403,98 @@ export default function ResearcherDashboard() {
       } else { alert('Error: ' + JSON.stringify(await res.json())); }
     } catch { alert('Network error'); }
     finally { setUploadingEvent(false); }
+  };
+
+  // ── EDIT EVENT ──
+  const openEditEvent = (event) => {
+    setEditingEventId(event.id);
+    setEditEventForm({
+      title: event.title || '',
+      description: event.description || '',
+      date: event.date || '',
+      location: event.location || '',
+      link: event.link || '',
+      photo: null,
+      icon: event.icon || 'Calendar',
+    });
+    setEditEventPhotoPreview(event.photo ? getApiUrl(event.photo) : null);
+    setShowEditEvent(true);
+  };
+
+  const handleEditEventInput = (e) => {
+    const { name, value, files } = e.target;
+    if (name === 'photo') {
+      const f = files[0];
+      setEditEventForm(p => ({ ...p, photo: f }));
+      setEditEventPhotoPreview(f ? URL.createObjectURL(f) : null);
+    } else {
+      setEditEventForm(p => ({ ...p, [name]: value }));
+    }
+  };
+
+  const handleUpdateEvent = async (e) => {
+    e.preventDefault();
+    setUploadingEvent(true);
+
+    const data = new FormData();
+    data.append('title', editEventForm.title);
+    data.append('description', editEventForm.description);
+    data.append('date', editEventForm.date);
+    data.append('location', editEventForm.location);
+    data.append('link', editEventForm.link);
+    data.append('icon', editEventForm.icon);
+    if (editEventForm.photo) data.append('photo', editEventForm.photo);
+
+    try {
+      const res = await fetch(getApiUrl(`/api/events/${editingEventId}`), {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: data,
+      });
+
+      if (res.ok) {
+        const updatedEvent = await res.json();
+        setEvents(prev => prev.map(e => (e.id === editingEventId ? updatedEvent : e)));
+        setShowEditEvent(false);
+        setEditingEventId(null);
+        alert('Event updated successfully!');
+      } else {
+        alert('Error updating event: ' + JSON.stringify(await res.json()));
+      }
+    } catch {
+      alert('Network error');
+    } finally {
+      setUploadingEvent(false);
+    }
+  };
+
+  // ── DELETE EVENT ──
+  const openDeleteEventConfirm = (event) => {
+    setDeletingEventId(event.id);
+    setShowDeleteEventConfirm(true);
+  };
+
+  const handleDeleteEvent = async () => {
+    setIsDeletingEvent(true);
+    try {
+      const res = await fetch(getApiUrl(`/api/events/${deletingEventId}`), {
+        method: 'DELETE',
+        headers: authHeaders(),
+      });
+
+      if (res.ok) {
+        setEvents(prev => prev.filter(e => e.id !== deletingEventId));
+        setShowDeleteEventConfirm(false);
+        setDeletingEventId(null);
+        alert('Event deleted successfully!');
+      } else {
+        alert('Error deleting event');
+      }
+    } catch {
+      alert('Network error');
+    } finally {
+      setIsDeletingEvent(false);
+    }
   };
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -291,19 +574,6 @@ export default function ResearcherDashboard() {
   // ══════════════════════════════════════════════════════════════════════════
   return (
     <div className="min-h-screen bg-[#E0F2FE]">
-
-      {/* ── Header ── */}
-      <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow"></div>
-            <span className="text-lg font-bold text-slate-800 hidden sm:block">Research Portal</span>
-          </div>
-          <div className="bg-blue-50 text-blue-700 px-5 py-2 rounded-full font-medium border border-blue-200 shadow-sm text-sm">
-            {user?.user?.username}
-          </div>
-        </div>
-      </header>
 
       {/* ── Body ── */}
       <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -411,13 +681,19 @@ export default function ResearcherDashboard() {
           {/* ══ PUBLICATIONS TAB ══ */}
           {activeTab === TABS.PUBLICATIONS && (
             <div className="space-y-6">
+
+              {/* ============= HEADER + ADD BUTTON (on top) ============= */}
               <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <div>
                     <h2 className="text-2xl font-bold text-slate-800">Publications</h2>
                     <p className="text-sm text-slate-500 mt-1">Your research contributions</p>
                   </div>
-                  <button onClick={() => setShowAddPublication(!showAddPublication)}
+                  <button
+                    onClick={() => {
+                      if (showAddPublication) resetPubForm();
+                      setShowAddPublication(!showAddPublication);
+                    }}
                     className={`px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-md ${
                       showAddPublication
                         ? 'bg-slate-200 text-slate-700 hover:bg-slate-300'
@@ -426,70 +702,14 @@ export default function ResearcherDashboard() {
                     {showAddPublication ? 'Cancel' : '+ Add Publication'}
                   </button>
                 </div>
-
-                <div className="space-y-5">
-                  {publications.length === 0 ? (
-                    <div className="text-center py-14 px-4">
-                      <div className="text-5xl mb-3">📚</div>
-                      <p className="text-slate-500">No publications yet.</p>
-                      <p className="text-slate-400 text-sm mt-1">Add your first publication to get started!</p>
-                    </div>
-                  ) : publications.map((pub, idx) => (
-                    <div key={pub.id} className="group border border-slate-200 rounded-xl p-5 hover:shadow-lg transition-all bg-white hover:border-blue-200">
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0 w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-xs">{idx + 1}</div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-bold text-slate-800 group-hover:text-blue-700 transition-colors">{pub.title}</h3>
-                          <p className="text-sm text-slate-600 mt-1">
-                            <span className="font-medium text-slate-700">Authors:</span>{' '}
-                            {Array.isArray(pub.authors) ? pub.authors.join(' • ') : pub.authors}
-                          </p>
-                          <div className="flex flex-wrap gap-2 mt-2 text-sm">
-                            {pub.journal_name    && <span className="px-2.5 py-1 bg-slate-100 rounded-full text-slate-700 text-xs">📔 {pub.journal_name}</span>}
-                            {pub.conference_info && <span className="px-2.5 py-1 bg-purple-100 rounded-full text-purple-700 text-xs">🎤 {pub.conference_info}</span>}
-                            {pub.publisher       && <span className="px-2.5 py-1 bg-green-100 rounded-full text-green-700 text-xs">📍 {pub.publisher}</span>}
-                          </div>
-                          {pub.doi && <p className="mt-2 font-mono text-blue-600 text-xs">DOI: {pub.doi}</p>}
-
-                          <div className="flex gap-2 mt-3">
-                            {/* ── Abstract toggle button ── */}
-                            {pub.abstract && (
-                              <button
-                                onClick={() => setOpenAbstractId(openAbstractId === pub.id ? null : pub.id)}
-                                className="text-xs px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-gray-700 rounded-md font-medium transition-colors flex items-center gap-1"
-                              >
-                                📄 Abstract
-                                <span className="text-blue-500">{openAbstractId === pub.id ? '▲' : '▼'}</span>
-                              </button>
-                            )}
-                            {(pub.doi || pub.url) && (
-                              <a href={pub.url || `https://doi.org/${pub.doi}`} target="_blank"
-                                className="text-xs px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md font-medium transition-colors">🌐 HTML</a>
-                            )}
-                            {pub.pdf_path && (
-                              <a href={getApiUrl(pub.pdf_path)} target="_blank"
-                                className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors">📑 PDF</a>
-                            )}
-                          </div>
-
-                          {/* ── Inline abstract paragraph ── */}
-                          {openAbstractId === pub.id && pub.abstract && (
-                            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                              <p className="text-xs font-semibold text-gray-900 mb-1">Abstract</p>
-                              <p className="text-xs text-gray-700 leading-relaxed">{pub.abstract}</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
 
-              {/* ============= ADD PUBLICATION FORM ============= */}
+              {/* ============= ADD / EDIT PUBLICATION FORM ============= */}
               {showAddPublication && (
                 <div className="bg-white rounded-2xl shadow-xl border-2 border-blue-100 p-8">
-                  <h3 className="text-2xl font-bold text-slate-800 mb-1">Add New Publication</h3>
+                  <h3 className="text-2xl font-bold text-slate-800 mb-1">
+                    {editingPublicationId ? 'Edit Publication' : 'Add New Publication'}
+                  </h3>
                   <p className="text-sm text-slate-500 mb-7">Fill in the details below</p>
                   <form onSubmit={handleSubmitPublication} className="space-y-6">
                     {/* Type toggle */}
@@ -566,6 +786,15 @@ export default function ResearcherDashboard() {
                         )}
                       </button>
                     </div>
+                     <div>
+  <label className="block text-sm font-semibold text-slate-700 mb-2">Attach PDF</label>
+  <input
+    type="file" name="pdf" accept="application/pdf"
+    onChange={handlePubInput}
+    className="w-full p-3 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-2 file:px-6 file:rounded-lg file:border-0"
+  />
+  {publicationForm.pdf && <p className="text-xs text-green-600 mt-1">✓ {publicationForm.pdf.name}</p>}
+</div>
 
                     {/* ============= ABSTRACT FIELD (COLLAPSIBLE) ============= */}
                     {showAbstractField && (
@@ -589,12 +818,94 @@ export default function ResearcherDashboard() {
                     )}
 
                     <div className="flex gap-4 pt-2">
-                      <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md transition hover:from-blue-700 hover:to-indigo-700">Save Publication</button>
-                      <button type="button" onClick={() => setShowAddPublication(false)} className="flex-1 bg-slate-200 text-slate-700 font-semibold py-3 rounded-lg hover:bg-slate-300 transition">Cancel</button>
+                      <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md transition hover:from-blue-700 hover:to-indigo-700">
+                        {editingPublicationId ? 'Update Publication' : 'Save Publication'}
+                      </button>
+                      <button type="button" onClick={() => { setShowAddPublication(false); resetPubForm(); }} className="flex-1 bg-slate-200 text-slate-700 font-semibold py-3 rounded-lg hover:bg-slate-300 transition">Cancel</button>
                     </div>
                   </form>
                 </div>
               )}
+
+              {/* ============= PUBLICATION LIST (below the form) ============= */}
+              <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
+                <div className="space-y-5">
+                  {publications.length === 0 ? (
+                    <div className="text-center py-14 px-4">
+                      <div className="text-5xl mb-3">📚</div>
+                      <p className="text-slate-500">No publications yet.</p>
+                      <p className="text-slate-400 text-sm mt-1">Add your first publication to get started!</p>
+                    </div>
+                  ) : publications.map((pub, idx) => (
+                    <div key={pub.id} className="group border border-slate-200 rounded-xl p-5 hover:shadow-lg transition-all bg-white hover:border-blue-200">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-xs">{idx + 1}</div>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between gap-3">
+                            <h3 className="text-lg font-bold text-slate-800 group-hover:text-blue-700 transition-colors">{pub.title}</h3>
+                            {/* ── Edit / Delete buttons ── */}
+                            <div className="flex gap-2 flex-shrink-0">
+                              <button
+                                onClick={() => handleEditClick(pub)}
+                                className="text-xs px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-md font-medium transition-colors"
+                              >
+                                ✏️ Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeletePublication(pub.id)}
+                                className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors"
+                              >
+                                🗑️ Delete
+                              </button>
+                            </div>
+                          </div>
+                          <p className="text-sm text-slate-600 mt-1">
+                            <span className="font-medium text-slate-700">Authors:</span>{' '}
+                            {Array.isArray(pub.authors) ? pub.authors.join(' • ') : pub.authors}
+                          </p>
+                          <div className="flex flex-wrap gap-2 mt-2 text-sm">
+                            {pub.journal_name    && <span className="px-2.5 py-1 bg-slate-100 rounded-full text-slate-700 text-xs">📔 {pub.journal_name}</span>}
+                            {pub.conference_info && <span className="px-2.5 py-1 bg-purple-100 rounded-full text-purple-700 text-xs">🎤 {pub.conference_info}</span>}
+                            {pub.publisher       && <span className="px-2.5 py-1 bg-green-100 rounded-full text-green-700 text-xs">📍 {pub.publisher}</span>}
+                          </div>
+                          {pub.doi && <p className="mt-2 font-mono text-blue-600 text-xs">DOI: {pub.doi}</p>}
+
+                          <div className="flex gap-2 mt-3">
+                            {/* ── Abstract toggle button ── */}
+                            {pub.abstract && (
+                              <button
+                                onClick={() => setOpenAbstractId(openAbstractId === pub.id ? null : pub.id)}
+                                className="text-xs px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-gray-700 rounded-md font-medium transition-colors flex items-center gap-1"
+                              >
+                                📄 Abstract
+                                <span className="text-blue-500">{openAbstractId === pub.id ? '▲' : '▼'}</span>
+                              </button>
+                            )}
+                            {(pub.doi || pub.url) && (
+                              <a href={pub.url || `https://doi.org/${pub.doi}`} target="_blank"
+                                className="text-xs px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md font-medium transition-colors">🌐 HTML</a>
+                            )}
+                            {pub.pdf_path && (
+                              <a href={getApiUrl(pub.pdf_path)} target="_blank"
+                                className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors">📑 PDF</a>
+                            )}
+                          </div>
+
+                         
+
+                          {/* ── Inline abstract paragraph ── */}
+                          {openAbstractId === pub.id && pub.abstract && (
+                            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                              <p className="text-xs font-semibold text-gray-900 mb-1">Abstract</p>
+                              <p className="text-xs text-gray-700 leading-relaxed">{pub.abstract}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
@@ -696,6 +1007,22 @@ export default function ResearcherDashboard() {
                                 Congratulations! Your innovation is now visible to the public.
                               </div>
                             )}
+
+                            {/* ── Edit / Delete buttons ── */}
+                            <div className="flex gap-2 mt-4">
+                              <button
+                                onClick={() => openEditInnovation(inv)}
+                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition text-sm"
+                              >
+                                ✏️ Edit
+                              </button>
+                              <button
+                                onClick={() => openDeleteInnovationConfirm(inv)}
+                                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg transition text-sm"
+                              >
+                                🗑️ Delete
+                              </button>
+                            </div>
                           </div>
                         </div>
                       );
@@ -804,6 +1131,22 @@ export default function ResearcherDashboard() {
                                 🔗 Registration Link
                               </a>
                             )}
+
+                            {/* ── Edit / Delete buttons ── */}
+                            <div className="flex gap-2 mt-4">
+                              <button
+                                onClick={() => openEditEvent(evt)}
+                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition text-sm"
+                              >
+                                ✏️ Edit
+                              </button>
+                              <button
+                                onClick={() => openDeleteEventConfirm(evt)}
+                                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg transition text-sm"
+                              >
+                                🗑️ Delete
+                              </button>
+                            </div>
                           </div>
                         </div>
                       );
@@ -816,6 +1159,272 @@ export default function ResearcherDashboard() {
 
         </div>{/* end main col */}
       </div>
+
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {/* EDIT INNOVATION MODAL */}
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {showEditInnovation && editingInnovation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
+            <h3 className="text-2xl font-bold text-slate-800 mb-6 text-center">Edit Innovation</h3>
+            <form onSubmit={handleSubmitEditInnovation} className="space-y-6">
+              <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-6 text-center">
+                <p className="text-sm text-purple-600">Editing</p>
+                <p className="text-xl font-bold text-purple-900 line-clamp-2">{editingInnovation.name}</p>
+              </div>
+
+              {editInnovationPhotoPreview && (
+                <div className="flex justify-center">
+                  <img src={editInnovationPhotoPreview} alt="Preview" className="w-full max-w-sm h-48 object-cover rounded-xl shadow-lg" />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Innovation Name *</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={editInnovationForm.name}
+                  onChange={handleEditInnovationInput}
+                  required
+                  className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Description *</label>
+                <textarea
+                  name="description"
+                  value={editInnovationForm.description}
+                  onChange={handleEditInnovationInput}
+                  required
+                  rows={5}
+                  className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500 resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Sponsorship Needed *</label>
+                  <select
+                    name="sponsorship_needed"
+                    value={editInnovationForm.sponsorship_needed}
+                    onChange={handleEditInnovationInput}
+                    className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-purple-500"
+                  >
+                    <option value="no-need">No Need</option>
+                    <option value="unsponsored">Seeking Sponsor</option>
+                    <option value="sponsored">Already Sponsored</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Photo (optional)</label>
+                  <input
+                    type="file"
+                    name="photo"
+                    accept="image/*"
+                    onChange={handleEditInnovationInput}
+                    className="w-full p-3 border-2 border-dashed border-purple-300 rounded-xl bg-purple-50 file:bg-purple-600 file:text-white file:py-2 file:px-6 file:rounded-lg file:border-0"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-4 pt-6">
+                <button
+                  type="submit"
+                  disabled={uploadingInnovation}
+                  className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:opacity-70 text-white font-bold py-4 rounded-xl transition"
+                >
+                  {uploadingInnovation ? 'Updating…' : 'Save Changes'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditInnovation(false);
+                    setEditingInnovation(null);
+                  }}
+                  className="flex-1 bg-slate-500 hover:bg-slate-600 text-white font-bold py-4 rounded-xl"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {/* DELETE INNOVATION CONFIRMATION MODAL */}
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {showDeleteInnovationConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h3 className="text-2xl font-bold text-slate-800 mb-2">Delete Innovation?</h3>
+            <p className="text-slate-600 mb-6">This action cannot be undone. Are you sure you want to delete this innovation?</p>
+
+            <div className="flex gap-4">
+              <button
+                onClick={handleDeleteInnovation}
+                disabled={isDeletingInnovation}
+                className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-70 text-white font-bold py-3 rounded-xl transition"
+              >
+                {isDeletingInnovation ? 'Deleting…' : 'Yes, Delete'}
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeleteInnovationConfirm(false);
+                  setDeletingInnovationId(null);
+                }}
+                className="flex-1 bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold py-3 rounded-xl"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {/* EDIT EVENT MODAL */}
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {showEditEvent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Edit Event</h3>
+
+            {editEventPhotoPreview && (
+              <div className="flex justify-center mb-6">
+                <img src={editEventPhotoPreview} alt="Preview" className="w-full max-w-sm h-48 object-cover rounded-xl shadow-lg" />
+              </div>
+            )}
+
+            <form onSubmit={handleUpdateEvent} className="space-y-6">
+              <input
+                type="text"
+                name="title"
+                placeholder="Event Title"
+                value={editEventForm.title}
+                onChange={handleEditEventInput}
+                required
+                className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500"
+              />
+              <textarea
+                name="description"
+                placeholder="Description"
+                rows={4}
+                value={editEventForm.description}
+                onChange={handleEditEventInput}
+                required
+                className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500 resize-none"
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input
+                  type="datetime-local"
+                  name="date"
+                  value={editEventForm.date}
+                  onChange={handleEditEventInput}
+                  required
+                  className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500"
+                />
+                <input
+                  type="text"
+                  name="location"
+                  placeholder="Location"
+                  value={editEventForm.location}
+                  onChange={handleEditEventInput}
+                  required
+                  className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <input
+                type="url"
+                name="link"
+                placeholder="Registration Link (optional)"
+                value={editEventForm.link}
+                onChange={handleEditEventInput}
+                className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500"
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <select
+                  name="icon"
+                  value={editEventForm.icon}
+                  onChange={handleEditEventInput}
+                  className="p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500"
+                >
+                  <option>Calendar</option>
+                  <option>Laptop</option>
+                  <option>Users</option>
+                  <option>GraduationCap</option>
+                  <option>Presentation</option>
+                </select>
+                <input
+                  type="file"
+                  name="photo"
+                  accept="image/*"
+                  onChange={handleEditEventInput}
+                  className="w-full p-3 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-2 file:px-5 file:rounded-lg file:border-0"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button
+                  type="submit"
+                  disabled={uploadingEvent}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl disabled:opacity-70"
+                >
+                  {uploadingEvent ? 'Updating…' : 'Save Changes'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditEvent(false);
+                    setEditingEventId(null);
+                  }}
+                  className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 rounded-xl"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {/* DELETE EVENT CONFIRMATION MODAL */}
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {showDeleteEventConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">Delete Event?</h3>
+            <p className="text-gray-600 text-center mb-8">
+              Are you sure you want to delete this event? This action cannot be undone.
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={handleDeleteEvent}
+                disabled={isDeletingEvent}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl disabled:opacity-70"
+              >
+                {isDeletingEvent ? 'Deleting...' : 'Delete'}
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeleteEventConfirm(false);
+                  setDeletingEventId(null);
+                }}
+                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 rounded-xl"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

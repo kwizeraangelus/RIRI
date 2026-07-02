@@ -18,7 +18,7 @@ interface Publication {
   supervisor_name?: string;
   submission_type?: string;
   degree_type?: 'thesis' | 'dissertation';
-  university?: string;
+  university_name?: string;
   year?: number;
 }
 
@@ -27,7 +27,7 @@ interface Researcher {
   username: string;
   profile_image: string | null;
   details: string;
-  university: string;
+  university_name: string;
 }
 
 interface UniversityStats {
@@ -63,9 +63,9 @@ export default function UniversityPage() {
 
       setPublications(approvedPubs);
 
-      // Filter by university
+      // Filter by university (backend field is `university_name`, not `university`)
       const uniPubs = approvedPubs.filter(p =>
-        p.university?.toLowerCase().includes(universityName.toLowerCase())
+        p.university_name?.toLowerCase().includes(universityName.toLowerCase())
       );
 
       const filteredPubs = activeFilter === 'all'
@@ -113,10 +113,8 @@ export default function UniversityPage() {
       if (researchersRes.ok) {
         const allResearchers: Researcher[] = await researchersRes.json();
         const uniResearchers = allResearchers
-          .filter(r => r.university?.toLowerCase().includes(universityName.toLowerCase()))
+          .filter(r => r.university_name?.toLowerCase().includes(universityName.toLowerCase()))
           .slice(0, 6); // Show up to 6 notable researchers
-          console.log('All researchers from API:', allResearchers);
-          console.log('Filtered for university:', uniResearchers);
         setResearchers(uniResearchers);
       }
     } catch (error) {
@@ -135,10 +133,6 @@ export default function UniversityPage() {
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
-
-
-
-
 
   const getDegreeColor = (degreeType?: string) => {
     return degreeType === 'thesis'
@@ -192,7 +186,7 @@ export default function UniversityPage() {
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
                 <div className="text-4xl font-bold text-purple-300 mb-2">{stats.dissertations}</div>
-                <div className="text-gray-200 font-semibold">Dissertations</div>
+                <div className="text-gray-200 font-semibold">FYP</div>
               </div>
             </div>
           )}
@@ -211,7 +205,7 @@ export default function UniversityPage() {
             Theses ({stats?.theses || 0})
           </button>
           <button onClick={() => setActiveFilter('dissertation')} className={`px-8 py-3 rounded-full text-lg font-bold transition-all shadow-lg ${activeFilter === 'dissertation' ? 'bg-purple-600 text-white scale-105' : 'bg-white text-purple-600 border-2 border-purple-300 hover:border-purple-600 hover:scale-105'}`}>
-            Dissertations ({stats?.dissertations || 0})
+            FYP ({stats?.dissertations || 0})
           </button>
         </div>
 
@@ -230,7 +224,7 @@ export default function UniversityPage() {
           </div>
         )}
 
-        {/* NEW: Notable Researchers / University Biography */}
+        {/* Notable Researchers */}
         {researchers.length > 0 && (
           <div className="mb-16 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-3xl shadow-2xl p-10 border-2 border-indigo-200">
             <h2 className="text-3xl font-bold text-center text-[#050A14] mb-10">
@@ -315,7 +309,7 @@ export default function UniversityPage() {
                       )}
                       {publication.degree_type && (
                         <div className={`absolute top-4 right-4 px-4 py-2 rounded-full text-xs font-bold text-white shadow-lg ${getDegreeColor(publication.degree_type)}`}>
-                          {publication.degree_type === 'thesis' ? 'THESIS' : 'DISSERTATION'}
+                          {publication.degree_type === 'thesis' ? 'THESIS' : 'FYP'}
                         </div>
                       )}
                     </div>

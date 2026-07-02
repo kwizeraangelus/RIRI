@@ -22,11 +22,62 @@ interface Counts {
   no_need: number;
 }
 
+interface AuthUser {
+  id: number;
+  username: string;
+  email: string;
+  user_category: string;
+  first_name?: string;
+  last_name?: string;
+  is_staff?: boolean;
+}
+
 const SPONSORSHIP_OPTIONS = [
   { label: 'Sponsored', value: 'sponsored', color: 'bg-green-600' },
   { label: 'Unsponsored', value: 'unsponsored', color: 'bg-orange-600' },
   { label: 'No Need', value: 'no-need', color: 'bg-gray-600' },
 ];
+
+/** Safely parses the stored user JSON from localStorage. */
+const safeParseUser = (str: string | null): AuthUser | null => {
+  if (!str || str === 'undefined' || str === 'null' || str === '') return null;
+  try {
+    const parsed = JSON.parse(str);
+    if (parsed && typeof parsed === 'object') {
+      return {
+        id: parsed.id || 0,
+        username: parsed.username || '',
+        email: parsed.email || '',
+        user_category: (parsed.user_category || '').toUpperCase(),
+        first_name: parsed.first_name || '',
+        last_name: parsed.last_name || '',
+        is_staff: parsed.is_staff || false,
+      };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+/** Resolves where the "Upload Innovation" button should send the user. */
+const getUploadDestination = (user: AuthUser | null): string => {
+  if (user && user.user_category?.toUpperCase() === 'UNIVERSITY') {
+    return '/university';
+  } else if (user && user.user_category?.toUpperCase() === 'ADMIN') {
+    return '/admin-dashboard';
+  
+  }else if(user && user.user_category?.toUpperCase() === 'INNOVATOR'){
+ return '/innovator';
+  } else if(user && user.user_category?.toUpperCase() === 'RESEARCHER'){
+    return '/researcher';
+  }
+  else if (user) {
+    // Any other logged-in user category — send to their general dashboard
+    return '/';
+  }
+  return '/login';
+};
 
 const InnovationCard: React.FC<Innovation> = ({
   id, name, description, photo, sponsorship_needed
@@ -51,7 +102,7 @@ const InnovationCard: React.FC<Innovation> = ({
         />
         {sponsorship_needed && sponsorshipInfo && (
           <div className="absolute top-3 right-3">
-            <span className={`px-5 py-2 rounded-full text-xs font-bold text-white shadow-lg uppercase tracking-wider ${sponsorshipInfo.color}`}>
+            <span className={`px-5 py-2 rounded-full text-sm font-bold text-white shadow-lg uppercase tracking-wider ${sponsorshipInfo.color}`}>
               {sponsorshipInfo.label}
             </span>
           </div>
@@ -59,15 +110,15 @@ const InnovationCard: React.FC<Innovation> = ({
       </div>
 
       <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4 line-clamp-2 group-hover:text-blue-700 transition">
+        <h3 className="text-2xl font-bold text-gray-900 mb-4 line-clamp-2 group-hover:text-blue-700 transition">
           {name}
         </h3>
-        <p className="text-gray-600 line-clamp-3 text-sm mt-5 mb-6 leading-relaxed">
+        <p className="text-gray-600 line-clamp-3 text-lg mt-5 mb-6 leading-relaxed">
           {description || 'No description available.'}
         </p>
-        <div className="flex items-center text-blue-600 font-semibold text-sm group-hover:text-blue-800">
+        <div className="flex items-center text-blue-600 font-semibold text-lg group-hover:text-blue-800">
           Read More
-          <svg className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 ml-1 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </div>
@@ -84,6 +135,17 @@ export default function InnovationsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSponsorship, setSelectedSponsorship] = useState<string | null>(null);
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+
+  // ── Read logged-in user from localStorage on mount ──
+  useEffect(() => {
+    const storedUserStr = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('access_token');
+    const user = safeParseUser(storedUserStr);
+    setAuthUser(user && storedToken ? user : null);
+  }, []);
+
+  const uploadDestination = getUploadDestination(authUser);
 
   const buildApiUrl = useCallback(() => {
     const params = new URLSearchParams();
@@ -164,16 +226,13 @@ export default function InnovationsPage() {
 
   return (
     <div className="min-h-screen bg-[#E0F2FE] text-gray-900">
-      {/* DARK NAVY TOP BAND */}
-      <div className="h-28 bg-[#050A14]" aria-hidden="true" />
-
       {/* HERO */}
-      <section className="relative -mt-28 pt-36 pb-20 text-center">
+      <section className="pt-20 pb-20 text-center">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-5xl md:text-6xl font-bold text-[#050A14] mb-6">
             Browse <span className="text-[#FFD700]">Innovations</span>
           </h1>
-          <p className="text-xl text-gray-700 max-w-2xl mx-auto">
+          <p className="text-2xl text-gray-700 max-w-2xl mx-auto">
             Explore groundbreaking innovations from Rwanda creative community.
           </p>
         </div>
@@ -190,7 +249,7 @@ export default function InnovationsPage() {
                 placeholder="Search by name, description..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-14 pr-12 py-5 rounded-full bg-white border-2 border-gray-200 text-gray-800 placeholder-gray-500 focus:outline-none focus:border-[#FFD700] focus:shadow-xl transition-all text-lg shadow-lg"
+                className="w-full pl-14 pr-12 py-5 rounded-full bg-white border-2 border-gray-200 text-gray-800 placeholder-gray-500 focus:outline-none focus:border-[#FFD700] focus:shadow-xl transition-all text-xl shadow-lg"
               />
               <svg className="absolute left-5 top-6 w-7 h-7 text-[#050A14]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -214,7 +273,7 @@ export default function InnovationsPage() {
                   key={opt.value}
                   onClick={() => setSelectedSponsorship(prev => prev === opt.value ? null : opt.value)}
                   disabled={count === 0}
-                  className={`py-6 rounded-2xl font-bold text-sm uppercase tracking-wide transition-all shadow-xl flex flex-col items-center ${
+                  className={`py-6 rounded-2xl font-bold text-base uppercase tracking-wide transition-all shadow-xl flex flex-col items-center ${
                     selectedSponsorship === opt.value
                       ? 'bg-[#050A14] text-[#FFD700] scale-105 shadow-2xl'
                       : count === 0
@@ -223,7 +282,7 @@ export default function InnovationsPage() {
                   }`}
                 >
                   <span>{opt.label}</span>
-                  <span className="text-xs mt-2 opacity-80">{count} items</span>
+                  <span className="text-sm mt-2 opacity-80">{count} items</span>
                 </button>
               );
             })}
@@ -233,12 +292,12 @@ export default function InnovationsPage() {
           {isLoading ? (
             <div className="text-center py-32">
               <div className="inline-block animate-spin rounded-full h-16 w-16 border-8 border-[#FFD700] border-t-transparent"></div>
-              <p className="mt-6 text-xl text-[#050A14] font-medium">Loading innovations...</p>
+              <p className="mt-6 text-2xl text-[#050A14] font-medium">Loading innovations...</p>
             </div>
           ) : innovations.length === 0 ? (
             <div className="text-center py-32 bg-white/90 rounded-3xl shadow-2xl">
               <p className="text-3xl font-bold text-gray-600">No innovations found</p>
-              <p className="text-gray-500 mt-4">Try adjusting your search or filters.</p>
+              <p className="text-xl text-gray-500 mt-4">Try adjusting your search or filters.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -250,8 +309,11 @@ export default function InnovationsPage() {
         </div>
       </section>
 
-      {/* Upload Button */}
-      <Link href="/login" className="fixed right-6 bottom-6 z-50 flex items-center gap-3 bg-[#FFD700] text-[#050A14] px-7 py-4 rounded-full shadow-2xl hover:scale-110 transition-all font-bold text-sm uppercase">
+      {/* Upload Button — sends logged-in users to their dashboard, others to login */}
+      <Link
+        href={uploadDestination}
+        className="fixed right-6 bottom-6 z-50 flex items-center gap-3 bg-[#FFD700] text-[#050A14] px-7 py-4 rounded-full shadow-2xl hover:scale-110 transition-all font-bold text-base uppercase"
+      >
         Upload Innovation
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -260,10 +322,10 @@ export default function InnovationsPage() {
 
       {/* Footer */}
       <footer className="bg-[#050A14] text-white py-16 mt-32">
-        <div className="max-w-7xl mx-auto px-6 text-center">
+        <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="text-6xl font-bold uppercase italic tracking-wider mb-4">RIRI</div>
-          <p className="text-gray-300 text-lg">Rwanda Innovation & Research Institute</p>
-          <p className="text-sm text-gray-500 mt-8">© 2025 RIRI • All rights reserved</p>
+          <p className="text-gray-300 text-xl">Rwanda Innovation & Research Institute</p>
+          <p className="text-base text-gray-500 mt-8">© 2025 RIRI • All rights reserved</p>
         </div>
       </footer>
     </div>

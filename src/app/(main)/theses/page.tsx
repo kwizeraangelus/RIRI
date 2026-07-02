@@ -19,7 +19,9 @@ interface Publication {
   supervisor_name?: string;
   submission_type?: string;
   degree_type?: 'thesis' | 'dissertation';
-  university?: string;
+  university_name?: string;
+  average_rating?: number; // NEW - computed by backend (rating_sum / rating_count)
+  rating_count?: number;   // NEW - number of ratings submitted
 }
 
 interface Counts {
@@ -72,9 +74,10 @@ const FIELD_TO_KEY: Record<string, keyof Counts> = {
 };
 
 // Maps Counts key → clean display label
+// NOTE: display label only — the underlying key/value stays "dissertation" everywhere else
 const FIELD_DISPLAY_NAMES: Record<string, string> = {
   thesis:                   'Thesis',
-  dissertation:             'Dissertation',
+  dissertation:             'FYP',
   engineering:              'Engineering',
   medicine_health_sciences: 'Medicine / Health Sciences',
   arts_humanities:          'Arts & Humanities',
@@ -141,7 +144,7 @@ const matchesSearch = (pub: Publication, query: string): boolean => {
     pub.year,
     pub.title,
     pub.authors,
-    pub.university,
+    pub.university_name,
     pub.supervisor_name,
     pub.degree_type,
     formatFieldName(pub.submission_type),
@@ -177,14 +180,86 @@ const getUploadDestination = (user: AuthUser | null): string => {
   }else if(user && user.user_category?.toUpperCase() === 'ADMIN'){
     return 'admin-dashboard';
   }
-  return '/register';
+  return '/login';
+};
+
+// ──────────────────────────────────────────────────────
+// StarRating — read-only display, or interactive (click to submit)
+// ──────────────────────────────────────────────────────
+const StarRating: React.FC<{
+  average: number;
+  count: number;
+  interactive?: boolean;
+  onRate?: (rating: number) => Promise<void> | void;
+  size?: 'sm' | 'lg';
+}> = ({ average, count, interactive = false, onRate, size = 'lg' }) => {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // What value drives the filled stars: hover preview (interactive) or the real average
+  const displayValue = hovered ?? average;
+  const starSize = size === 'sm' ? 'w-3.5 h-3.5' : 'w-6 h-6';
+
+  return (
+    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+      <div className="flex" onMouseLeave={() => setHovered(null)}>
+        {[1, 2, 3, 4, 5].map((star) => {
+          // Partial-fill support: e.g. average 3.6 -> star 4 is 60% filled
+          const fillPercent = Math.max(0, Math.min(1, displayValue - (star - 1))) * 100;
+
+          return (
+            <button
+              key={star}
+              type="button"
+              disabled={!interactive || submitting}
+              onMouseEnter={() => interactive && setHovered(star)}
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (!interactive || !onRate || submitting) return;
+                setSubmitting(true);
+                try {
+                  await onRate(star);
+                } finally {
+                  setSubmitting(false);
+                }
+              }}
+              className={`relative ${starSize} ${interactive ? 'cursor-pointer' : 'cursor-default'} ${
+                submitting ? 'opacity-50' : ''
+              }`}
+              aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+            >
+              {/* Empty star (background) */}
+              <svg className={`${starSize} absolute inset-0 text-gray-300`} fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.958a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.447a1 1 0 00-.364 1.118l1.287 3.957c.3.922-.755 1.688-1.539 1.118l-3.367-2.447a1 1 0 00-1.176 0l-3.367 2.447c-.784.57-1.838-.196-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.063 9.385c-.783-.57-.38-1.81.588-1.81h4.163a1 1 0 00.95-.69l1.285-3.958z" />
+              </svg>
+              {/* Filled star (clipped to fillPercent) */}
+              <div className="absolute inset-0 overflow-hidden" style={{ width: `${fillPercent}%` }}>
+                <svg className={`${starSize} text-[#FFD700]`} fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.958a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.447a1 1 0 00-.364 1.118l1.287 3.957c.3.922-.755 1.688-1.539 1.118l-3.367-2.447a1 1 0 00-1.176 0l-3.367 2.447c-.784.57-1.838-.196-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.063 9.385c-.783-.57-.38-1.81.588-1.81h4.163a1 1 0 00.95-.69l1.285-3.958z" />
+                </svg>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      {count > 0 ? (
+        <span className="text-xs text-gray-500">
+          {average.toFixed(1)} ({count})
+        </span>
+      ) : interactive ? (
+        <span className="text-xs text-gray-400">Rate this</span>
+      ) : (
+        <span className="text-xs text-gray-400">rates</span>
+      )}
+    </div>
+  );
 };
 
 // ──────────────────────────────────────────────────────
 // MiniPublicationCard — shown in the search dropdown
 // ──────────────────────────────────────────────────────
 const MiniPublicationCard: React.FC<Publication & { onClick: () => void }> = ({
-  title, authors, university, degree_type, onClick,
+  title, authors, university_name, degree_type, average_rating = 0, rating_count = 0, onClick,
 }) => (
   <div
     onClick={onClick}
@@ -199,7 +274,10 @@ const MiniPublicationCard: React.FC<Publication & { onClick: () => void }> = ({
         <p className="text-gray-700 line-clamp-1">
           <span className="text-gray-500">By:</span> {authors}
         </p>
-        {university && <p className="text-gray-600 line-clamp-1">{university}</p>}
+        {university_name && <p className="text-gray-600 line-clamp-1">{university_name}</p>}
+      </div>
+      <div className="mt-1.5">
+        <StarRating average={average_rating} count={rating_count} size="sm" />
       </div>
       {degree_type && (
         <div className="mt-2">
@@ -208,7 +286,7 @@ const MiniPublicationCard: React.FC<Publication & { onClick: () => void }> = ({
               degree_type === 'thesis' ? 'bg-blue-600' : 'bg-purple-600'
             }`}
           >
-            {degree_type === 'thesis' ? 'Thesis' : 'Dissertation'}
+            {degree_type === 'thesis' ? 'Thesis' : 'FYP'}
           </span>
         </div>
       )}
@@ -219,8 +297,9 @@ const MiniPublicationCard: React.FC<Publication & { onClick: () => void }> = ({
 // ──────────────────────────────────────────────────────
 // PublicationCard — shown in the main grid
 // ──────────────────────────────────────────────────────
-const PublicationCard: React.FC<Publication> = ({
-  id, title, year, authors, description, supervisor_name, university, degree_type, submission_type,
+const PublicationCard: React.FC<Publication & { onRate?: (id: number, rating: number) => Promise<void> }> = ({
+  id, title, year, authors, description, supervisor_name, university_name, degree_type, submission_type,
+  average_rating = 0, rating_count = 0, onRate,
 }) => {
   const router = useRouter();
 
@@ -235,7 +314,7 @@ const PublicationCard: React.FC<Publication> = ({
                 degree_type === 'thesis' ? 'bg-blue-600' : 'bg-purple-600'
               }`}
             >
-              {degree_type === 'thesis' ? 'Thesis' : 'Dissertation'}
+              {degree_type === 'thesis' ? 'Thesis' : 'FYP'}
             </span>
           </div>
         )}
@@ -247,16 +326,16 @@ const PublicationCard: React.FC<Publication> = ({
         </h3>
 
         <div className="space-y-3 text-base flex-1">
-          {university && (
+          {university_name && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                router.push(`/university/${encodeURIComponent(university)}`);
+                router.push(`/university/${encodeURIComponent(university_name)}`);
               }}
               className="font-semibold text-green-700 hover:underline text-left p-0 bg-transparent border-none cursor-pointer block"
             >
               <span className="text-gray-500 font-medium">University: </span>
-              {university}
+              {university_name}
             </button>
           )}
 
@@ -278,12 +357,31 @@ const PublicationCard: React.FC<Publication> = ({
               {formatFieldName(submission_type)}
             </p>
           )}
+          {degree_type && (
+            <p className="font-semibold">
+              <span className="text-gray-500 font-medium">Type: </span>
+              <span className={degree_type === 'thesis' ? 'text-blue-700' : 'text-purple-700'}>
+                {degree_type === 'thesis' ? 'Thesis' : 'FYP'}
+              </span>
+            </p>
+          )}
           {year && (
-  <p className="text-gray-700 font-semibold">
-    <span className="text-gray-500 font-medium">Academic year: </span>
-    {formatFieldName(year.toString())}
-  </p>
-)}
+            <p className="text-gray-700 font-semibold">
+              <span className="text-gray-500 font-medium">Academic year: </span>
+              {formatFieldName(year.toString())}
+            </p>
+          )}
+
+          {/* Rating — click stars to submit your own rating */}
+          <div className="pt-1">
+            <StarRating
+              average={average_rating}
+              count={rating_count}
+              interactive={!!onRate}
+              
+            />
+          </div>
+
           <p className="text-gray-600 line-clamp-3 text-base mt-4 leading-relaxed">
             {description || 'No description available.'}
           </p>
@@ -409,8 +507,74 @@ export default function ThesesPage() {
     setShowSearchResults(false);
   };
 
+  // ── Submit a rating for a publication ──
+  // Expects the backend endpoint (NestJS `addRating`) to be mounted at
+  // POST /api/innovations/:id/rate/  with body { rating: number } and to
+  // return { success: boolean, average: number }.
+  // Adjust the path below if your real route differs.
+  const handleRate = useCallback(async (id: number, rating: number) => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+    try {
+      const res = await fetch(getApiUrl(`/api/innovations/${id}/rate/`), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ rating }),
+      });
+      if (!res.ok) throw new Error('Rating request failed');
+      const data: { success: boolean; average: number } = await res.json();
+
+      // Update the card in place so the stars/count refresh immediately
+      setAllPublications((prev) =>
+        prev.map((pub) =>
+          pub.id === id
+            ? {
+                ...pub,
+                average_rating: data.average,
+                rating_count: (pub.rating_count ?? 0) + 1,
+              }
+            : pub
+        )
+      );
+    } catch (err) {
+      console.error('Rating error:', err);
+    }
+  }, [router]);
+
   // Where the floating "Upload Book" button should go
   const uploadDestination = getUploadDestination(authUser);
+
+  // Total count for the "All" pill. When a degree filter is active the backend
+  // recomputes thesis/dissertation counts scoped to that filter, so summing
+  // them always reflects what's currently loaded.
+  const totalDegreeCount = counts.thesis + counts.dissertation;
+
+  const DEGREE_TABS: { key: 'all' | 'thesis' | 'dissertation'; label: string; count: number }[] = [
+    { key: 'all', label: 'All', count: totalDegreeCount },
+    { key: 'thesis', label: 'Theses', count: counts.thesis },
+    { key: 'dissertation', label: 'FYP', count: counts.dissertation },
+  ];
+
+  const degreeTabStyles: Record<'all' | 'thesis' | 'dissertation', { active: string; inactive: string }> = {
+    all: {
+      active: 'bg-[#050A14] text-[#FFD700] border-2 border-[#050A14] shadow-lg scale-105',
+      inactive: 'bg-white text-gray-500 border-2 border-gray-300 hover:border-gray-400',
+    },
+    thesis: {
+      active: 'bg-blue-600 text-white border-2 border-blue-600 shadow-lg scale-105',
+      inactive: 'bg-white text-blue-600 border-2 border-blue-300 hover:border-blue-500',
+    },
+    dissertation: {
+      active: 'bg-purple-600 text-white border-2 border-purple-600 shadow-lg scale-105',
+      inactive: 'bg-white text-purple-600 border-2 border-purple-300 hover:border-purple-500',
+    },
+  };
 
   // ──────────────────────────────────────────────────────
   // Render
@@ -436,7 +600,7 @@ export default function ThesesPage() {
         <div className="max-w-7xl mx-auto">
 
           {/* Search bar */}
-          <div className="relative flex justify-center mb-12 z-30">
+          <div className="relative flex justify-center mb-6 z-30">
             <div className="w-full max-w-2xl relative">
               <input
                 type="text"
@@ -513,6 +677,25 @@ export default function ThesesPage() {
             )}
           </div>
 
+          {/* Degree filter pills — All / Theses / FYP */}
+          <div className="flex justify-center gap-3 sm:gap-4 mb-12 flex-wrap">
+            {DEGREE_TABS.map((tab) => {
+              const isActive = degreeFilter === tab.key;
+              const styles = degreeTabStyles[tab.key];
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setDegreeFilter(tab.key)}
+                  className={`px-6 sm:px-7 py-2.5 rounded-full font-bold text-sm sm:text-base transition-all ${
+                    isActive ? styles.active : styles.inactive
+                  }`}
+                >
+                  {tab.label} ({tab.count})
+                </button>
+              );
+            })}
+          </div>
+
           {/* Field filters + publications grid (hidden while search dropdown is open) */}
           {!showSearchResults && (
             <>
@@ -573,7 +756,7 @@ export default function ThesesPage() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
                   {allPublications.map((pub) => (
-                    <PublicationCard key={pub.id} {...pub} />
+                    <PublicationCard key={pub.id} {...pub}  />
                   ))}
                 </div>
               )}

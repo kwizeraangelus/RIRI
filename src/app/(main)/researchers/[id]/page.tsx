@@ -1,3 +1,4 @@
+// app/researchers/[id]/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -38,13 +39,13 @@ export default function PublicResearcherProfile() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#E0F2FE] flex items-center justify-center">
-        <div className="text-3xl font-light text-slate-600 animate-pulse">Loading Profile...</div>
+        <div className="text-4xl font-light text-slate-600 animate-pulse">Loading Profile...</div>
       </div>
     );
   }
 
   if (!researcher) {
-    return <div className="text-center py-20 text-red-600">Researcher not found</div>;
+    return <div className="text-center py-20 text-red-600 text-2xl">Researcher not found</div>;
   }
 
   return (
@@ -69,38 +70,38 @@ export default function PublicResearcherProfile() {
             </div>
 
             {/* Info */}
-            <div className="space-y-5 text-sm">
+            <div className="space-y-5 text-base">
               <div>
-                <p className="font-semibold text-gray-700">
-                  Position <span className="text-gray-400 text-sm">(current Occupation)</span>
+                <p className="font-semibold text-gray-700 text-lg">
+                  Position <span className="text-gray-400 text-base">(current Occupation)</span>
                 </p>
                 <p className="text-gray-600 mt-1">{researcher.Position}</p>
               </div>
               <div>
-                <p className="font-semibold text-gray-700">Research Area</p>
+                <p className="font-semibold text-gray-700 text-lg">Research Area</p>
                 <p className="text-gray-600 mt-1">{researcher.ResearchArea}</p>
               </div>
               <div>
-                <p className="font-semibold text-gray-700">Field</p>
+                <p className="font-semibold text-gray-700 text-lg">Field</p>
                 <p className="text-gray-600 mt-1">{researcher.Field}</p>
               </div>
               <div>
-                <p className="font-semibold text-gray-700">Email</p>
+                <p className="font-semibold text-gray-700 text-lg">Email</p>
                 <a href={`mailto:${researcher.email}`} className="text-blue-600 hover:underline break-all">
                   {researcher.email}
                 </a>
               </div>
               <div>
-                <p className="font-semibold text-gray-700">Contact Number</p>
+                <p className="font-semibold text-gray-700 text-lg">Contact Number</p>
                 <p className="text-gray-600">{researcher.contact}</p>
               </div>
               <div>
-                <p className="font-semibold text-gray-700">Qualification</p>
+                <p className="font-semibold text-gray-700 text-lg">Qualification</p>
                 <p className="text-gray-600">{researcher.qualification}</p>
               </div>
               {researcher.orcid && (
                 <div>
-                  <p className="font-semibold text-gray-700">ORCID</p>
+                  <p className="font-semibold text-gray-700 text-lg">ORCID</p>
                   <p className="font-mono text-blue-600">{researcher.orcid}</p>
                 </div>
               )}
@@ -111,21 +112,21 @@ export default function PublicResearcherProfile() {
         {/* Left Side - Bio + Publications - Appears SECOND on mobile, first on desktop */}
         <div className="lg:col-span-2 space-y-8 order-last lg:order-first">
           <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-            <h1 className="text-3xl font-bold text-slate-800 mb-2">{researcher.name}</h1>
-            <p className="text-slate-600 mb-6">{researcher.qualification}</p>
+            <h1 className="text-4xl font-bold text-slate-800 mb-2">{researcher.name}</h1>
+            <p className="text-slate-600 mb-6 text-lg">{researcher.qualification}</p>
 
             {/* Bio - with justified text */}
-            <div className="prose text-gray-700 leading-relaxed text-justify">
+            <div className="prose text-gray-700 leading-relaxed text-justify text-lg">
               <p>{researcher.bio || "No biography available for this researcher."}</p>
             </div>
           </div>
 
           {/* Publications Section */}
           <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-            <h2 className="text-2xl font-bold text-slate-800 mb-6">Publications</h2>
+            <h2 className="text-3xl font-bold text-slate-800 mb-6">Publications</h2>
 
             {researcher.publications.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-gray-500 text-lg">
                 No publications available yet.
               </div>
             ) : (
@@ -134,17 +135,17 @@ export default function PublicResearcherProfile() {
                   <div key={pub.id} className="border border-slate-200 rounded-xl p-6 hover:shadow-md transition-all">
                     <div className="flex flex-col gap-4">
                       <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-sm">
+                        <div className="flex-shrink-0 w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-base">
                           {index + 1}
                         </div>
 
                         <div className="flex-1">
-                          <h3 className="text-xl font-semibold text-slate-800 leading-tight">
+                          <h3 className="text-2xl font-semibold text-slate-800 leading-tight">
                             {pub.title}
                           </h3>
 
                           {/* Authors */}
-                          <p className="text-sm text-slate-600 mt-3">
+                          <p className="text-base text-slate-600 mt-3">
                             <span className="font-medium">Authors:</span>{' '}
                             {Array.isArray(pub.authors) 
                               ? pub.authors.join(' • ') 
@@ -154,24 +155,24 @@ export default function PublicResearcherProfile() {
                           {/* Tags */}
                           <div className="flex flex-wrap gap-3 mt-4">
                             {pub.journal_name && (
-                              <span className="px-4 py-1.5 bg-slate-100 rounded-full text-slate-700 text-sm flex items-center gap-1">
+                              <span className="px-4 py-1.5 bg-slate-100 rounded-full text-slate-700 text-base flex items-center gap-1">
                                 📍 {pub.journal_name}
                               </span>
                             )}
                             {pub.conference_info && (
-                              <span className="px-4 py-1.5 bg-purple-100 rounded-full text-purple-700 text-sm flex items-center gap-1">
+                              <span className="px-4 py-1.5 bg-purple-100 rounded-full text-purple-700 text-base flex items-center gap-1">
                                 🎤 {pub.conference_info}
                               </span>
                             )}
                             {pub.publisher && (
-                              <span className="px-4 py-1.5 bg-green-100 rounded-full text-green-700 text-sm flex items-center gap-1">
+                              <span className="px-4 py-1.5 bg-green-100 rounded-full text-green-700 text-base flex items-center gap-1">
                                 📔 {pub.publisher}
                               </span>
                             )}
                           </div>
 
                           {/* DOI */}
-                          <div className="mt-5 flex flex-wrap gap-4 text-sm">
+                          <div className="mt-5 flex flex-wrap gap-4 text-base">
                             {pub.doi && (
                               <a 
                                 href={`https://doi.org/${pub.doi}`} 
@@ -189,16 +190,16 @@ export default function PublicResearcherProfile() {
                             {pub.abstract && (
                               <button
                                 onClick={() => setOpenAbstractId(openAbstractId === pub.id ? null : pub.id)}
-                                className="text-xs px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-medium transition flex items-center gap-1.5"
+                                className="text-sm px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-medium transition flex items-center gap-1.5"
                               >
                                 📄 Abstract
-                                <span className="text-slate-300 text-xs">{openAbstractId === pub.id ? '▲' : '▼'}</span>
+                                <span className="text-slate-300 text-sm">{openAbstractId === pub.id ? '▲' : '▼'}</span>
                               </button>
                             )}
                             {!pub.abstract && (
                               <button
                                 disabled
-                                className="text-xs px-5 py-2 bg-slate-100 text-slate-400 rounded-lg font-medium cursor-not-allowed"
+                                className="text-sm px-5 py-2.5 bg-slate-100 text-slate-400 rounded-lg font-medium cursor-not-allowed"
                               >
                                 📄 Abstract
                               </button>
@@ -207,7 +208,7 @@ export default function PublicResearcherProfile() {
                               <a 
                                 href={pub.url} 
                                 target="_blank" 
-                                className="text-xs px-5 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-medium transition"
+                                className="text-sm px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-medium transition"
                               >
                                 🌐 HTML
                               </a>
@@ -216,7 +217,7 @@ export default function PublicResearcherProfile() {
                               <a 
                                 href={getApiUrl(pub.pdf_path)} 
                                 target="_blank" 
-                                className="text-xs px-5 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition"
+                                className="text-sm px-5 py-2.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition"
                               >
                                 📑 PDF
                               </a>
@@ -228,8 +229,8 @@ export default function PublicResearcherProfile() {
                       {/* Full-width Abstract - Below the publication info */}
                       {openAbstractId === pub.id && pub.abstract && (
                         <div className="mt-2 p-6 bg-gray-100 border border-gray-300 rounded-lg w-full">
-                          <p className="text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wider">Abstract</p>
-                          <p className="text-sm text-gray-900 leading-relaxed text-justify">{pub.abstract}</p>
+                          <p className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wider">Abstract</p>
+                          <p className="text-base text-gray-900 leading-relaxed text-justify">{pub.abstract}</p>
                         </div>
                       )}
                     </div>

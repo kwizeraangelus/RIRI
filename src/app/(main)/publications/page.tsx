@@ -13,6 +13,7 @@ interface Publication {
   journal_name?: string;
   publisher?: string;
   publication_type?: string;
+  pdf_path?: string;
   doi?: string;
   url?: string;
   user?: User;
@@ -207,8 +208,17 @@ export default function PublicationsPage() {
                               {pub.doi}
                             </a>
                           </p>
-                        )}
-                        <p><span className="text-gray-400">read pdf:</span> {pub.user?.username || 'Researcher'}</p>
+                        )} 
+                        {pub.pdf_path && (
+  <a
+    href={getApiUrl(pub.pdf_path)}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-flex items-center gap-1 text-[#050A14] font-semibold hover:underline mt-2 text-base"
+  >
+    📑 Read PDF
+  </a>
+)}
                         {pub.url && (
                           <a
                             href={pub.url}

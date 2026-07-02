@@ -1,3 +1,4 @@
+// app/researchers/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -57,18 +58,15 @@ export default function ResearchersPage() {
     );
   });
 
-  if (loading) return <div className="text-center py-20 text-2xl">Loading Researchers...</div>;
-  if (error) return <div className="text-center py-20 text-red-600 text-2xl">Error: {error}</div>;
+  if (loading) return <div className="text-center py-20 text-3xl">Loading Researchers...</div>;
+  if (error) return <div className="text-center py-20 text-red-600 text-3xl">Error: {error}</div>;
 
   return (
-    <div className="min-h-screen bg-[#E0F2FE] text-gray-900">
-      {/* DARK NAVY TOP BAND */}
-      <div className="h-28 bg-[#050A14]" aria-hidden="true" />
-
+    <div className=" bg-[#E0F2FE] text-gray-900">
       {/* HERO SECTION */}
-      <section className="relative -mt-28 pt-36 pb-20 text-center">
+      <section className="relative pt-20 pb-20 text-center">
         <div className="max-w-4xl mx-auto px-6">
-          <p className="text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto">
+          <p className="text-2xl md:text-3xl text-gray-700 max-w-2xl mx-auto">
             Meet the brilliant minds advancing research and innovation in Rwanda
           </p>
         </div>
@@ -78,18 +76,18 @@ export default function ResearchersPage() {
       <div className="max-w-5xl mx-auto px-6 mb-10">
         <div className="relative max-w-xl mx-auto">
           <div className="absolute left-5 top-1/2 -translate-y-1/2 text-blue-600">
-            <Search size={24} />
+            <Search size={28} />
           </div>
           <input
             type="text"
             placeholder="Search by Name, Qualification, Position, Research Area, Field..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-14 pr-6 py-4 bg-white border border-gray-300 rounded-2xl text-base focus:outline-none focus:border-[#FFD700] shadow-sm"
+            className="w-full pl-14 pr-6 py-4 bg-white border border-gray-300 rounded-2xl text-lg focus:outline-none focus:border-[#FFD700] shadow-sm"
           />
         </div>
         {searchTerm && (
-          <p className="text-center text-sm text-slate-500 mt-3">
+          <p className="text-center text-base text-slate-500 mt-3">
             {filtered.length} result{filtered.length !== 1 ? 's' : ''} for <span className="font-semibold text-slate-700">"{searchTerm}"</span>
           </p>
         )}
@@ -99,7 +97,7 @@ export default function ResearchersPage() {
       <div className="max-w-5xl mx-auto px-6">
         <div className="space-y-8">
           {filtered.length === 0 ? (
-            <div className="text-center py-12 text-xl text-gray-500">No researchers found.</div>
+            <div className="text-center py-12 text-2xl text-gray-500">No researchers found.</div>
           ) : (
             filtered.map((person) => (
               <div 
@@ -107,8 +105,8 @@ export default function ResearchersPage() {
                 className="flex flex-col md:flex-row gap-8 border-b border-gray-200 pb-10 last:border-none bg-white rounded-2xl p-6 shadow-sm"
               >
                 {/* Left Column: Image + Button */}
-                <div className="flex flex-col items-center md:items-start w-full md:w-48 flex-shrink-0">
-                  <div className="w-32 h-40 bg-gray-100 rounded-xl overflow-hidden mb-4">
+                <div className="flex flex-col items-center md:items-start w-full md:w-52 flex-shrink-0">
+                  <div className="w-36 h-44 bg-gray-100 rounded-xl overflow-hidden mb-4">
                     <img 
                       src={person.image} 
                       alt={person.name} 
@@ -120,7 +118,7 @@ export default function ResearchersPage() {
                   </div>
                   
                   <Link href={`/researchers/${person.id}`} className="w-full md:w-auto">
-                    <button className="w-full md:w-auto bg-red-700 hover:bg-red-800 text-white font-medium px-6 py-2.5 rounded-xl text-base transition-colors">
+                    <button className="w-full md:w-auto bg-red-700 hover:bg-red-800 text-white font-medium px-6 py-3 rounded-xl text-lg transition-colors">
                       VIEW PROFILE
                     </button>
                   </Link>
@@ -128,9 +126,9 @@ export default function ResearchersPage() {
 
                 {/* Right Column: Text Content */}
                 <div className="flex-1 pt-1">
-                  <h3 className="text-3xl font-semibold text-gray-900 mb-4">{person.name}</h3>
+                  <h3 className="text-4xl font-semibold text-gray-900 mb-4">{person.name}</h3>
 
-                  <div className="space-y-2 text-base">
+                  <div className="space-y-2 text-lg">
                     <div className="text-gray-500">
                       <span className="font-medium text-gray-700">Qualification:</span> {person.qualification}
                     </div>

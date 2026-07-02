@@ -41,7 +41,7 @@ const [loading, setLoading] = useState(true);
   if (loading) {
     return (
       <div className="min-h-screen bg-[#E0F2FE] flex items-center justify-center">
-        <div className="text-[#050A14] text-xl font-bold flex items-center gap-4">
+        <div className="text-[#050A14] text-2xl font-bold flex items-center gap-4">
           <div className="inline-block animate-spin rounded-full h-10 w-10 border-8 border-[#FFD700] border-t-transparent"></div>
           Loading innovation...
         </div>
@@ -54,11 +54,11 @@ const [loading, setLoading] = useState(true);
     return (
       <div className="min-h-screen bg-[#E0F2FE] flex items-center justify-center p-4">
         <div className="bg-white p-10 rounded-3xl shadow-2xl text-center max-w-md">
-          <h2 className="text-3xl font-bold text-red-600 mb-4">Error</h2>
-          <p className="text-gray-700 mb-8 text-lg">{error}</p>
+          <h2 className="text-4xl font-bold text-red-600 mb-4">Error</h2>
+          <p className="text-gray-700 mb-8 text-xl">{error}</p>
           <button
             onClick={() => router.push('/innovations')}
-            className="px-8 py-4 bg-[#FFD700] text-[#050A14] font-bold rounded-full hover:scale-105 transition-all shadow-xl text-lg"
+            className="px-8 py-4 bg-[#FFD700] text-[#050A14] font-bold rounded-full hover:scale-105 transition-all shadow-xl text-xl"
           >
             Back to Innovations
           </button>
@@ -109,7 +109,7 @@ const [loading, setLoading] = useState(true);
   />
 ) : (
   <div className="bg-gradient-to-br from-gray-200 to-gray-300 border-8 border-dashed border-gray-400 rounded-2xl w-full h-96 flex items-center justify-center shadow-xl">
-    <span className="text-gray-600 text-2xl font-bold">No Photo</span>
+    <span className="text-gray-600 text-3xl font-bold">No Photo</span>
   </div>
 )}
             </div>
@@ -118,16 +118,16 @@ const [loading, setLoading] = useState(true);
           {/* Content */}
           <div className="md:col-span-2 space-y-10">
             <div className="prose prose-lg max-w-none">
-              <p className="text-gray-800 leading-relaxed text-justify text-lg whitespace-pre-wrap">
+              <p className="text-gray-800 leading-relaxed text-justify text-xl whitespace-pre-wrap">
                 {innovation.description}
               </p>
             </div>
 
-            <div className="border-t-4 border-[#FFD700] pt-8 text-base grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50 p-8 rounded-2xl shadow-inner">
+            <div className="border-t-4 border-[#FFD700] pt-8 text-lg grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50 p-8 rounded-2xl shadow-inner">
   {/* --- 1. STATUS BLOCK --- */}
   <div>
-    <strong className="text-[#050A14] text-lg">Status:</strong>{' '}
-    <span className={`font-bold text-xl block mt-2 ${
+    <strong className="text-[#050A14] text-xl">Status:</strong>{' '}
+    <span className={`font-bold text-2xl block mt-2 ${
       innovation?.status === true ? 'text-green-600' : 'text-orange-600'
     }`}>
       {innovation?.status === true ? 'Approved' : 'Pending'}
@@ -136,8 +136,8 @@ const [loading, setLoading] = useState(true);
 
   {/* --- 2. SPONSORSHIP BLOCK --- */}
   <div>
-    <strong className="text-[#050A14] text-lg">Sponsorship Needed:</strong>{' '}
-    <span className={`font-bold text-xl block mt-2 ${
+    <strong className="text-[#050A14] text-xl">Sponsorship Needed:</strong>{' '}
+    <span className={`font-bold text-2xl block mt-2 ${
       innovation?.sponsorship_needed === 'sponsored' ? 'text-blue-600' :
       innovation?.sponsorship_needed === 'unsponsored' ? 'text-purple-700' :
       'text-gray-700'
@@ -153,8 +153,8 @@ const [loading, setLoading] = useState(true);
 
 
               <div className="md:col-span-2">
-  <strong className="text-[#050A14] text-lg">Submitted by:</strong>{' '}
-  <span className="text-[#050A14] font-medium text-lg">
+  <strong className="text-[#050A14] text-xl">Submitted by:</strong>{' '}
+  <span className="text-[#050A14] font-medium text-xl">
     {innovation?.user?.first_name 
       ? `${innovation.user.first_name} ${innovation.user.second_name || ''}`.trim()
       : innovation?.user?.username !== "Anonymous" 
@@ -167,12 +167,12 @@ const [loading, setLoading] = useState(true);
 
             {/* Optional CTA Section */}
             <div className="text-center mt-12">
-              <p className="text-2xl font-bold text-[#050A14] mb-6">
+              <p className="text-3xl font-bold text-[#050A14] mb-6">
                 Interested in supporting this innovation?
               </p>
              <Link
                    href="/contact"
-                   className="inline-block px-10 py-5 bg-[#FFD700] text-[#050A14] font-bold text-xl rounded-full shadow-2xl hover:scale-110 transition-all"
+                   className="inline-block px-10 py-5 bg-[#FFD700] text-[#050A14] font-bold text-2xl rounded-full shadow-2xl hover:scale-110 transition-all"
                  >
                    Contact Innovator
              </Link>
