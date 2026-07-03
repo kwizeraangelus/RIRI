@@ -1,8 +1,0 @@
-{
-  "/(main)/publications/page": "app/(main)/publications/page.js",
-  "/(main)/innovation/page": "app/(main)/innovation/page.js",
-  "/(main)/innovation/[id]/page": "app/(main)/innovation/[id]/page.js",
-  "/(main)/page": "app/(main)/page.js",
-  "/(main)/researchers/page": "app/(main)/researchers/page.js",
-  "/(main)/theses/page": "app/(main)/theses/page.js"
-}
