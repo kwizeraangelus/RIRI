@@ -68,7 +68,7 @@ export default function BookDetailPage() {
       case 'book chapter':
         return 'Book Chapter';
       default:
-        return type || 'Research Publication';
+        return type;
     }
   };
 
@@ -182,7 +182,7 @@ export default function BookDetailPage() {
       // Use Web Share API if available
       try {
         await navigator.share({
-          title: book?.title || 'Research Publication',
+          title: book?.title,
           text: `Check out this research: ${book?.title}`,
           url: currentUrl,
         });
@@ -475,7 +475,7 @@ export default function BookDetailPage() {
         )}
 
         <footer className="bg-gray-100 px-8 py-6 text-center text-sm text-gray-600 border-t">
-          © 2025 Rwanda Research Hub. All rights reserved.
+          © 2026 Rwanda Research Hub. All rights reserved.
         </footer>
       </div>
     </article>

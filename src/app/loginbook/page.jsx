@@ -182,7 +182,7 @@ export default function LoginBookPage() {
           </div>
 
           <p className="text-center text-xs text-gray-500 mt-8">
-            Rwanda Research Hub © 2025
+            Rwanda Research Hub © 2026
           </p>
         </div>
       </div>

@@ -130,7 +130,7 @@ const [loading, setLoading] = useState(true);
     <span className={`font-bold text-2xl block mt-2 ${
       innovation?.status === true ? 'text-green-600' : 'text-orange-600'
     }`}>
-      {innovation?.status === true ? 'Approved' : 'Pending'}
+      {innovation?.status === true ? 'Reviewed' : 'Pending'}
     </span>
   </div>
 
@@ -174,13 +174,15 @@ const [loading, setLoading] = useState(true);
                    href="/contact"
                    className="inline-block px-10 py-5 bg-[#FFD700] text-[#050A14] font-bold text-2xl rounded-full shadow-2xl hover:scale-110 transition-all"
                  >
-                   Contact Innovator
+                   Contact RIRI
              </Link>
               
             </div>
           </div>
         </div>
+        
       </div>
+      
     </div>
   );
 }

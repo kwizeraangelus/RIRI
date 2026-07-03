@@ -143,7 +143,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               fontSize: '68px',
               lineHeight: '1',
               letterSpacing: '6px',
-              fontStyle: 'italic',
+              
               textShadow: '2px 2px 0px rgba(255,215,0,0.15)',
             }}
           >
@@ -152,7 +152,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <span
             style={{
               fontFamily: 'Poppins, sans-serif',
-              fontSize: '13px',
+              fontSize: '8px',
               letterSpacing: '0.18em',
               color: '#FFD700',
               textTransform: 'uppercase',

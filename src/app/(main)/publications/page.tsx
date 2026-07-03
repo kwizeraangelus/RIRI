@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo, ReactNode } from 'react';
+import Link from 'next/link';
 import { getApiUrl } from '@/utils/api';
 
 interface User {
@@ -166,15 +167,15 @@ export default function PublicationsPage() {
                       className="w-full flex items-start justify-between px-6 py-5 gap-4 text-left hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-[#050A14] text-base sm:text-lg break-words">
+                        <p className="font-medium text-black text-base sm:text-lg break-words">
                           {highlight(pub.title || 'Untitled', q)}
                         </p>
-                        <p className="text-gray-500 text-sm italic mt-1 text-left truncate">
+                        <p className="text-black text-sm italic mt-1 text-left truncate">
                           {highlight(authors, q)}
                         </p>
                       </div>
                       <svg
-                        className={`w-5 h-5 text-gray-400 flex-shrink-0 mt-1 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                        className={`w-5 h-5 text-black flex-shrink-0 mt-1 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
                         fill="none" stroke="currentColor" viewBox="0 0 24 24"
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -189,16 +190,16 @@ export default function PublicationsPage() {
                             {pub.publication_type}
                           </span>
                         )}
-                        <p><span className="text-gray-400">Authors:</span> {highlight(authors, q)}</p>
+                        <p><span className="text-black font-bold">Authors:</span> {highlight(authors, q)}</p>
                         {(pub.journal_name || pub.publisher) && (
                           <p>
-                            <span className="text-gray-400">Journal / Publisher:</span>{' '}
+                            <span className="text-black font-bold">Journal / Publisher:</span>{' '}
                             {highlight(pub.journal_name || pub.publisher || '', q)}
                           </p>
                         )}
                         {pub.doi && (
                           <p>
-                            <span className="text-gray-400">DOI:</span>{' '}
+                            <span className="text-black font-bold">DOI:</span>{' '}
                             <a
                               href={`https://doi.org/${pub.doi}`}
                               target="_blank"
@@ -211,7 +212,7 @@ export default function PublicationsPage() {
                         )} 
                         {pub.pdf_path && (
   <a
-    href={getApiUrl(pub.pdf_path)}
+    href={pub.pdf_path}
     target="_blank"
     rel="noopener noreferrer"
     className="inline-flex items-center gap-1 text-[#050A14] font-semibold hover:underline mt-2 text-base"
@@ -219,19 +220,7 @@ export default function PublicationsPage() {
     📑 Read PDF
   </a>
 )}
-                        {pub.url && (
-                          <a
-                            href={pub.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[#050A14] font-semibold hover:underline mt-2 text-base"
-                          >
-                            Read full work
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                          </a>
-                        )}
+                        
                       </div>
                     )}
                   </div>
@@ -243,9 +232,93 @@ export default function PublicationsPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#050A14] text-white py-12 mt-20 text-center">
-        <p className="text-[#FFD700] font-bold text-5xl italic mb-2">RIRI</p>
-        <p className="text-gray-400 text-base">Rwanda Innovation & Research Institute</p>
+      <footer className="bg-[#0c1e30] text-white pt-14 pb-8 px-4 sm:px-8">
+        <div className="max-w-6xl mx-auto">
+
+          {/* Top grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-10 border-b border-white/10">
+
+            {/* Brand col */}
+            <div className="lg:col-span-1">
+              <p
+                className="font-bold uppercase text-white mb-1"
+                style={{ fontFamily: "'Bell MT', 'Palatino Linotype', Georgia, serif", fontSize: '38px', letterSpacing: '4px', fontStyle: 'italic', lineHeight: 1 }}
+              >
+                RIRI
+              </p>
+              <p className="text-[#FFD700] text-[9px] uppercase tracking-widest mb-4">Discover · Innovate · Inspire</p>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Rwanda's premier platform connecting researchers, innovators, and knowledge seekers.
+              </p>
+            </div>
+
+            {/* Quick links */}
+            <div>
+              <h4 className="text-[#FFD700] font-bold uppercase tracking-widest text-xs mb-5">Quick Links</h4>
+              <ul className="space-y-3">
+                {['Researchers', 'Theses', 'Publications', 'Innovations', 'Events'].map((item) => (
+                  <li key={item}>
+                    <Link href={`/${item.toLowerCase()}`} className="text-gray-300 hover:text-[#FFD700] transition text-sm">
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="text-[#FFD700] font-bold uppercase tracking-widest text-xs mb-5">Contact Us</h4>
+              <ul className="space-y-3 text-sm text-gray-300">
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-[#FFD700]">✉</span>
+                  <span>info@riri.rw</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-[#FFD700]">📍</span>
+                  <span>Kigali, Rwanda</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5 text-[#FFD700]">📞</span>
+                  <span>+250 793211640</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Social */}
+            <div>
+              <h4 className="text-[#FFD700] font-bold uppercase tracking-widest text-xs mb-5">Follow Us</h4>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { name: 'Facebook', icon: 'f' },
+                  { name: 'WhatsApp', icon: 'w' },
+                  { name: 'Instagram', icon: 'ig' },
+                  { name: 'TikTok', icon: 'tt' },
+                ].map((social) => (
+                  <button
+                    key={social.name}
+                    onClick={() => notifyInfo(social.name)}
+                    className="px-4 py-2 rounded-full border border-white/20 text-sm text-gray-300 hover:border-[#FFD700] hover:text-[#FFD700] transition"
+                  >
+                    {social.name}
+                  </button>
+                ))}
+              </div>
+              <p className="text-gray-500 text-xs mt-6 leading-relaxed">
+                Stay updated with the latest research events and innovations from Rwanda.
+              </p>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+            <p>© {new Date().getFullYear()} RIRI. All Rights Reserved.</p>
+            <div className="flex gap-5">
+              <Link href="/about" className="hover:text-[#FFD700] transition">About</Link>
+              <Link href="/contact" className="hover:text-[#FFD700] transition">Contact</Link>
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   );

@@ -221,7 +221,7 @@ export default function HomePage() {
               <ul className="space-y-3 text-sm text-gray-300">
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5 text-[#FFD700]">✉</span>
-                  <span>info@riri.gov.rw</span>
+                  <span>info@riri.rw</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5 text-[#FFD700]">📍</span>
@@ -229,7 +229,7 @@ export default function HomePage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5 text-[#FFD700]">📞</span>
-                  <span>+250 000 000 000</span>
+                  <span>+250 793211640</span>
                 </li>
               </ul>
             </div>
