@@ -215,7 +215,7 @@ export default function PublicResearcherProfile() {
                             )}
                             {pub.pdf_path && (
                               <a 
-                                href={getApiUrl(pub.pdf_path)} 
+                                href={pub.pdf_path} 
                                 target="_blank" 
                                 className="text-sm px-5 py-2.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition"
                               >

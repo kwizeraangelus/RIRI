@@ -95,8 +95,8 @@ export default function PendingEventsPage() {
               <div key={event.id} className="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden hover:shadow-2xl transition">
                 {/* Photo */}
                 {event.photo ? (
-                  <img src={getApiUrl(event.photo)} alt={event.title}
-                    className="w-full h-48 object-cover" />
+                  <img src={event.photo} alt={event.title}
+                  className="w-full h-48 object-cover" />
                 ) : (
                   <div className="bg-gradient-to-br from-[#4a772e] to-[#3a5f24] h-48 flex items-center justify-center text-white text-5xl font-bold">
                     {event.icon || 'Calendar'}

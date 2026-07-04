@@ -98,7 +98,7 @@ const [loading, setLoading] = useState(true);
     src={
       getApiUrl 
         ? getApiUrl(innovation.photo) 
-        : `http://localhost:8000${innovation.photo}`
+        : `https://api.riri.rw${innovation.photo}`
     }   // ← Full backend URL
     alt={innovation.name}
     width={500}

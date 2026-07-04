@@ -251,7 +251,7 @@ export default function ApprovedInnovations() {
                   <div className="sm:w-48 sm:h-48 flex-shrink-0">
                     {innovation.photo_url ? (
                       <img
-                        src={getApiUrl(innovation.photo_url)}
+                        src={innovation.photo_url}
                         alt={innovation.name}
                         className="w-full h-48 sm:h-full object-cover rounded-t-xl sm:rounded-l-xl sm:rounded-tr-none"
                       />
@@ -344,7 +344,7 @@ export default function ApprovedInnovations() {
 
               {selectedInnovation.photo_url && (
                 <img
-                  src={getApiUrl(selectedInnovation.photo_url)}
+                  src={selectedInnovation.photo_url}
                   alt={selectedInnovation.name}
                   className="w-full h-64 object-cover rounded-lg mb-4"
                 />

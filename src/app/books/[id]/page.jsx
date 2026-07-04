@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
+import Link from "next/link";
 import { 
   Share2, 
   ThumbsUp, 
@@ -474,10 +475,97 @@ export default function BookDetailPage() {
           </div>
         )}
 
-        <footer className="bg-gray-100 px-8 py-6 text-center text-sm text-gray-600 border-t">
-          © 2026 Rwanda Research Hub. All rights reserved.
-        </footer>
+        
       </div>
+       <footer className="bg-[#0c1e30] text-white pt-14 pb-8 px-4 sm:px-8">
+              <div className="max-w-6xl mx-auto">
+      
+                {/* Top grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-10 border-b border-white/10">
+      
+                  {/* Brand col */}
+                  <div className="lg:col-span-1">
+                    <p
+                      className="font-bold uppercase text-white mb-1"
+                      style={{ fontFamily: "'Bell MT', 'Palatino Linotype', Georgia, serif", fontSize: '38px', letterSpacing: '4px', fontStyle: 'italic', lineHeight: 1 }}
+                    >
+                      RIRI
+                    </p>
+                    <p className="text-[#FFD700] text-[9px] uppercase tracking-widest mb-4">Discover · Innovate · Inspire</p>
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      Rwanda's premier platform connecting researchers, innovators, and knowledge seekers.
+                    </p>
+                  </div>
+      
+                  {/* Quick links */}
+                  <div>
+                    <h4 className="text-[#FFD700] font-bold uppercase tracking-widest text-xs mb-5">Quick Links</h4>
+                    <ul className="space-y-3">
+                      {['Researchers', 'Theses', 'Publications', 'Innovations', 'Events'].map((item) => (
+                        <li key={item}>
+                          <Link href={`/${item.toLowerCase()}`} className="text-gray-300 hover:text-[#FFD700] transition text-sm">
+                            {item}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+      
+                  {/* Contact */}
+                  <div>
+                    <h4 className="text-[#FFD700] font-bold uppercase tracking-widest text-xs mb-5">Contact Us</h4>
+                    <ul className="space-y-3 text-sm text-gray-300">
+                      <li className="flex items-start gap-2">
+                        <span className="mt-0.5 text-[#FFD700]">✉</span>
+                        <span>info@riri.rw</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-0.5 text-[#FFD700]">📍</span>
+                        <span>Kigali, Rwanda</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-0.5 text-[#FFD700]">📞</span>
+                        <span>+250 793211640</span>
+                      </li>
+                    </ul>
+                  </div>
+      
+                  {/* Social */}
+                  <div>
+                    <h4 className="text-[#FFD700] font-bold uppercase tracking-widest text-xs mb-5">Follow Us</h4>
+                    <div className="flex flex-wrap gap-3">
+                      {[
+                        { name: 'Facebook', icon: 'f' },
+                        { name: 'WhatsApp', icon: 'w' },
+                        { name: 'Instagram', icon: 'ig' },
+                        { name: 'TikTok', icon: 'tt' },
+                      ].map((social) => (
+                        <button
+                          key={social.name}
+                          onClick={() => notifyInfo(social.name)}
+                          className="px-4 py-2 rounded-full border border-white/20 text-sm text-gray-300 hover:border-[#FFD700] hover:text-[#FFD700] transition"
+                        >
+                          {social.name}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-gray-500 text-xs mt-6 leading-relaxed">
+                      Stay updated with the latest research events and innovations from Rwanda.
+                    </p>
+                  </div>
+                </div>
+      
+                {/* Bottom bar */}
+                <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+                  <p>© {new Date().getFullYear()} RIRI. All Rights Reserved.</p>
+                  <div className="flex gap-5">
+                    <Link href="/about" className="hover:text-[#FFD700] transition">About</Link>
+                    <Link href="/contact" className="hover:text-[#FFD700] transition">Contact</Link>
+                  </div>
+                </div>
+              </div>
+            </footer>
     </article>
+    
   );
 }

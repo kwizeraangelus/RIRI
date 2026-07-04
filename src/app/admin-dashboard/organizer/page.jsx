@@ -243,7 +243,7 @@ export default function EventDashboard() {
                   return (
                     <div key={event.id} className="group bg-white border-2 border-blue-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition transform hover:scale-105 cursor-pointer relative">
                       {event.photo ? (
-                        <img src={getApiUrl(event.photo)} alt={event.title} className="w-full h-48 object-cover" />
+                        <img src={event.photo} alt={event.title} className="w-full h-48 object-cover" />
                       ) : (
                         <div className="bg-gradient-to-br from-blue-400 to-indigo-500 h-48 flex items-center justify-center text-6xl text-white">
                           {event.icon || 'Calendar'}
@@ -279,7 +279,7 @@ export default function EventDashboard() {
           <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">My Profile</h3>
           <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-blue-500 shadow-xl">
             {user?.profile_image ? (
-              <Image src={getApiUrl(user.profile_image)} alt="Profile" width={128} height={128} className="w-full h-full object-cover" unoptimized />
+              <Image src={user.profile_image} alt="Profile" width={128} height={128} className="w-full h-full object-cover" unoptimized />
             ) : (
               <div className="bg-gradient-to-br from-blue-400 to-indigo-500 w-full h-full flex items-center justify-center text-white text-5xl font-bold">
                 {user?.user?.username?.[0]?.toUpperCase()}

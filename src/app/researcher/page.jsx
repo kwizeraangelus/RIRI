@@ -95,7 +95,7 @@ export default function ResearcherDashboard() {
   useEffect(() => { fetchAll(); }, []);
 
   const authHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem('token')}`,
+    Authorization: `Bearer ${localStorage.getItem('token')}`
   });
 
   const fetchAll = async () => {
@@ -289,7 +289,7 @@ export default function ResearcherDashboard() {
       photo: null,
       sponsorship_needed: inv.sponsorship_needed || 'no-need',
     });
-    setEditInnovationPhotoPreview(inv.photo ? getApiUrl(inv.photo) : null);
+    setEditInnovationPhotoPreview((inv.photo || inv.photo_url || null));
     setShowEditInnovation(true);
   };
 
@@ -417,7 +417,7 @@ export default function ResearcherDashboard() {
       photo: null,
       icon: event.icon || 'Calendar',
     });
-    setEditEventPhotoPreview(event.photo ? getApiUrl(event.photo) : null);
+    setEditEventPhotoPreview(event.photo || event.photo_url || null);
     setShowEditEvent(true);
   };
 
@@ -886,7 +886,7 @@ export default function ResearcherDashboard() {
                                 className="text-xs px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md font-medium transition-colors">🌐 HTML</a>
                             )}
                             {pub.pdf_path && (
-                              <a href={getApiUrl(pub.pdf_path)} target="_blank"
+                              <a href={pub.pdf_path} target="_blank"
                                 className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors">📑 PDF</a>
                             )}
                           </div>
@@ -979,7 +979,7 @@ export default function ResearcherDashboard() {
                       return (
                         <div key={inv.id} className="group border-2 border-purple-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition relative bg-white">
                           {inv.photo
-                            ? <img src={getApiUrl(inv.photo)} alt={inv.name} className="w-full h-44 object-cover" />
+                            ? <img src={inv.photo} alt={inv.name} className="w-full h-44 object-cover" />
                             : <div className="bg-gradient-to-br from-purple-400 to-pink-500 h-44 flex items-center justify-center text-5xl">💡</div>
                           }
                           <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-white shadow ${
@@ -1112,9 +1112,10 @@ export default function ResearcherDashboard() {
                       return (
                         <div key={evt.id} className="group border-2 border-blue-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition relative bg-white">
                           {evt.photo
-                            ? <img src={getApiUrl(evt.photo)} alt={evt.title} className="w-full h-44 object-cover" />
+                            ? <img src={evt.photo} alt={evt.title} className="w-full h-44 object-cover" />
                             : <div className="bg-gradient-to-br from-blue-400 to-indigo-500 h-44 flex items-center justify-center text-5xl text-white">{evt.icon || '📅'}</div>
                           }
+                        
                           <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold text-white shadow ${
                             status === 'approved' ? 'bg-emerald-600' : status === 'rejected' ? 'bg-red-600' : 'bg-amber-600'}`}>
                             {statusLabel}

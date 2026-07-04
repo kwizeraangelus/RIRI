@@ -125,7 +125,7 @@ export default function InnovationDashboard() {
       photo: null,
       sponsorship_needed: inv.sponsorship_needed || 'no-need',
     });
-    setEditInnovationPhotoPreview(inv.photo ? getApiUrl(inv.photo) : null);
+    setEditInnovationPhotoPreview(inv.photo || null);
     setShowEditInnovation(true);
   };
 
@@ -393,7 +393,7 @@ export default function InnovationDashboard() {
                       return (
                         <div key={inv.id} className="border-2 border-purple-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition relative bg-white">
                           {inv.photo
-                            ? <img src={getApiUrl(inv.photo)} alt={inv.name} className="w-full h-44 object-cover" />
+                            ? <img src={inv.photo} alt={inv.name} className="w-full h-44 object-cover" />
                             : <div className="bg-gradient-to-br from-purple-400 to-pink-500 h-44 flex items-center justify-center text-5xl">💡</div>
                           }
                           <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-white shadow ${
@@ -528,7 +528,7 @@ export default function InnovationDashboard() {
                       return (
                         <div key={evt.id} className="border-2 border-blue-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition relative bg-white">
                           {evt.photo
-                            ? <img src={getApiUrl(evt.photo)} alt={evt.title} className="w-full h-44 object-cover" />
+                            ? <img src={evt.photo} alt={evt.title} className="w-full h-44 object-cover" />
                             : <div className="bg-gradient-to-br from-blue-400 to-indigo-500 h-44 flex items-center justify-center text-5xl text-white">📅</div>
                           }
                           <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold text-white shadow ${

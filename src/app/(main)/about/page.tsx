@@ -114,9 +114,8 @@ const AboutPage = () => {
                     <ul className="space-y-2">
                       {[
                         'Connect all Rwandan academic institutions',
-                        'Increase research publication by 300%',
-                        'Commercialize 50+ research projects annually',
-                        'Create 10,000 research jobs by 2030',
+                        'Increase research visibility',
+                        'Commercialize research projects',
                         'Establish Rwanda as East Africa research hub'
                       ].map((item, index) => (
                         <li key={index} className="flex items-center gap-2 text-gray-700">

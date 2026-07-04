@@ -163,7 +163,7 @@ export default function EventDashboard() {
       photo: null,
       icon: event.icon || 'Calendar'
     });
-    setEditPhotoPreview(event.photo ? getApiUrl(event.photo) : null);
+    setEditPhotoPreview(event.photo || event.photo_url || null);
     setShowEditEvent(true);
   };
 
@@ -247,7 +247,7 @@ export default function EventDashboard() {
       details: user?.details || '',
       phone: user?.phone || '',
     });
-    setImagePreview(user?.profile_image ? getApiUrl(user.profile_image) : null);
+    setImagePreview(user?.profile_image || user?.user?.profile_image || null);
     setShowEditProfile(true);
   };
 
@@ -383,7 +383,7 @@ export default function EventDashboard() {
                   return (
                     <div key={event.id} className="group bg-white border-2 border-blue-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition transform hover:scale-105 relative">
                       {event.photo ? (
-                        <img src={getApiUrl(event.photo)} alt={event.title} className="w-full h-48 object-cover" />
+                        <img src={event.photo} alt={event.title} className="w-full h-48 object-cover" />
                       ) : (
                         <div className="bg-gradient-to-br from-blue-400 to-indigo-500 h-48 flex items-center justify-center text-6xl text-white">
                           {event.icon || 'Calendar'}
@@ -439,7 +439,7 @@ export default function EventDashboard() {
           <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-blue-500 shadow-xl">
             {user?.profile_image ? (
               <Image
-                src={getApiUrl(user?.profile_image || user?.user?.profile_image)}
+                src={user?.profile_image || user?.user?.profile_image}
                 alt="Profile"
                 width={128}
                 height={128}

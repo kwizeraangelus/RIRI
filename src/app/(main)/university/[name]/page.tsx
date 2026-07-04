@@ -240,7 +240,7 @@ export default function UniversityPage() {
                     <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-indigo-300 shadow-lg mb-6">
                       {researcher.profile_image ? (
                         <Image
-                          src={getApiUrl(researcher.profile_image)}
+                          src={researcher.profile_image}
                           alt={researcher.username}
                           width={112}
                           height={112}

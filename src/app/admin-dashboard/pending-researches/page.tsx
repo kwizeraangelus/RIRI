@@ -194,7 +194,7 @@ export default function PendingPublicationsPage() {
                   {pub.pdf && (
                     <p className="mb-4">
                       <a
-                        href={getApiUrl(pub.pdf)}
+                        href={pub.pdf}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-indigo-600 hover:underline"

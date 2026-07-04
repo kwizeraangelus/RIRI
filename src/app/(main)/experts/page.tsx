@@ -123,7 +123,7 @@ export default function ExpertsPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#0c1e30] text-white pt-14 pb-8 px-4 sm:px-8">
+       <footer className="bg-[#0c1e30] text-white pt-14 pb-8 px-4 sm:px-8">
         <div className="max-w-6xl mx-auto">
 
           {/* Top grid */}
@@ -171,7 +171,7 @@ export default function ExpertsPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5 text-[#FFD700]">📞</span>
-                  <span>+250 000 000 000</span>
+                  <span>+250 793211640</span>
                 </li>
               </ul>
             </div>

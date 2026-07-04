@@ -82,9 +82,11 @@ const getUploadDestination = (user: AuthUser | null): string => {
 const InnovationCard: React.FC<Innovation> = ({
   id, name, description, photo, sponsorship_needed
 }) => {
- const imageSrc = photo 
-    ? getApiUrl(photo) 
-    : `http://localhost:8000${photo}`;
+ const imageSrc = photo
+  ? photo.startsWith('http')
+    ? photo                    // R2 URL — use directly
+    : `https://api.riri.rw${photo}`  // legacy local path
+  : null;
 
   const sponsorshipInfo = SPONSORSHIP_OPTIONS.find(opt => opt.value === sponsorship_needed);
 

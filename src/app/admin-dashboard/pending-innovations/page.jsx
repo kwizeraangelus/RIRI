@@ -128,7 +128,7 @@ export default function PendingInnovationsPage() {
                 {/* Photo */}
                 {innovation.photo ? (
                   <img
-                    src={getApiUrl(innovation.photo)}
+                    src={innovation.photo}
                     alt={innovation.name}
                     className="w-full h-48 object-cover"
                   />
