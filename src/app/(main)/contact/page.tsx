@@ -343,7 +343,7 @@ export default function ContactClient() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="mt-0.5 text-[#FFD700]">📞</span>
-                  <span>+250 000 000 000</span>
+                  <span>+250 793211640</span>
                 </li>
               </ul>
             </div>
