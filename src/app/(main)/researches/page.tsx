@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useMemo, ReactNode } from 'react';
 import { getApiUrl } from '@/utils/api';
+import Link from "next/link";
 
 interface User {
   username?: string;
