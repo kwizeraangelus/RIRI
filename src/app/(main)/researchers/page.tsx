@@ -108,7 +108,7 @@ export default function ResearchersPage() {
                 <div className="flex flex-col items-center md:items-start w-full md:w-52 flex-shrink-0">
                   <div className="w-36 h-44 bg-gray-100 rounded-xl overflow-hidden mb-4">
                     <img 
-                      src={person.image ||  "https://placeholder.co"} 
+                      src={person.image ||  null} 
                       alt={person.name} 
                       className="w-full h-full object-cover" 
                       onError={(e) => {
