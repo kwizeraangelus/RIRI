@@ -491,7 +491,7 @@ export default function BookDetailPage() {
                     >
                       RIRI
                     </p>
-                    <p className="text-[#FFD700] text-[9px] uppercase tracking-widest mb-4">Discover · Innovate · Inspire</p>
+                    <p className="text-[#FFD700] text-[9px] uppercase tracking-widest mb-4"></p>
                     <p className="text-gray-400 text-sm leading-relaxed">
                       Rwanda's premier platform connecting researchers, innovators, and knowledge seekers.
                     </p>

@@ -3,7 +3,7 @@
 
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
-import { Menu, X, LogOut, User } from 'lucide-react';
+import { Menu, X, LogOut, User, Mail } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import AuthModal from '@/components/AuthModal';
@@ -219,6 +219,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     <Link href="/profile" onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/10 text-[18px]">
                       <User size={22} /> My Profile
                     </Link>
+                    {/* ← Add this block for admin only */}
+  {(authData.user?.is_staff || authData.user?.user_category === 'ADMIN') && (
+    <Link href="/admin-dashboard/messages" onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-5 py-3 hover:bg-white/10 text-[18px]">
+      <Mail size={22} /> Messages
+    </Link>
+  )}
                     <button onClick={handleLogout} className="w-full text-left flex items-center gap-3 px-5 py-3 text-red-400 hover:bg-red-500/10 text-[18px]">
                       <LogOut size={20} /> Logout
                     </button>

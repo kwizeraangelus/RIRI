@@ -876,7 +876,7 @@ export default function AdminDashboard() {
                           <div className="md:w-32 h-48 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
                             {book.cover_image_url ? (
                               <img
-                                src={getApiUrl(book.cover_image_url)}
+                                src={book.cover_image_url}
                                 alt={book.title}
                                 className="w-full h-full object-cover"
                                 onError={(e: React.SyntheticEvent<HTMLImageElement>) => {

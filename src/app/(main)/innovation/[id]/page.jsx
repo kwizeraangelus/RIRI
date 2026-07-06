@@ -96,8 +96,8 @@ const [loading, setLoading] = useState(true);
               {innovation.photo ? (
   <Image
     src={
-      getApiUrl 
-        ? getApiUrl(innovation.photo) 
+      innovation.photo.startsWith('http')
+        ? innovation.photo
         : `https://api.riri.rw${innovation.photo}`
     }   // ← Full backend URL
     alt={innovation.name}

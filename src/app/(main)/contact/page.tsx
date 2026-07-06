@@ -1,14 +1,9 @@
-// src/app/contact/ContactClient.tsx
 'use client';
 
 import { useState } from "react";
 import Link from "next/link";
 import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from "lucide-react";
-import emailjs from "@emailjs/browser";
-
-const EMAILJS_SERVICE_ID = "service_if8qxh6";
-const EMAILJS_TEMPLATE_ID = "template_e84we2b";
-const EMAILJS_PUBLIC_KEY = "2sFxf184ONQ3nezsQ";
+import { getApiUrl } from '@/utils/api';
 
 export default function ContactClient() {
   const [formData, setFormData] = useState({
@@ -30,30 +25,22 @@ export default function ContactClient() {
     setErrorMsg("");
 
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          from_name: formData.name,
-          from_email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-          reply_to: formData.email,
-        },
-        EMAILJS_PUBLIC_KEY
-      );
+      const res = await fetch(getApiUrl('/api/contact'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || 'Failed to send message');
+      }
 
       setStatus("success");
       setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch (error: any) {
-      console.log("FULL ERROR:", error);
-      console.log("ERROR TEXT:", error?.text);
-      console.log("ERROR STATUS:", error?.status);
-    
-      setErrorMsg(
-        error?.text || "Failed to send message. Please try again."
-      );
-    
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to send message. Please try again.";
+      setErrorMsg(errorMessage);
       setStatus("error");
     }
   };
@@ -117,7 +104,7 @@ export default function ContactClient() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition"
-                      placeholder="Kwizera Angelus"
+                      placeholder="RIRI"
                     />
                   </div>
 
@@ -131,7 +118,7 @@ export default function ContactClient() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition"
-                      placeholder="kwizeraangelus@gmail.com"
+                      placeholder="info@riri.rw"
                     />
                   </div>
 
@@ -309,7 +296,7 @@ export default function ContactClient() {
               >
                 RIRI
               </p>
-              <p className="text-[#FFD700] text-[9px] uppercase tracking-widest mb-4">Discover · Innovate · Inspire</p>
+              <p className="text-[#FFD700] text-[9px] uppercase tracking-widest mb-4"></p>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Rwanda's premier platform connecting researchers, innovators, and knowledge seekers.
               </p>

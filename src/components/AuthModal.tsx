@@ -1,11 +1,12 @@
 // components/AuthModal.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, LogIn, UserPlus, Loader2, Eye, EyeOff } from 'lucide-react';
 import { notifySuccess } from '@/context/NotificationContext';
 import { getApiUrl } from '@/utils/api';
+
 
 interface UserData {
   id: string;
@@ -37,6 +38,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
     phone_number: '',
     confirmPassword: '',
     user_category: '',
+     university_name: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -79,6 +81,10 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
         confirmPassword: formData.confirmPassword,
         phone_number: formData.phone_number,
         user_category: formData.user_category.toLowerCase(),
+         university_name:
+        formData.user_category === 'university'
+          ? formData.university_name
+          : undefined,
       }),
     });
     if (!res.ok) {
@@ -87,6 +93,12 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
     }
     return res.json();
   };
+
+  useEffect(() => {
+  if (formData.user_category !== 'university' && formData.university_name) {
+    setFormData((prev) => ({ ...prev, university_name: '' }));
+  }
+}, [formData.user_category]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -264,6 +276,17 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
                 <option value="conf_organizer">Conference Organizer</option>
                 <option value="public_visitor">Public Visitor</option>
               </select>
+              {formData.user_category === 'university' && (
+  <input
+    type="text"
+    placeholder="University Name"
+    value={formData.university_name}
+    onChange={(e) => setFormData({ ...formData, university_name: e.target.value })}
+    required
+    className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
+    disabled={loading}
+  />
+)}
             </>
           )}
 

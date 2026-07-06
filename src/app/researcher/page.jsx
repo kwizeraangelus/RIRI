@@ -112,6 +112,7 @@ export default function ResearcherDashboard() {
       const [userData, pubData, invData, evtData] = await Promise.all([
         userRes.json(), pubRes.json(), invRes.json(), evtRes.json(),
       ]);
+      console.log('ME RESPONSE:', userData);
       setUser(userData);
       setPublications(pubData);
       setInnovations(invData);
@@ -510,7 +511,7 @@ export default function ResearcherDashboard() {
     e.preventDefault();
     const formData = new FormData();
     formData.append('bio', bio || '');
-    formData.append('platformId', platformId || '');
+  formData.append('orcid', platformId || user?.orcid || ''); 
     formData.append('qualification', qualification || '');
     formData.append('Field', Field || '');
     formData.append('Position', Position || '');

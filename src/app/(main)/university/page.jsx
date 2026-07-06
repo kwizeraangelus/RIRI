@@ -18,6 +18,7 @@ export default function UniversityDashboard() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [deletingId, setDeletingId] = useState(null); // NEW - tracks which upload is currently being deleted
   const [activeTab, setActiveTab] = useState('research'); // 'research' or 'events'
 
   // Research Upload States
@@ -252,6 +253,42 @@ export default function UniversityDashboard() {
     }
   };
 
+  // ============= DELETE UPLOAD HANDLER (NEW) =============
+  // Hits the same base route as edit (PATCH /api/upload/:id) but with DELETE,
+  // matching your NestJS controller's @Delete('upload/:id') under the same
+  // prefix as @Patch('upload/:id'). Adjust the path below if your delete
+  // route lives under a different prefix.
+  const handleDeleteUpload = async (upload) => {
+    const confirmed = window.confirm(`Delete "${upload.title}"? This cannot be undone.`);
+    if (!confirmed) return;
+
+    setDeletingId(upload.id);
+    const token = localStorage.getItem('token');
+
+    try {
+      const res = await fetch(getApiUrl(`/api/upload/${upload.id}`), {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        setUploads(prev => prev.filter(u => u.id !== upload.id));
+      } else if (res.status === 403) {
+        alert('You can only delete your own uploads.');
+      } else if (res.status === 404) {
+        alert('This upload no longer exists.');
+        setUploads(prev => prev.filter(u => u.id !== upload.id));
+      } else {
+        const err = await res.json().catch(() => ({}));
+        alert('Error: ' + JSON.stringify(err));
+      }
+    } catch {
+      alert('Network error');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const resetForm = () => {
     setDegreeType('');
     setSelectedField('');
@@ -326,7 +363,7 @@ export default function UniversityDashboard() {
       university: user?.university || '',
       details: user?.details || '',
     });
-    setImagePreview(user?.profile_image ? getApiUrl(user.profile_image) : null);
+    setImagePreview(user?.profile_image || null);
     setShowEditProfile(true);
   };
 
@@ -445,7 +482,7 @@ export default function UniversityDashboard() {
                           Thesis
                         </button>
                         <button onClick={() => setDegreeType('dissertation')} className="py-8 bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-2xl rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition">
-                          Dissertation
+                          FYP
                         </button>
                       </div>
                     </div>
@@ -551,12 +588,22 @@ export default function UniversityDashboard() {
                             </div>
                           )}
 
-                          <button
-                            onClick={() => openEditUpload(upload)}
-                            className="mt-6 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 rounded-xl transition"
-                          >
-                            ✏️ Edit
-                          </button>
+                          {/* Edit + Delete buttons */}
+                          <div className="mt-6 flex gap-3">
+                            <button
+                              onClick={() => openEditUpload(upload)}
+                              className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 rounded-xl transition"
+                            >
+                              ✏️ Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUpload(upload)}
+                              disabled={deletingId === upload.id}
+                              className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition"
+                            >
+                              {deletingId === upload.id ? 'Deleting...' : '🗑️ Delete'}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -643,7 +690,7 @@ export default function UniversityDashboard() {
                       return (
                         <div key={event.id} className="group bg-white border-2 border-blue-100 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition transform hover:scale-105 cursor-pointer relative">
                           {event.photo ? (
-                            <img src={getApiUrl(event.photo)} alt={event.title} className="w-full h-48 object-cover" />
+                            <img src={event.photo} alt={event.title} className="w-full h-48 object-cover" />
                           ) : (
                             <div className="bg-gradient-to-br from-blue-400 to-indigo-500 h-48 flex items-center justify-center text-6xl text-white">
                               {event.icon || 'Calendar'}
@@ -681,7 +728,7 @@ export default function UniversityDashboard() {
           <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-blue-500 shadow-xl">
             {user?.profile_image ? (
               <Image
-                src={getApiUrl(user?.profile_image || user?.user?.profile_image)}
+                src={user?.profile_image || user?.user?.profile_image}
                 alt="Profile"
                 width={128}
                 height={128}
@@ -711,7 +758,7 @@ export default function UniversityDashboard() {
           </div>
 
           <button
-           onClick={() => window.location.href = `profile`}
+           onClick={() => window.location.href = `/profile`}
             className="mt-8 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg transition"
           >
             Edit Profile
