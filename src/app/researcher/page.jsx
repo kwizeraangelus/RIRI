@@ -34,6 +34,8 @@ export default function ResearcherDashboard() {
     symposium_title: '', publication_type: 'journal',
     abstract: '',pdf: null,
   });
+  const [existingPdfUrl, setExistingPdfUrl] = useState(null); // NEW
+const [removePdf, setRemovePdf] = useState(false);
 
   // ── Innovations ───────────────────────────────────────────────────────────
   const [innovations, setInnovations]         = useState([]);
@@ -43,6 +45,7 @@ export default function ResearcherDashboard() {
     name: '', description: '', photo: null, sponsorship_needed: 'no-need',
   });
   const [innovationPhotoPreview, setInnovationPhotoPreview] = useState(null);
+  const [removeInnovationPhoto, setRemoveInnovationPhoto] = useState(false);
 
   // ── Edit Innovation ──────────────────────────────────────────────────────
   const [showEditInnovation, setShowEditInnovation] = useState(false);
@@ -75,6 +78,7 @@ export default function ResearcherDashboard() {
     link: '', photo: null, icon: 'Calendar',
   });
   const [editEventPhotoPreview, setEditEventPhotoPreview] = useState(null);
+  const [removeEventPhoto, setRemoveEventPhoto] = useState(false); // NEW
 
   // ── Delete Event ─────────────────────────────────────────────────────────
   const [showDeleteEventConfirm, setShowDeleteEventConfirm] = useState(false);
@@ -90,6 +94,7 @@ export default function ResearcherDashboard() {
   const [Field, setField]             = useState('');
   const [Position, setPosition]       = useState('');
   const [ResearchArea, setResearchArea] = useState('');
+  const [removeProfileImage, setRemoveProfileImage] = useState(false);
 
   // ── Fetch everything on mount ─────────────────────────────────────────────
   useEffect(() => { fetchAll(); }, []);
@@ -141,6 +146,7 @@ export default function ResearcherDashboard() {
   const { name, value, files } = e.target;
   if (name === 'pdf') {
     setPublicationForm(p => ({ ...p, pdf: files[0] }));
+    setRemovePdf(false); // NEW
   } else {
     setPublicationForm(p => ({ ...p, [name]: value }));
   }
@@ -152,8 +158,10 @@ export default function ResearcherDashboard() {
       doi: '', display_doi: '', url: '', publisher: '',
       book_title: '', patent_title: '', Conference_title: '',
       symposium_title: '', publication_type: 'journal',
-      abstract: '',
+      abstract: '',pdf: null,
     });
+    setExistingPdfUrl(null); // NEW
+    setRemovePdf(false); // NEW
     setShowAbstractField(false);
     setEditingPublicationId(null);
   };
@@ -175,6 +183,8 @@ export default function ResearcherDashboard() {
       publication_type: pub.publication_type || 'journal',
       abstract: pub.abstract || '',
     });
+     setExistingPdfUrl(pub.pdf_path || null); // NEW
+     setRemovePdf(false); // NEW
     setShowAbstractField(!!pub.abstract);
     setEditingPublicationId(pub.id);
     setShowAddPublication(true);
@@ -198,7 +208,10 @@ export default function ResearcherDashboard() {
       fd.append(key, value);
     }
   });
-
+  
+  if (!publicationForm.pdf && removePdf) {
+  fd.append('remove_pdf', 'true'); // NEW
+}
   try {
     const res = await fetch(url, {
       method: isEditing ? 'PATCH' : 'POST',
@@ -291,6 +304,7 @@ export default function ResearcherDashboard() {
       sponsorship_needed: inv.sponsorship_needed || 'no-need',
     });
     setEditInnovationPhotoPreview((inv.photo || inv.photo_url || null));
+    setRemoveInnovationPhoto(false);
     setShowEditInnovation(true);
   };
 
@@ -298,8 +312,10 @@ export default function ResearcherDashboard() {
     const { name, value, files } = e.target;
     if (name === 'photo') {
       const f = files[0];
+      
       setEditInnovationForm(p => ({ ...p, photo: f }));
       setEditInnovationPhotoPreview(f ? URL.createObjectURL(f) : null);
+       setRemoveInnovationPhoto(false);
     } else {
       setEditInnovationForm(p => ({ ...p, [name]: value }));
     }
@@ -314,7 +330,11 @@ export default function ResearcherDashboard() {
     data.append('name', editInnovationForm.name);
     data.append('description', editInnovationForm.description);
     data.append('sponsorship_needed', editInnovationForm.sponsorship_needed);
-    if (editInnovationForm.photo) data.append('photo', editInnovationForm.photo);
+    if (editInnovationForm.photo) {
+    data.append('photo', editInnovationForm.photo);       // new file replaces old
+  } else if (removeInnovationPhoto) {
+    data.append('remove_photo', 'true');                  // explicit delete signal
+  }
 
     try {
       const res = await fetch(getApiUrl(`/api/innovations/${editingInnovation.id}`), {
@@ -419,6 +439,7 @@ export default function ResearcherDashboard() {
       icon: event.icon || 'Calendar',
     });
     setEditEventPhotoPreview(event.photo || event.photo_url || null);
+    setRemoveEventPhoto(false);
     setShowEditEvent(true);
   };
 
@@ -428,6 +449,7 @@ export default function ResearcherDashboard() {
       const f = files[0];
       setEditEventForm(p => ({ ...p, photo: f }));
       setEditEventPhotoPreview(f ? URL.createObjectURL(f) : null);
+       setRemoveEventPhoto(false);
     } else {
       setEditEventForm(p => ({ ...p, [name]: value }));
     }
@@ -444,7 +466,11 @@ export default function ResearcherDashboard() {
     data.append('location', editEventForm.location);
     data.append('link', editEventForm.link);
     data.append('icon', editEventForm.icon);
-    if (editEventForm.photo) data.append('photo', editEventForm.photo);
+     if (editEventForm.photo) {
+    data.append('photo', editEventForm.photo);
+  } else if (removeEventPhoto) {
+    data.append('remove_photo', 'true');
+  }
 
     try {
       const res = await fetch(getApiUrl(`/api/events/${editingEventId}`), {
@@ -505,6 +531,7 @@ export default function ResearcherDashboard() {
     setBio(user?.bio || ''); setPlatformId(user?.orcid || '');
     setQualification(user?.qualification || ''); setField(user?.Field || '');
     setPosition(user?.Position || ''); setResearchArea(user?.ResearchArea || '');
+    setRemoveProfileImage(false);
     setIsEditing(true);
   };
   const handleProfileSubmit = async (e) => {
@@ -618,12 +645,48 @@ export default function ResearcherDashboard() {
                 </div>
                 <div className="flex justify-center">
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-100">
-                      {user?.profile_image
-                        ? <img src={user.profile_image} alt="Profile" className="w-full h-full object-cover" />
-                        : <div className="w-full h-full flex items-center justify-center text-3xl text-slate-400">👤</div>
-                      }
-                    </div>
+                    <div className="border-2 border-slate-200 rounded-lg p-2 hover:bg-slate-50 transition space-y-2">
+  {(profileImage || (user?.profile_image && !removeProfileImage)) && (
+    <div className="flex justify-center">
+      <div className="relative">
+        <img
+          src={profileImage ? URL.createObjectURL(profileImage) : user.profile_image}
+          alt="Profile"
+          className="w-20 h-20 rounded-full object-cover border-2 border-white shadow"
+        />
+        <button
+          type="button"
+          onClick={() => {
+            if (profileImage) {
+              setProfileImage(null);
+            } else {
+              setRemoveProfileImage(true);
+            }
+          }}
+          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+        >
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  )}
+
+  <label className="cursor-pointer flex items-center gap-2 text-sm text-slate-600">
+    <input
+      type="file"
+      className="hidden"
+      onChange={e => {
+        setProfileImage(e.target.files[0]);
+        setRemoveProfileImage(false);
+      }}
+      accept="image/*"
+    />
+    <span className="text-xl">📷</span>
+    {profileImage ? <span className="text-green-600 font-medium">✓ New photo selected</span> : 'Upload photo'}
+  </label>
+</div>
                     <div className="absolute bottom-1 right-1 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white"></div>
                   </div>
                 </div>
@@ -658,13 +721,22 @@ export default function ResearcherDashboard() {
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Research Area" value={ResearchArea} onChange={e => setResearchArea(e.target.value)} />
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Position" value={Position} onChange={e => setPosition(e.target.value)} />
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Field" value={Field} onChange={e => setField(e.target.value)} />
-                  <div className="border-2 border-slate-200 rounded-lg p-2 hover:bg-slate-50 transition">
-                    <label className="cursor-pointer flex items-center gap-2 text-sm text-slate-600">
-                      <input type="file" className="hidden" onChange={e => setProfileImage(e.target.files[0])} accept="image/*" />
-                      <span className="text-xl">📷</span>
-                      {profileImage ? <span className="text-green-600 font-medium">✓ Selected</span> : 'Upload photo'}
-                    </label>
-                  </div>
+                  <div className="border-2 border-slate-200 rounded-lg p-2 hover:bg-slate-50 transition flex items-center justify-between">
+  <label className="cursor-pointer flex items-center gap-2 text-sm text-slate-600">
+    <input type="file" className="hidden" onChange={e => setProfileImage(e.target.files[0])} accept="image/*" />
+    <span className="text-xl">📷</span>
+    {profileImage ? <span className="text-green-600 font-medium">✓ Selected</span> : 'Upload photo'}
+  </label>
+  {profileImage && (
+    <button
+      type="button"
+      onClick={() => setProfileImage(null)}
+      className="text-xs text-red-600 hover:text-red-800 font-medium underline"
+    >
+      Clear
+    </button>
+  )}
+</div>
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="ORCID / Platform ID" value={platformId} onChange={e => setPlatformId(e.target.value)} />
                   <div className="flex gap-3 pt-2">
                     <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-2.5 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition shadow-md text-sm">Save</button>
@@ -789,12 +861,52 @@ export default function ResearcherDashboard() {
                     </div>
                      <div>
   <label className="block text-sm font-semibold text-slate-700 mb-2">Attach PDF</label>
+
+  {existingPdfUrl && !removePdf && !publicationForm.pdf && (
+    <div className="flex items-center justify-between p-3 mb-2 bg-slate-50 border border-slate-200 rounded-lg">
+      <a href={existingPdfUrl} target="_blank" className="text-xs text-blue-600 hover:underline truncate">
+        📑 Current PDF attached
+      </a>
+      <button
+        type="button"
+        onClick={() => setRemovePdf(true)}
+        className="text-xs text-red-600 hover:text-red-800 font-medium underline ml-3"
+      >
+        Remove
+      </button>
+    </div>
+  )}
+
+  {removePdf && (
+    <div className="flex items-center justify-between p-3 mb-2 bg-red-50 border border-red-200 rounded-lg">
+      <span className="text-xs text-red-700 italic">PDF will be removed when you save.</span>
+      <button
+        type="button"
+        onClick={() => setRemovePdf(false)}
+        className="text-xs text-blue-600 hover:text-blue-800 underline ml-3"
+      >
+        Undo
+      </button>
+    </div>
+  )}
+
   <input
     type="file" name="pdf" accept="application/pdf"
     onChange={handlePubInput}
     className="w-full p-3 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-2 file:px-6 file:rounded-lg file:border-0"
   />
-  {publicationForm.pdf && <p className="text-xs text-green-600 mt-1">✓ {publicationForm.pdf.name}</p>}
+  {publicationForm.pdf && (
+    <div className="flex items-center gap-2 mt-1">
+      <p className="text-xs text-green-600">✓ {publicationForm.pdf.name}</p>
+      <button
+        type="button"
+        onClick={() => setPublicationForm(p => ({ ...p, pdf: null }))}
+        className="text-xs text-red-600 hover:text-red-800 font-medium underline"
+      >
+        Clear
+      </button>
+    </div>
+  )}
 </div>
 
                     {/* ============= ABSTRACT FIELD (COLLAPSIBLE) ============= */}
@@ -931,10 +1043,20 @@ export default function ResearcherDashboard() {
                 <div className="bg-white rounded-2xl shadow-xl border-2 border-purple-100 p-8">
                   <h3 className="text-2xl font-bold text-slate-800 mb-8 text-center">Submit Innovation</h3>
                   {innovationPhotoPreview && (
-                    <div className="flex justify-center mb-6">
-                      <img src={innovationPhotoPreview} alt="Preview" className="w-full max-w-lg h-56 object-cover rounded-xl shadow-lg" />
-                    </div>
-                  )}
+  <div className="flex flex-col items-center gap-2 mb-6">
+    <img src={innovationPhotoPreview} alt="Preview" className="w-full max-w-lg h-56 object-cover rounded-xl shadow-lg" />
+    <button
+      type="button"
+      onClick={() => {
+        setInnovationForm(p => ({ ...p, photo: null }));
+        setInnovationPhotoPreview(null);
+      }}
+      className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors"
+    >
+      ✕ Clear Photo
+    </button>
+  </div>
+)}
                   <form onSubmit={handleSubmitInnovation} className="space-y-5">
                     <input name="name" placeholder="Name of Innovation *" value={innovationForm.name} onChange={handleInnovationInput} required
                       className="w-full p-4 border border-slate-300 rounded-xl outline-none focus:border-purple-500 border-2" />
@@ -1054,11 +1176,21 @@ export default function ResearcherDashboard() {
               {showEventForm && (
                 <div className="bg-white rounded-2xl shadow-xl border-2 border-blue-100 p-8">
                   <h3 className="text-2xl font-bold text-slate-800 mb-8 text-center">Create New Event</h3>
-                  {eventPhotoPreview && (
-                    <div className="flex justify-center mb-6">
-                      <img src={eventPhotoPreview} alt="Preview" className="w-full max-w-lg h-56 object-cover rounded-xl shadow-lg" />
-                    </div>
-                  )}
+                   {eventPhotoPreview && (
+  <div className="flex flex-col items-center gap-2 mb-6">
+    <img src={eventPhotoPreview} alt="Preview" className="w-full max-w-lg h-56 object-cover rounded-xl shadow-lg" />
+    <button
+      type="button"
+      onClick={() => {
+        setEventForm(p => ({ ...p, photo: null }));
+        setEventPhotoPreview(null);
+      }}
+      className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors"
+    >
+      ✕ Clear Photo
+    </button>
+  </div>
+)}
                   <form onSubmit={handleSubmitEvent} className="space-y-5">
                     <input name="title" placeholder="Event Title *" value={eventForm.title} onChange={handleEventInput} required
                       className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500" />
@@ -1175,11 +1307,39 @@ export default function ResearcherDashboard() {
                 <p className="text-xl font-bold text-purple-900 line-clamp-2">{editingInnovation.name}</p>
               </div>
 
-              {editInnovationPhotoPreview && (
-                <div className="flex justify-center">
-                  <img src={editInnovationPhotoPreview} alt="Preview" className="w-full max-w-sm h-48 object-cover rounded-xl shadow-lg" />
-                </div>
-              )}
+              {editInnovationPhotoPreview && !removeInnovationPhoto && (
+  <div className="flex flex-col items-center gap-2">
+    <img src={editInnovationPhotoPreview} alt="Preview" className="w-full max-w-sm h-48 object-cover rounded-xl shadow-lg" />
+    <button
+      type="button"
+      onClick={() => {
+        setEditInnovationForm(p => ({ ...p, photo: null }));
+        setEditInnovationPhotoPreview(null);
+        setRemoveInnovationPhoto(true); // mark for deletion on save
+      }}
+      className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors"
+    >
+      ✕ Remove Photo
+    </button>
+  </div>
+)}
+
+{removeInnovationPhoto && (
+  <div className="text-center">
+    <p className="text-xs text-slate-500 italic mb-1">Photo will be removed when you save.</p>
+    <button
+      type="button"
+      onClick={() => {
+        // undo — restore original preview
+        setEditInnovationPhotoPreview(editingInnovation.photo || editingInnovation.photo_url || null);
+        setRemoveInnovationPhoto(false);
+      }}
+      className="text-xs text-blue-600 hover:text-blue-800 underline"
+    >
+      Undo
+    </button>
+  </div>
+)}
 
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">Innovation Name *</label>
@@ -1295,11 +1455,39 @@ export default function ResearcherDashboard() {
           <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 max-h-[90vh] overflow-y-auto">
             <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Edit Event</h3>
 
-            {editEventPhotoPreview && (
-              <div className="flex justify-center mb-6">
-                <img src={editEventPhotoPreview} alt="Preview" className="w-full max-w-sm h-48 object-cover rounded-xl shadow-lg" />
-              </div>
-            )}
+           {editEventPhotoPreview && !removeEventPhoto && (
+  <div className="flex flex-col items-center gap-2 mb-6">
+    <img src={editEventPhotoPreview} alt="Preview" className="w-full max-w-sm h-48 object-cover rounded-xl shadow-lg" />
+    <button
+      type="button"
+      onClick={() => {
+        setEditEventForm(p => ({ ...p, photo: null }));
+        setEditEventPhotoPreview(null);
+        setRemoveEventPhoto(true);
+      }}
+      className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors"
+    >
+      ✕ Remove Photo
+    </button>
+  </div>
+)}
+
+{removeEventPhoto && (
+  <div className="text-center mb-6">
+    <p className="text-xs text-slate-500 italic mb-1">Photo will be removed when you save.</p>
+    <button
+      type="button"
+      onClick={() => {
+        const evt = events.find(e => e.id === editingEventId);
+        setEditEventPhotoPreview(evt?.photo || evt?.photo_url || null);
+        setRemoveEventPhoto(false);
+      }}
+      className="text-xs text-blue-600 hover:text-blue-800 underline"
+    >
+      Undo
+    </button>
+  </div>
+)}
 
             <form onSubmit={handleUpdateEvent} className="space-y-6">
               <input
@@ -1371,6 +1559,7 @@ export default function ResearcherDashboard() {
                   className="w-full p-3 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-2 file:px-5 file:rounded-lg file:border-0"
                 />
               </div>
+              
 
               <div className="flex gap-4 pt-4">
                 <button
@@ -1427,6 +1616,7 @@ export default function ResearcherDashboard() {
           </div>
         </div>
       )}
+      
     </div>
   );
 }

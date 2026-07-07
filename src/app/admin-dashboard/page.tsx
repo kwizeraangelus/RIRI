@@ -104,6 +104,8 @@ interface Filters {
   category: string;
 }
 
+
+
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<string>('pending');
   const [data, setData] = useState<DashboardData>({ kpis: {}, pending: [] });
@@ -153,6 +155,10 @@ export default function AdminDashboard() {
     author: '',
     category: ''
   });
+  const resolveFileUrl = (path?: string): string => {
+  if (!path) return '';
+  return path.startsWith('http') ? path : getApiUrl(path);
+};
 
   // =========== FETCH FUNCTIONS ===========
   const fetchDashboard = async (): Promise<void> => {
@@ -718,7 +724,7 @@ export default function AdminDashboard() {
                           {item.file_path && (
                             <button
                               onClick={() => {
-                                const url = getApiUrl(`/${item.file_path}`);
+                                const url = resolveFileUrl(item.file_path);
                                 const ext = item.file_path!.split('.').pop()?.toLowerCase();
 
                                 if (ext === 'pdf') {
@@ -962,15 +968,15 @@ export default function AdminDashboard() {
                               <div className="mt-3">
                                 <button
                                   onClick={() => {
-                                    const url = book.file_path ? getApiUrl(book.file_path) : "";
-                                    const ext = book.file_paths?.split('.').pop()?.toLowerCase();
-                                    if (ext === 'pdf') {
-                                      window.open(url, '_blank');
-                                    } else {
-                                      const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-                                      window.open(viewerUrl, '_blank');
-                                    }
-                                  }}
+                                  const url = resolveFileUrl(book.file_path);
+                                  const ext = book.file_path?.split('.').pop()?.toLowerCase();
+                                  if (ext === 'pdf') {
+                                    window.open(url, '_blank');
+                                  } else {
+                                    const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+                                    window.open(viewerUrl, '_blank');
+                                  }
+                                }}
                                   className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded text-sm font-medium hover:bg-blue-100 transition-colors"
                                 >
                                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

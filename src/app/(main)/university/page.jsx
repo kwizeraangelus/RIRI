@@ -52,6 +52,9 @@ export default function UniversityDashboard() {
     other_field: ''
   });
 
+  const [existingFileUrl, setExistingFileUrl] = useState(null); // NEW
+  const [removeFile, setRemoveFile] = useState(false);
+
   // Event States
   const [showEventForm, setShowEventForm] = useState(false);
   const [eventFormData, setEventFormData] = useState({
@@ -76,6 +79,7 @@ export default function UniversityDashboard() {
     details: ''
   });
   const [imagePreview, setImagePreview] = useState(null);
+  const [removeProfileImage, setRemoveProfileImage] = useState(false); // NEW
 
   useEffect(() => {
     fetchUserAndData();
@@ -135,6 +139,9 @@ export default function UniversityDashboard() {
 
   const handleEditInputChange = (e) => {
     const { name, value, files } = e.target;
+     if (name === 'file' && files) {
+    setRemoveFile(false); // NEW
+  }
     setEditForm(prev => ({
       ...prev,
       [name]: files ? files[0] : value
@@ -211,6 +218,8 @@ export default function UniversityDashboard() {
       year: upload.year.toString(),
       file: null
     });
+    setExistingFileUrl(upload.file_path || upload.file || null); // NEW — adjust field name to match your API
+    setRemoveFile(false);
     setShowEditUpload(true);
   };
 
@@ -364,6 +373,7 @@ export default function UniversityDashboard() {
       details: user?.details || '',
     });
     setImagePreview(user?.profile_image || null);
+    setRemoveProfileImage(false); // NEW
     setShowEditProfile(true);
   };
 
@@ -374,6 +384,9 @@ export default function UniversityDashboard() {
     Object.entries(profileForm).forEach(([k, v]) => {
       if (v !== '' && v !== null) data.append(k, v);
     });
+    if (removeProfileImage) {
+    data.append('remove_profile_image', 'true'); // NEW
+  }
 
     const res = await fetch(getApiUrl('/api/update/'), {
       method: 'PATCH',
@@ -635,10 +648,20 @@ export default function UniversityDashboard() {
                   <h3 className="text-2xl font-bold text-gray-800 text-center mb-10">Create New Event</h3>
 
                   {eventPhotoPreview && (
-                    <div className="flex justify-center mb-6">
-                      <img src={eventPhotoPreview} alt="Preview" className="w-full max-w-lg h-64 object-cover rounded-xl shadow-lg" />
-                    </div>
-                  )}
+  <div className="flex flex-col items-center gap-2 mb-6">
+    <img src={eventPhotoPreview} alt="Preview" className="w-full max-w-lg h-64 object-cover rounded-xl shadow-lg" />
+    <button
+      type="button"
+      onClick={() => {
+        setEventFormData(prev => ({ ...prev, photo: null }));
+        setEventPhotoPreview(null);
+      }}
+      className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors"
+    >
+      ✕ Clear Photo
+    </button>
+  </div>
+)}
 
                   <form onSubmit={handleEventSubmit} className="space-y-6">
                     <input name="title" placeholder="Event Title *" value={eventFormData.title} onChange={handleEventInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
@@ -772,30 +795,46 @@ export default function UniversityDashboard() {
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
             <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Edit Profile</h3>
             <form onSubmit={saveProfile} className="space-y-6">
-              <div className="flex flex-col items-center">
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-blue-500 mb-4">
-                  {imagePreview ? (
-                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="bg-gray-200 w-full h-full flex items-center justify-center text-gray-500">No Image</div>
-                  )}
-                </div>
-                <label className="cursor-pointer">
-                  <span className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">Choose Photo</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        setProfileForm(prev => ({ ...prev, profile_image: file }));
-                        setImagePreview(URL.createObjectURL(file));
-                      }
-                    }}
-                    className="hidden"
-                  />
-                </label>
-              </div>
+             <div className="flex flex-col items-center">
+  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-blue-500 mb-2 relative">
+    {imagePreview ? (
+      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+    ) : (
+      <div className="bg-gray-200 w-full h-full flex items-center justify-center text-gray-500">No Image</div>
+    )}
+  </div>
+
+  {imagePreview && (
+    <button
+      type="button"
+      onClick={() => {
+        setImagePreview(null);
+        setProfileForm(prev => ({ ...prev, profile_image: null }));
+        setRemoveProfileImage(true); // NEW
+      }}
+      className="text-xs text-red-600 hover:text-red-800 underline mb-3"
+    >
+      Remove photo
+    </button>
+  )}
+
+  <label className="cursor-pointer">
+    <span className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">Choose Photo</span>
+    <input
+      type="file"
+      accept="image/*"
+      onChange={(e) => {
+        const file = e.target.files[0];
+        if (file) {
+          setProfileForm(prev => ({ ...prev, profile_image: file }));
+          setImagePreview(URL.createObjectURL(file));
+          setRemoveProfileImage(false); // NEW — picking new photo cancels remove
+        }
+      }}
+      className="hidden"
+    />
+  </label>
+</div>
 
               <input type="number" placeholder="Age" value={profileForm.age} onChange={e => setProfileForm(p => ({ ...p, age: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
               <input type="tel" placeholder="Phone" value={profileForm.phone_number} onChange={e => setProfileForm(p => ({ ...p, phone_number: e.target.value }))} className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
@@ -890,16 +929,57 @@ export default function UniversityDashboard() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Update File (optional)</label>
-                <input
-                  type="file"
-                  name="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={handleEditInputChange}
-                  className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg text-gray-900"
-                />
-                <p className="text-xs text-gray-500 mt-2">Leave empty to keep current file</p>
-              </div>
+  <label className="block text-sm font-semibold text-gray-700 mb-2">Update File (optional)</label>
+
+  {existingFileUrl && !removeFile && !editForm.file && (
+    <div className="flex items-center justify-between p-3 mb-2 bg-blue-50 border border-blue-200 rounded-lg">
+      <a href={existingFileUrl} target="_blank" className="text-xs text-blue-600 hover:underline truncate">
+        📄 Current file attached
+      </a>
+      <button
+        type="button"
+        onClick={() => setRemoveFile(true)}
+        className="text-xs text-red-600 hover:text-red-800 font-medium underline ml-3"
+      >
+        Remove
+      </button>
+    </div>
+  )}
+
+  {removeFile && (
+    <div className="flex items-center justify-between p-3 mb-2 bg-red-50 border border-red-200 rounded-lg">
+      <span className="text-xs text-red-700 italic">File will be removed when you save.</span>
+      <button
+        type="button"
+        onClick={() => setRemoveFile(false)}
+        className="text-xs text-blue-600 hover:text-blue-800 underline ml-3"
+      >
+        Undo
+      </button>
+    </div>
+  )}
+
+  <input
+    type="file"
+    name="file"
+    accept=".pdf,.doc,.docx"
+    onChange={handleEditInputChange}
+    className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg text-gray-900"
+  />
+  {editForm.file && (
+    <div className="flex items-center gap-2 mt-1">
+      <p className="text-xs text-green-600">✓ {editForm.file.name}</p>
+      <button
+        type="button"
+        onClick={() => setEditForm(p => ({ ...p, file: null }))}
+        className="text-xs text-red-600 hover:text-red-800 font-medium underline"
+      >
+        Clear
+      </button>
+    </div>
+  )}
+  <p className="text-xs text-gray-500 mt-2">Leave empty to keep current file</p>
+</div>
 
               <div className="flex gap-4 pt-6">
                 <button
