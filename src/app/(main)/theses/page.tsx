@@ -132,6 +132,12 @@ const formatFieldName = (submissionType?: string): string => {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 };
 
+/** Converts a raw degree_type value into the label shown in the UI ("thesis" -> "Thesis", "dissertation" -> "FYP"). */
+const formatDegreeType = (degreeType?: string): string => {
+  if (!degreeType) return '';
+  return degreeType === 'thesis' ? 'Thesis' : degreeType === 'dissertation' ? 'FYP' : degreeType;
+};
+
 /** Converts a raw Counts key to a display label. */
 const formatCountKey = (key: string): string =>
   FIELD_DISPLAY_NAMES[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
@@ -148,6 +154,7 @@ const matchesSearch = (pub: Publication, query: string): boolean => {
     pub.supervisor_name,
     pub.degree_type,
     formatFieldName(pub.submission_type),
+    formatDegreeType(pub.degree_type),
   ].some((field) => String(field ?? '').toLowerCase().includes(q));
 };
 

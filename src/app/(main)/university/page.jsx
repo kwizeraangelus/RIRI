@@ -235,6 +235,11 @@ export default function UniversityDashboard() {
     data.append('supervisor_name', editForm.supervisor_name);
     data.append('year', editForm.year);
     if (editForm.file) data.append('file', editForm.file);
+    if (editForm.file) {
+    data.append('file', editForm.file);
+  } else if (removeFile) {
+    data.append('remove_file', 'true');
+  }
 
     const token = localStorage.getItem('token');
 
@@ -250,6 +255,7 @@ export default function UniversityDashboard() {
         setUploads(prev => prev.map(u => u.id === updatedUpload.id ? updatedUpload : u));
         setShowEditUpload(false);
         setEditingUpload(null);
+        setRemoveFile(false);
         alert('Research updated successfully!');
       } else {
         const err = await res.json();
@@ -551,7 +557,7 @@ export default function UniversityDashboard() {
                       <input name="supervisor_name" placeholder="Supervisor Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl bg-blue-50 text-gray-900" />
                       <input name="year" type="number" placeholder="Year " onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
                       <textarea name="description" placeholder="Brief description / Abstract " rows={4} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none text-gray-900" />
-                      <input type="file" name="file" accept=".pdf,.doc,.docx" onChange={handleInputChange} required className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg" />
+                      <input type="file" name="file" accept=".pdf,.doc,.docx" onChange={handleInputChange} required className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-300 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg" />
 
                       <button type="submit" disabled={uploading} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-5 rounded-xl text-lg shadow-lg disabled:opacity-70">
                         {uploading ? 'Submitting...' : 'Submit Research'}
@@ -931,20 +937,7 @@ export default function UniversityDashboard() {
               <div>
   <label className="block text-sm font-semibold text-gray-700 mb-2">Update File (optional)</label>
 
-  {existingFileUrl && !removeFile && !editForm.file && (
-    <div className="flex items-center justify-between p-3 mb-2 bg-blue-50 border border-blue-200 rounded-lg">
-      <a href={existingFileUrl} target="_blank" className="text-xs text-blue-600 hover:underline truncate">
-        📄 Current file attached
-      </a>
-      <button
-        type="button"
-        onClick={() => setRemoveFile(true)}
-        className="text-xs text-red-600 hover:text-red-800 font-medium underline ml-3"
-      >
-        Remove
-      </button>
-    </div>
-  )}
+  
 
   {removeFile && (
     <div className="flex items-center justify-between p-3 mb-2 bg-red-50 border border-red-200 rounded-lg">

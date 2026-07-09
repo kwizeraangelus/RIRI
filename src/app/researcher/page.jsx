@@ -258,6 +258,35 @@ const [removePdf, setRemovePdf] = useState(false);
       alert('Network error');
     }
   };
+  const [savingPhoto, setSavingPhoto] = useState(false);
+
+const handleQuickPhotoSave = async () => {
+  if (!profileImage && !removeProfileImage) return;
+  setSavingPhoto(true);
+  const formData = new FormData();
+  if (profileImage) {
+    formData.append('profile_image', profileImage);
+  } else if (removeProfileImage) {
+    formData.append('remove_profile_image', 'true');
+  }
+  try {
+    const res = await fetch(getApiUrl('/api/update-profile'), {
+      method: 'PATCH', headers: authHeaders(), body: formData,
+    });
+    if (res.ok) {
+      setUser(await res.json());
+      setProfileImage(null);
+      setRemoveProfileImage(false);
+      alert('Profile photo updated!');
+    } else {
+      alert('Update failed: ' + JSON.stringify(await res.json()));
+    }
+  } catch {
+    alert('Network error');
+  } finally {
+    setSavingPhoto(false);
+  }
+};
 
   // ══════════════════════════════════════════════════════════════════════════
   // INNOVATION helpers
@@ -645,47 +674,112 @@ const [removePdf, setRemovePdf] = useState(false);
                 </div>
                 <div className="flex justify-center">
                   <div className="relative">
-                    <div className="border-2 border-slate-200 rounded-lg p-2 hover:bg-slate-50 transition space-y-2">
-  {(profileImage || (user?.profile_image && !removeProfileImage)) && (
-    <div className="flex justify-center">
-      <div className="relative">
-        <img
-          src={profileImage ? URL.createObjectURL(profileImage) : user.profile_image}
-          alt="Profile"
-          className="w-20 h-20 rounded-full object-cover border-2 border-white shadow"
-        />
+                   <div className="border-2 border-slate-200 rounded-lg p-3 hover:bg-slate-50 transition">
+  {/* Current photo (no pending change) */}
+  {!profileImage && !removeProfileImage && user?.profile_image && (
+    <div className="flex flex-col items-center gap-2">
+      <img
+        src={user.profile_image}
+        alt="Profile"
+        className="w-20 h-20 rounded-full object-cover border-2 border-white shadow"
+      />
+      <div className="flex gap-3">
+        <label className="cursor-pointer text-xs text-blue-600 hover:text-blue-800 font-medium underline">
+          <input
+            type="file"
+            className="hidden"
+            onChange={e => setProfileImage(e.target.files[0])}
+            accept="image/*"
+          />
+          Change photo
+        </label>
         <button
           type="button"
-          onClick={() => {
-            if (profileImage) {
-              setProfileImage(null);
-            } else {
-              setRemoveProfileImage(true);
-            }
-          }}
-          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+          onClick={() => setRemoveProfileImage(true)}
+          className="text-xs text-red-600 hover:text-red-800 font-medium underline"
         >
-          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          Remove
         </button>
       </div>
     </div>
   )}
 
-  <label className="cursor-pointer flex items-center gap-2 text-sm text-slate-600">
-    <input
-      type="file"
-      className="hidden"
-      onChange={e => {
-        setProfileImage(e.target.files[0]);
-        setRemoveProfileImage(false);
-      }}
-      accept="image/*"
-    />
-    <span className="text-xl">📷</span>
-    {profileImage ? <span className="text-green-600 font-medium">✓ New photo selected</span> : 'Upload photo'}
-  </label>
+  {/* No photo at all, nothing pending */}
+  {!profileImage && !removeProfileImage && !user?.profile_image && (
+    <label className="cursor-pointer flex items-center justify-center gap-2 text-sm text-slate-600 py-2">
+      <input
+        type="file"
+        className="hidden"
+        onChange={e => setProfileImage(e.target.files[0])}
+        accept="image/*"
+      />
+      <span className="text-xl">📷</span>
+      Upload photo
+    </label>
+  )}
+
+  {/* New photo selected, pending save */}
+  {profileImage && (
+    <div className="flex flex-col items-center gap-2">
+      <img
+        src={URL.createObjectURL(profileImage)}
+        alt="New photo preview"
+        className="w-20 h-20 rounded-full object-cover border-2 border-white shadow"
+      />
+      <p className="text-xs text-green-600 font-medium">✓ New photo selected</p>
+      <div className="flex gap-2 w-full">
+        <button
+          type="button"
+          onClick={handleQuickPhotoSave}
+          disabled={savingPhoto}
+          className="flex-1 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition disabled:opacity-60"
+        >
+          {savingPhoto ? 'Saving…' : '✓ Save Photo'}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+  console.log('Remove clicked, current profileImage:', profileImage);
+  if (profileImage) {
+    setProfileImage(null);
+  } else {
+    setRemoveProfileImage(true);
+  }
+}}
+          className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )}
+
+  {/* Removal pending, not yet saved */}
+  {removeProfileImage && !profileImage && (
+    <div className="flex flex-col items-center gap-2 text-center">
+      <div className="w-20 h-20 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center text-2xl">
+        🗑️
+      </div>
+      <p className="text-xs text-red-600 italic">Photo will be removed when you save.</p>
+      <div className="flex gap-2 w-full">
+        <button
+          type="button"
+          onClick={handleQuickPhotoSave}
+          disabled={savingPhoto}
+          className="flex-1 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition disabled:opacity-60"
+        >
+          {savingPhoto ? 'Saving…' : '✓ Save'}
+        </button>
+        <button
+          type="button"
+          onClick={() => setRemoveProfileImage(false)}
+          className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition"
+        >
+          Undo
+        </button>
+      </div>
+    </div>
+  )}
 </div>
                     <div className="absolute bottom-1 right-1 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white"></div>
                   </div>
@@ -730,7 +824,14 @@ const [removePdf, setRemovePdf] = useState(false);
   {profileImage && (
     <button
       type="button"
-      onClick={() => setProfileImage(null)}
+     onClick={() => {
+  console.log('Remove clicked, current profileImage:', profileImage);
+  if (profileImage) {
+    setProfileImage(null);
+  } else {
+    setRemoveProfileImage(true);
+  }
+}}
       className="text-xs text-red-600 hover:text-red-800 font-medium underline"
     >
       Clear
