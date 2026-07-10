@@ -956,7 +956,7 @@ export default function UniversityDashboard() {
               </div>
 
               <div>
-  <label className="block text-sm font-semibold text-gray-700 mb-2">Update File (optional)</label>
+  <label className="block text-sm font-semibold text-gray-700 mb-2">Update File <span className="text-gray-500">limit size 16 MB</span></label>
 
   
 
