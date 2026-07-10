@@ -144,10 +144,20 @@ const [removePdf, setRemovePdf] = useState(false);
   };
   const handlePubInput = (e) => {
   const { name, value, files } = e.target;
-  if (name === 'pdf') {
-    setPublicationForm(p => ({ ...p, pdf: files[0] }));
-    setRemovePdf(false); // NEW
-  } else {
+
+  if (name === 'pdf' && files?.[0]) {
+    const file = files[0];
+    
+    if (file.size > 16 * 1024 * 1024) {   // 16MB
+      alert("Oops! The file must be less than 16MB.");
+      e.target.value = ''; // Clear the input
+      return;
+    }
+
+    setPublicationForm(p => ({ ...p, pdf: file }));
+    setRemovePdf(false);
+  } 
+  else {
     setPublicationForm(p => ({ ...p, [name]: value }));
   }
 };
@@ -292,15 +302,24 @@ const handleQuickPhotoSave = async () => {
   // INNOVATION helpers
   // ══════════════════════════════════════════════════════════════════════════
   const handleInnovationInput = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'photo') {
-      const f = files[0];
-      setInnovationForm(p => ({ ...p, photo: f }));
-      setInnovationPhotoPreview(f ? URL.createObjectURL(f) : null);
-    } else {
-      setInnovationForm(p => ({ ...p, [name]: value }));
+  const { name, value, files } = e.target;
+
+  if (name === 'photo' && files?.[0]) {
+    const file = files[0];
+    
+    if (file.size > 5 * 1024 * 1024) {   // 5MB for images
+      alert("Oops! Photo must be less than 5MB.");
+      e.target.value = '';
+      return;
     }
-  };
+
+    const f = files[0];
+    setInnovationForm(p => ({ ...p, photo: f }));
+    setInnovationPhotoPreview(f ? URL.createObjectURL(f) : null);
+  } else {
+    setInnovationForm(p => ({ ...p, [name]: value }));
+  }
+};
   const handleSubmitInnovation = async (e) => {
     e.preventDefault(); setUploadingInnovation(true);
     const data = new FormData();
@@ -338,17 +357,24 @@ const handleQuickPhotoSave = async () => {
   };
 
   const handleEditInnovationInput = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'photo') {
-      const f = files[0];
-      
-      setEditInnovationForm(p => ({ ...p, photo: f }));
-      setEditInnovationPhotoPreview(f ? URL.createObjectURL(f) : null);
-       setRemoveInnovationPhoto(false);
-    } else {
-      setEditInnovationForm(p => ({ ...p, [name]: value }));
+  const { name, value, files } = e.target;
+  if (name === 'photo' && files?.[0]) {
+    const file = files[0];
+    
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Oops! Photo must be less than 5MB.");
+      e.target.value = '';
+      return;
     }
-  };
+
+    const f = files[0];
+    setEditInnovationForm(p => ({ ...p, photo: f }));
+    setEditInnovationPhotoPreview(f ? URL.createObjectURL(f) : null);
+    setRemoveInnovationPhoto(false);
+  } else {
+    setEditInnovationForm(p => ({ ...p, [name]: value }));
+  }
+};
 
   const handleSubmitEditInnovation = async (e) => {
     e.preventDefault();
@@ -961,7 +987,7 @@ const handleQuickPhotoSave = async () => {
                       </button>
                     </div>
                      <div>
-  <label className="block text-sm font-semibold text-slate-700 mb-2">Attach PDF</label>
+  <label className="block text-sm font-semibold text-slate-700 mb-2">Attach PDF <span className="text-gray-500">limit size 16 MB</span></label>
 
   {existingPdfUrl && !removePdf && !publicationForm.pdf && (
     <div className="flex items-center justify-between p-3 mb-2 bg-slate-50 border border-slate-200 rounded-lg">
@@ -1481,7 +1507,7 @@ const handleQuickPhotoSave = async () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Photo (optional)</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Photo (optional) <span className="text-gray-500">limit size 5 MB</span></label>
                   <input
                     type="file"
                     name="photo"

@@ -52,7 +52,7 @@ const CATEGORY_COLOR: Record<string, string> = {
   admin: '#FFD700',          ADMIN: '#FFD700',
 };
 
-const ACADEMIC = ['researcher','university','conf_organizer','RESEARCHER','UNIVERSITY','CONF_ORGANIZER'];
+const ACADEMIC = ['university', 'UNIVERSITY'];
 
 function safeParseUser(str: string | null): UserProfile | null {
   if (!str || str === 'undefined' || str === 'null') return null;
@@ -336,7 +336,7 @@ export default function ProfilePage() {
   const tabs = [
     { key: 'info'      as const, label: 'Personal Info', icon: <User size={14} /> },
     ...(showAcademic ? [{ key: 'academic' as const, label: 'Academic', icon: <BookOpen size={14} /> }] : []),
-    { key: 'documents' as const, label: 'Documents',     icon: <FileText size={14} /> },
+
     { key: 'password'  as const, label: 'Password',      icon: <Lock size={14} /> },
   ];
 

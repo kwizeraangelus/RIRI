@@ -130,23 +130,43 @@ export default function UniversityDashboard() {
   };
 
   const handleInputChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: files ? files[0] : value
-    }));
-  };
+  const { name, value, files } = e.target;
+
+  if (name === 'file' && files?.[0]) {
+    const file = files[0];
+    
+    if (file.size > 16 * 1024 * 1024) {  // 16MB
+      alert("Oops! The file must be less than 16MB.");
+      e.target.value = ''; // Clear the selected file
+      return;
+    }
+  }
+
+  setFormData(prev => ({
+    ...prev,
+    [name]: files ? files[0] : value
+  }));
+};
 
   const handleEditInputChange = (e) => {
-    const { name, value, files } = e.target;
-     if (name === 'file' && files) {
-    setRemoveFile(false); // NEW
+  const { name, value, files } = e.target;
+
+  if (name === 'file' && files?.[0]) {
+    const file = files[0];
+    
+    if (file.size > 16 * 1024 * 1024) {
+      alert("Oops! The file must be less than 16MB.");
+      e.target.value = '';
+      return;
+    }
+    setRemoveFile(false);
   }
-    setEditForm(prev => ({
-      ...prev,
-      [name]: files ? files[0] : value
-    }));
-  };
+
+  setEditForm(prev => ({
+    ...prev,
+    [name]: files ? files[0] : value
+  }));
+};
 
   useEffect(() => {
     if (degreeType && selectedField && selectedField !== 'other') {
@@ -557,10 +577,11 @@ export default function UniversityDashboard() {
                       <input name="supervisor_name" placeholder="Supervisor Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl bg-blue-50 text-gray-900" />
                       <input name="year" type="number" placeholder="Year " onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
                       <textarea name="description" placeholder="Brief description / Abstract " rows={4} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none text-gray-900" />
+                       <label className="block text-sm font-semibold text-slate-700 mb-2"> <span className="text-gray-500">limit size 16 MB</span></label>                      
                       <input type="file" name="file" accept=".pdf,.doc,.docx" onChange={handleInputChange} required className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-300 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg" />
-
+                       
                       <button type="submit" disabled={uploading} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-5 rounded-xl text-lg shadow-lg disabled:opacity-70">
-                        {uploading ? 'Submitting...' : 'Submit Research'}
+                        {uploading ? 'Submitting...' : 'Submit'}
                       </button>
                     </form>
                   )}
