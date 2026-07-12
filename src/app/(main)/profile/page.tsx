@@ -459,7 +459,7 @@ export default function ProfilePage() {
                 <Field label="Last Name"  name="last_name"    value={f.last_name}    editing={editing} onChange={handleFieldChange} placeholder="Doe" />
               </div>
               <Field label="Username"    name="username"     value={profile.username} editing={false} onChange={() => {}} />
-              <Field label="Institution" name="institution"  value={f.institution}  editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali Institute of Science and Technology" />
+             
               <Field label="Location"    name="location"     value={f.location}      editing={editing} onChange={handleFieldChange} icon={<MapPin size={11}/>} placeholder="Kigali, Rwanda" />
               <Field label="Phone"       name="phone_number" value={f.phone_number}  editing={editing} onChange={handleFieldChange} icon={<Phone size={11}/>} type="tel" placeholder="+250 7XX XXX XXX" />
               <Field label="Graduation University" name="graduation_university" value={f.graduation_university} editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali Institute of Science and Technology" />
