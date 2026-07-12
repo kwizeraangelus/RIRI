@@ -10,9 +10,12 @@ type ResearcherDetail = {
   name: string;
   qualification: string;
   email: string;
+  graduation_university: string;
   contact: string;
   Position: string;
   ResearchArea: string;
+  institution:string;
+  location: string;
   Field: string;
   bio: string;
   image: string;
@@ -96,9 +99,22 @@ export default function PublicResearcherProfile() {
                 <p className="text-gray-600">{researcher.contact}</p>
               </div>
               <div>
+                <p className="font-semibold text-gray-700 text-lg">University Location</p>
+                <p className="text-gray-600">{researcher.location}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-700 text-lg">Graduation University</p>
+                <p className="text-gray-600">{researcher.graduation_university}</p>
+              </div>
+              <div>
                 <p className="font-semibold text-gray-700 text-lg">Qualification</p>
                 <p className="text-gray-600">{researcher.qualification}</p>
               </div>
+              <div>
+                <p className="font-semibold text-gray-700 text-lg">Affiliation Institution</p>
+                <p className="text-gray-600">{researcher.institution}</p>
+              </div>
+
               {researcher.orcid && (
                 <div>
                   <p className="font-semibold text-gray-700 text-lg">ORCID</p>
@@ -114,6 +130,8 @@ export default function PublicResearcherProfile() {
           <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
             <h1 className="text-4xl font-bold text-slate-800 mb-2">{researcher.name}</h1>
             <p className="text-slate-600 mb-6 text-lg">{researcher.qualification}</p>
+
+            <p className="text-slate-600 mb-6 text-lg">{researcher.institution}</p>
 
             {/* Bio - with justified text */}
             <div className="prose text-gray-700 leading-relaxed text-justify text-lg">

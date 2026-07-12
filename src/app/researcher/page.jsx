@@ -91,7 +91,10 @@ const [removePdf, setRemovePdf] = useState(false);
   const [platformId, setPlatformId]   = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [qualification, setQualification] = useState('');
+  const [institution, setInstitution] = useState('');
+  const [graduation_university, setgraduation_university] = useState('');
   const [Field, setField]             = useState('');
+  const [location, setlocation] = useState('');
   const [Position, setPosition]       = useState('');
   const [ResearchArea, setResearchArea] = useState('');
   const [removeProfileImage, setRemoveProfileImage] = useState(false);
@@ -104,31 +107,47 @@ const [removePdf, setRemovePdf] = useState(false);
   });
 
   const fetchAll = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) { router.push('/login'); return; }
-    try {
-      const [userRes, pubRes, invRes, evtRes] = await Promise.all([
-        fetch(getApiUrl('/api/me/'),               { headers: authHeaders() }),
-        fetch(getApiUrl('/api/my-researches/'),    { headers: authHeaders() }),
-        fetch(getApiUrl('/api/my-innovations/'),   { headers: authHeaders() }),
-        fetch(getApiUrl('/api/my-events/'),        { headers: authHeaders() }),
-      ]);
-      if (!userRes.ok) throw new Error('Unauthorized');
-      const [userData, pubData, invData, evtData] = await Promise.all([
-        userRes.json(), pubRes.json(), invRes.json(), evtRes.json(),
-      ]);
-      console.log('ME RESPONSE:', userData);
-      setUser(userData);
-      setPublications(pubData);
-      setInnovations(invData);
-      setEvents(evtData);
-    } catch (err) {
-      localStorage.removeItem('token');
-      router.push('/login');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const token = localStorage.getItem('token');
+  if (!token) { router.push('/login'); return; }
+  try {
+    const [userRes, pubRes, invRes, evtRes] = await Promise.all([
+      fetch(getApiUrl('/api/me/'),            { headers: authHeaders() }),
+      fetch(getApiUrl('/api/my-researches/'), { headers: authHeaders() }),
+      fetch(getApiUrl('/api/my-innovations/'),{ headers: authHeaders() }),
+      fetch(getApiUrl('/api/my-events/'),     { headers: authHeaders() }),
+    ]);
+    if (!userRes.ok) throw new Error('Unauthorized');
+
+    const [userData, pubData, invData, evtData] = await Promise.all([
+      userRes.json(), pubRes.json(), invRes.json(), evtRes.json(),
+    ]);
+
+    // Guard: these must be arrays. If a request failed or the API
+    // shape changed (wrapped in { data: [...] }, paginated, or an
+    // error object), fall back to [] instead of storing junk in state.
+    const asArray = (val, label) => {
+      if (Array.isArray(val)) return val;
+      if (val && Array.isArray(val.data)) return val.data;
+      if (val && Array.isArray(val.results)) return val.results;
+      console.warn(`Expected array for ${label}, got:`, val);
+      return [];
+    };
+
+    setUser(userData);
+    setPublications(asArray(pubData, 'publications'));
+    setInnovations(asArray(invData, 'innovations'));
+    setEvents(asArray(evtData, 'events'));
+
+    if (!pubRes.ok) console.warn('my-researches failed:', pubRes.status, pubData);
+    if (!invRes.ok) console.warn('my-innovations failed:', invRes.status, invData);
+    if (!evtRes.ok) console.warn('my-events failed:', evtRes.status, evtData);
+  } catch (err) {
+    localStorage.removeItem('token');
+    router.push('/login');
+  } finally {
+    setLoading(false);
+  }
+};
 
   // ══════════════════════════════════════════════════════════════════════════
   // PUBLICATION helpers
@@ -149,7 +168,7 @@ const [removePdf, setRemovePdf] = useState(false);
     const file = files[0];
     
     if (file.size > 16 * 1024 * 1024) {   // 16MB
-      alert("Oops! The file must be less than 16MB.");
+      alert("Oops! This file exceeds 16MB.");
       e.target.value = ''; // Clear the input
       return;
     }
@@ -308,7 +327,7 @@ const handleQuickPhotoSave = async () => {
     const file = files[0];
     
     if (file.size > 5 * 1024 * 1024) {   // 5MB for images
-      alert("Oops! Photo must be less than 5MB.");
+      alert("Oops! This file exceeds 5MB");
       e.target.value = '';
       return;
     }
@@ -362,7 +381,7 @@ const handleQuickPhotoSave = async () => {
     const file = files[0];
     
     if (file.size > 5 * 1024 * 1024) {
-      alert("Oops! Photo must be less than 5MB.");
+      alert("Oops! This file exceeds 5MB");
       e.target.value = '';
       return;
     }
@@ -584,8 +603,12 @@ const handleQuickPhotoSave = async () => {
   // ══════════════════════════════════════════════════════════════════════════
   const openEdit = () => {
     setBio(user?.bio || ''); setPlatformId(user?.orcid || '');
-    setQualification(user?.qualification || ''); setField(user?.Field || '');
+    setlocation(user?.qualification || ''); setField(user?.Field || '');
     setPosition(user?.Position || ''); setResearchArea(user?.ResearchArea || '');
+    setInstitution(user?.institution || '');
+    setPosition(user?.Position || '');
+    
+    setgraduation_university(user?.graduation_university || '');
     setRemoveProfileImage(false);
     setIsEditing(true);
   };
@@ -595,8 +618,11 @@ const handleQuickPhotoSave = async () => {
     formData.append('bio', bio || '');
   formData.append('orcid', platformId || user?.orcid || ''); 
     formData.append('qualification', qualification || '');
+    formData.append('institution', institution || '');
+    formData.append('graduation_university', graduation_university || ''),
     formData.append('Field', Field || '');
     formData.append('Position', Position || '');
+    formData.append('location', location || '');
     formData.append('ResearchArea', ResearchArea || '');
     if (profileImage) formData.append('profile_image', profileImage);
     try {
@@ -819,7 +845,12 @@ const handleQuickPhotoSave = async () => {
                     <div className="bg-slate-50 rounded-lg p-3 border border-slate-200 space-y-1 text-sm">
                       {user?.qualification && <div><span className="text-slate-500">Qualification: </span><span className="font-medium text-slate-700">{user.qualification}</span></div>}
                       {user?.Position      && <div><span className="text-slate-500">Position: </span><span className="font-medium text-slate-700">{user.Position}</span></div>}
+                      
+                      {user?.institution      && <div><span className="text-slate-500">Affiliation Institution: </span><span className="font-medium text-slate-700">{user.institution}</span></div>}
                       {user?.ResearchArea  && <div><span className="text-slate-500">Research Area: </span><span className="font-medium text-slate-700">{user.ResearchArea}</span></div>}
+                       {user?.graduation_university  && <div><span className="text-slate-500">Graduation University: </span><span className="font-medium text-slate-700">{user.graduation_university}</span></div>}
+                                             {user?.ResearchArea  && <div><span className="text-slate-500">Research Area: </span><span className="font-medium text-slate-700">{user.ResearchArea}</span></div>}
+                      {user?.location  && <div><span className="text-slate-500">Location: </span><span className="font-medium text-slate-700">{user.location}</span></div>}
                     </div>
                   )}
                   <div className="bg-slate-50 rounded-lg p-3 border border-slate-200">
@@ -840,7 +871,11 @@ const handleQuickPhotoSave = async () => {
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Qualification" value={qualification} onChange={e => setQualification(e.target.value)} />
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Research Area" value={ResearchArea} onChange={e => setResearchArea(e.target.value)} />
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Position" value={Position} onChange={e => setPosition(e.target.value)} />
+                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Position" value={institution} onChange={e => setPosition(e.target.value)} />
+                  
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Field" value={Field} onChange={e => setField(e.target.value)} />
+                  <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Graduation University" value={graduation_university} onChange={e => setgraduation_university(e.target.value)} />
+                  <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Graduation University" value={location} onChange={e => setgraduation_university(e.target.value)} />
                   <div className="border-2 border-slate-200 rounded-lg p-2 hover:bg-slate-50 transition flex items-center justify-between">
   <label className="cursor-pointer flex items-center gap-2 text-sm text-slate-600">
     <input type="file" className="hidden" onChange={e => setProfileImage(e.target.files[0])} accept="image/*" />

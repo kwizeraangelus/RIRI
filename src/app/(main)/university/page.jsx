@@ -136,7 +136,7 @@ export default function UniversityDashboard() {
     const file = files[0];
     
     if (file.size > 16 * 1024 * 1024) {  // 16MB
-      alert("Oops! The file must be less than 16MB.");
+      alert("Oops! This file exceeds 16MB.");
       e.target.value = ''; // Clear the selected file
       return;
     }
@@ -155,7 +155,7 @@ export default function UniversityDashboard() {
     const file = files[0];
     
     if (file.size > 16 * 1024 * 1024) {
-      alert("Oops! The file must be less than 16MB.");
+      alert("Oops! This file exceeds 16MB.");
       e.target.value = '';
       return;
     }

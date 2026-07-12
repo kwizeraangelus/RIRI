@@ -485,7 +485,7 @@ export default function InnovationDashboard() {
                           className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500 text-gray-900" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Location *</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">University Location *</label>
                         <input name="location" placeholder="Zoom, Kigali, etc." value={eventForm.location} onChange={handleEventInput} required
                           className="w-full p-4 border-2 border-slate-300 rounded-xl outline-none focus:border-blue-500" />
                       </div>

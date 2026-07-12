@@ -21,7 +21,8 @@ interface UserProfile {
   is_staff?: boolean;
   age?: number;
   location?: string;
-  details?: string;
+  institution?: string;
+  graduation_university?: string;
   profile_image?: string;
   bio?: string;
   orcid?: string;
@@ -154,7 +155,7 @@ export default function ProfilePage() {
 
   const [f, setF] = useState({
     first_name: '', last_name: '', phone_number: '',
-    age: '', location: '', details: '', bio: '', orcid: '', university_name: '',
+    age: '', location: '', institution: '', bio: '', orcid: '', university_name: '',graduation_university: '',
   });
   const [pw,     setPw]     = useState({ current: '', next: '', confirm: '' });
   const [showPw, setShowPw] = useState({ current: false, next: false, confirm: false });
@@ -167,10 +168,11 @@ export default function ProfilePage() {
       phone_number:    u.phone_number    || '',
       age:             u.age !== undefined ? String(u.age) : '',
       location:        u.location        || '',
-      details:         u.details         || '',
+      institution:     u.institution     || '',
       bio:             u.bio             || '',
       orcid:           u.orcid           || '',
       university_name: u.university_name || '',
+      graduation_university: u.graduation_university || '',
     });
   }
 
@@ -211,10 +213,11 @@ export default function ProfilePage() {
           phone_number:    f.phone_number    || undefined,
           age:             f.age ? Number(f.age) : undefined,
           location:        f.location        || undefined,
-          details:         f.details         || undefined,
+          institution:     f.institution     || undefined,
           bio:             f.bio             || undefined,
           orcid:           f.orcid           || undefined,
           university_name: f.university_name || undefined,
+          graduation_university: f.graduation_university || undefined,
         }),
       });
       if (!res.ok) {
@@ -411,7 +414,7 @@ export default function ProfilePage() {
               </div>
               <p style={{ color: 'rgba(255,255,255,.45)', fontSize: 13, margin: '0 0 2px', display: 'flex', alignItems: 'center', gap: 5 }}><Mail size={12} /> {profile.email}</p>
               <p style={{ color: 'rgba(255,255,255,.28)', fontSize: 12, margin: 0 }}>@{profile.username}</p>
-              {profile.details && <p style={{ color: 'rgba(255,255,255,.62)', fontSize: 14, marginTop: 10, maxWidth: 480, lineHeight: 1.6 }}>{profile.details}</p>}
+              {profile.institution && <p style={{ color: 'rgba(255,255,255,.62)', fontSize: 14, marginTop: 10, maxWidth: 480, lineHeight: 1.6 }}>{profile.institution}</p>}
             </div>
 
             {/* Edit/Save/Cancel */}
@@ -456,13 +459,15 @@ export default function ProfilePage() {
                 <Field label="Last Name"  name="last_name"    value={f.last_name}    editing={editing} onChange={handleFieldChange} placeholder="Doe" />
               </div>
               <Field label="Username"    name="username"     value={profile.username} editing={false} onChange={() => {}} />
-             
+              <Field label="Institution" name="institution"  value={f.institution}  editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali Institute of Science and Technology" />
               <Field label="Location"    name="location"     value={f.location}      editing={editing} onChange={handleFieldChange} icon={<MapPin size={11}/>} placeholder="Kigali, Rwanda" />
               <Field label="Phone"       name="phone_number" value={f.phone_number}  editing={editing} onChange={handleFieldChange} icon={<Phone size={11}/>} type="tel" placeholder="+250 7XX XXX XXX" />
+              <Field label="Graduation University" name="graduation_university" value={f.graduation_university} editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali Institute of Science and Technology" />
             </Card>
 
             <Card title="About" icon={<Briefcase size={15} />}>
-              <Field label="Tagline" name="details" value={f.details} editing={editing} onChange={handleFieldChange} placeholder="e.g. AI Researcher at RIRI" />
+              <Field label="Affiliation Institution" name="institution" value={f.institution} editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali Institute of Science and Technology" />
+              <Field label="Graduation University" name="graduation_university" value={f.graduation_university} editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali Institute of Science and Technology" />
               <Field label="Bio"     name="bio"     value={f.bio}     editing={editing} onChange={handleFieldChange} type="textarea" placeholder="Write a short bio about yourself…" />
               <div style={{ marginTop: 8, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,.07)' }}>
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,.32)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Account</p>
@@ -483,8 +488,9 @@ export default function ProfilePage() {
         {tab === 'academic' && showAcademic && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(290px,1fr))', gap: 18 }}>
             <Card title="Academic Info" icon={<Award size={15} />}>
-              <Field label="University / Institution" name="university_name" value={f.university_name} icon={<BookOpen size={11}/>} editing={editing} onChange={handleFieldChange} placeholder="University of Rwanda" />
-              <Field label="ORCID ID" name="orcid" value={f.orcid} editing={editing} onChange={handleFieldChange} placeholder="0000-0000-0000-0000" />
+              <Field label="University / Institution" name="university_name" value={f.university_name} editing={editing} onChange={handleFieldChange} placeholder="0000-0000-0000-0000" />
+              <Field label="Graduation University" name="graduation_university" value={f.graduation_university} editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali Institute of Science and Technology" />
+              <Field label="Location" name="location" value={f.location} editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali, Rwanda" />
               {!editing && profile.orcid && (
                 <a href={`https://orcid.org/${profile.orcid}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#FFD700', textDecoration: 'none', marginTop: -4 }}>
                   View on ORCID <ExternalLink size={12} />
