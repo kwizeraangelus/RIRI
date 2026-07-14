@@ -603,11 +603,12 @@ const handleQuickPhotoSave = async () => {
   // ══════════════════════════════════════════════════════════════════════════
   const openEdit = () => {
     setBio(user?.bio || ''); setPlatformId(user?.orcid || '');
-    setlocation(user?.qualification || ''); setField(user?.Field || '');
+    setlocation(user?.location || ''); setField(user?.Field || '');
     setPosition(user?.Position || ''); setResearchArea(user?.ResearchArea || '');
     setInstitution(user?.institution || '');
     setPosition(user?.Position || '');
-    
+    setQualification(user?.qualification || '');
+    setResearchArea(user?.ResearchArea || '');
     setgraduation_university(user?.graduation_university || '');
     setRemoveProfileImage(false);
     setIsEditing(true);
@@ -873,7 +874,7 @@ const handleQuickPhotoSave = async () => {
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Research Area" value={ResearchArea} onChange={e => setResearchArea(e.target.value)} />
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Field" value={Field} onChange={e => setField(e.target.value)} />
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Graduation University" value={graduation_university} onChange={e => setgraduation_university(e.target.value)} />
-                  <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Current Location" value={location} onChange={e => setLocation(e.target.value)} />
+                  <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Current Location" value={location} onChange={e => setlocation(e.target.value)} />
                    <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="ORCID / Platform ID (optional)" value={platformId} onChange={e => setPlatformId(e.target.value)} />
                    <textarea className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none resize-none text-sm" placeholder="Bio…" value={bio} onChange={e => setBio(e.target.value)} rows={3} />
                   <div className="border-2 border-slate-200 rounded-lg p-2 hover:bg-slate-50 transition flex items-center justify-between">
