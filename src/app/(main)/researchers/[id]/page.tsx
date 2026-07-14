@@ -81,6 +81,10 @@ export default function PublicResearcherProfile() {
                 <p className="text-gray-600 mt-1">{researcher.Position}</p>
               </div>
               <div>
+                <p className="font-semibold text-gray-700 text-lg">Affiliation Institution</p>
+                <p className="text-gray-600">{researcher.institution}</p>
+              </div>
+              <div>
                 <p className="font-semibold text-gray-700 text-lg">Research Area</p>
                 <p className="text-gray-600 mt-1">{researcher.ResearchArea}</p>
               </div>
@@ -88,20 +92,12 @@ export default function PublicResearcherProfile() {
                 <p className="font-semibold text-gray-700 text-lg">Field</p>
                 <p className="text-gray-600 mt-1">{researcher.Field}</p>
               </div>
-              <div>
-                <p className="font-semibold text-gray-700 text-lg">Email</p>
-                <a href={`mailto:${researcher.email}`} className="text-blue-600 hover:underline break-all">
-                  {researcher.email}
-                </a>
-              </div>
-              <div>
+               <div>
                 <p className="font-semibold text-gray-700 text-lg">Contact Number</p>
                 <p className="text-gray-600">{researcher.contact}</p>
               </div>
-              <div>
-                <p className="font-semibold text-gray-700 text-lg">University Location</p>
-                <p className="text-gray-600">{researcher.location}</p>
-              </div>
+             
+              
               <div>
                 <p className="font-semibold text-gray-700 text-lg">Graduation University</p>
                 <p className="text-gray-600">{researcher.graduation_university}</p>
@@ -110,10 +106,7 @@ export default function PublicResearcherProfile() {
                 <p className="font-semibold text-gray-700 text-lg">Qualification</p>
                 <p className="text-gray-600">{researcher.qualification}</p>
               </div>
-              <div>
-                <p className="font-semibold text-gray-700 text-lg">Affiliation Institution</p>
-                <p className="text-gray-600">{researcher.institution}</p>
-              </div>
+              
 
               {researcher.orcid && (
                 <div>
@@ -121,6 +114,10 @@ export default function PublicResearcherProfile() {
                   <p className="font-mono text-blue-600">{researcher.orcid}</p>
                 </div>
               )}
+              <div>
+                <p className="font-semibold text-gray-700 text-lg">Current location</p>
+                <p className="text-gray-600">{researcher.location}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -130,8 +127,6 @@ export default function PublicResearcherProfile() {
           <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
             <h1 className="text-4xl font-bold text-slate-800 mb-2">{researcher.name}</h1>
             <p className="text-slate-600 mb-6 text-lg">{researcher.qualification}</p>
-
-            <p className="text-slate-600 mb-6 text-lg">{researcher.institution}</p>
 
             {/* Bio - with justified text */}
             <div className="prose text-gray-700 leading-relaxed text-justify text-lg">

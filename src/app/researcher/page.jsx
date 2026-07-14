@@ -849,7 +849,7 @@ const handleQuickPhotoSave = async () => {
                       {user?.institution      && <div><span className="text-slate-500">Affiliation Institution: </span><span className="font-medium text-slate-700">{user.institution}</span></div>}
                       {user?.ResearchArea  && <div><span className="text-slate-500">Research Area: </span><span className="font-medium text-slate-700">{user.ResearchArea}</span></div>}
                        {user?.graduation_university  && <div><span className="text-slate-500">Graduation University: </span><span className="font-medium text-slate-700">{user.graduation_university}</span></div>}
-                                             {user?.ResearchArea  && <div><span className="text-slate-500">Research Area: </span><span className="font-medium text-slate-700">{user.ResearchArea}</span></div>}
+                                            
                       {user?.location  && <div><span className="text-slate-500">Location: </span><span className="font-medium text-slate-700">{user.location}</span></div>}
                     </div>
                   )}
@@ -867,15 +867,15 @@ const handleQuickPhotoSave = async () => {
               <div>
                 <h2 className="text-xl font-bold text-slate-800 mb-5">Edit Profile</h2>
                 <form onSubmit={handleProfileSubmit} className="space-y-4">
-                  <textarea className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none resize-none text-sm" placeholder="Bio…" value={bio} onChange={e => setBio(e.target.value)} rows={3} />
+                 <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Position" value={Position} onChange={e => setPosition(e.target.value)} />
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Qualification" value={qualification} onChange={e => setQualification(e.target.value)} />
+                  <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Affiliation Institution" value={institution} onChange={e => setInstitution(e.target.value)} />
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Research Area" value={ResearchArea} onChange={e => setResearchArea(e.target.value)} />
-                  <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Position" value={Position} onChange={e => setPosition(e.target.value)} />
-                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Position" value={institution} onChange={e => setPosition(e.target.value)} />
-                  
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Field" value={Field} onChange={e => setField(e.target.value)} />
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Graduation University" value={graduation_university} onChange={e => setgraduation_university(e.target.value)} />
-                  <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Graduation University" value={location} onChange={e => setgraduation_university(e.target.value)} />
+                  <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Current Location" value={location} onChange={e => setLocation(e.target.value)} />
+                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="ORCID / Platform ID (optional)" value={platformId} onChange={e => setPlatformId(e.target.value)} />
+                   <textarea className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none resize-none text-sm" placeholder="Bio…" value={bio} onChange={e => setBio(e.target.value)} rows={3} />
                   <div className="border-2 border-slate-200 rounded-lg p-2 hover:bg-slate-50 transition flex items-center justify-between">
   <label className="cursor-pointer flex items-center gap-2 text-sm text-slate-600">
     <input type="file" className="hidden" onChange={e => setProfileImage(e.target.files[0])} accept="image/*" />
@@ -899,7 +899,7 @@ const handleQuickPhotoSave = async () => {
     </button>
   )}
 </div>
-                  <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="ORCID / Platform ID" value={platformId} onChange={e => setPlatformId(e.target.value)} />
+                 
                   <div className="flex gap-3 pt-2">
                     <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-2.5 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition shadow-md text-sm">Save</button>
                     <button type="button" onClick={() => setIsEditing(false)} className="flex-1 bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-lg hover:bg-slate-300 transition text-sm">Cancel</button>

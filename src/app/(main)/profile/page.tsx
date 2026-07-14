@@ -154,7 +154,7 @@ export default function ProfilePage() {
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
 
   const [f, setF] = useState({
-    first_name: '', last_name: '', phone_number: '',
+    first_name: '', last_name: '', email: '', phone_number: '',
     age: '', location: '', institution: '', bio: '', orcid: '', university_name: '',graduation_university: '',
   });
   const [pw,     setPw]     = useState({ current: '', next: '', confirm: '' });
@@ -165,6 +165,7 @@ export default function ProfilePage() {
     setF({
       first_name:      u.first_name      || '',
       last_name:       u.last_name       || '',
+      email:           u.email           || '',
       phone_number:    u.phone_number    || '',
       age:             u.age !== undefined ? String(u.age) : '',
       location:        u.location        || '',
@@ -202,6 +203,13 @@ export default function ProfilePage() {
   // ── Save text fields ───────────────────────────────────────────────────────
   const handleSave = async () => {
     if (!profile) return;
+
+    // Basic client-side email validation before hitting the API
+    if (f.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) {
+      notify('Please enter a valid email address', 'error');
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await fetch(`${API}/profile/${profile.id}`, {
@@ -210,6 +218,7 @@ export default function ProfilePage() {
         body: JSON.stringify({
           first_name:      f.first_name      || undefined,
           last_name:       f.last_name       || undefined,
+          email:           f.email           || undefined,
           phone_number:    f.phone_number    || undefined,
           age:             f.age ? Number(f.age) : undefined,
           location:        f.location        || undefined,
@@ -459,10 +468,10 @@ export default function ProfilePage() {
                 <Field label="Last Name"  name="last_name"    value={f.last_name}    editing={editing} onChange={handleFieldChange} placeholder="Doe" />
               </div>
               <Field label="Username"    name="username"     value={profile.username} editing={false} onChange={() => {}} />
-             
-              <Field label="Location"    name="location"     value={f.location}      editing={editing} onChange={handleFieldChange} icon={<MapPin size={11}/>} placeholder="Kigali, Rwanda" />
+              <Field label="Email"       name="email"        value={f.email}         editing={editing} onChange={handleFieldChange} icon={<Mail size={11}/>} type="email" placeholder="you@example.com" />
+              <Field label="Current location"    name="location"     value={f.location}      editing={editing} onChange={handleFieldChange} icon={<MapPin size={11}/>} placeholder="Kigali, Rwanda" />
               <Field label="Phone"       name="phone_number" value={f.phone_number}  editing={editing} onChange={handleFieldChange} icon={<Phone size={11}/>} type="tel" placeholder="+250 7XX XXX XXX" />
-              <Field label="Graduation University" name="graduation_university" value={f.graduation_university} editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali Institute of Science and Technology" />
+             
             </Card>
 
             <Card title="About" icon={<Briefcase size={15} />}>
