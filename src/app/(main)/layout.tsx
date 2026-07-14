@@ -120,7 +120,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   const getUserInitial = (user: UserData | null) => {
     if (!user) return 'U';
-    return (user.username?.[0] || user.email?.[0] || 'U').toUpperCase();
+    return (user.email?.[0] || user.username?.[0] || 'U').toUpperCase();
   };
 
   const getInitialColor = (initial: string) => {
@@ -208,7 +208,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                       </div>
                       <div>
                         <p className="text-base text-gray-400">Signed in as</p>
-                        <p className="font-semibold text-[#FFD700] text-lg">{authData.user?.username || authData.user?.email}</p>
+                        <p className="font-semibold text-[#FFD700] text-lg">{authData.user?.email || authData.user?.username}</p>
                       </div>
                     </div>
                   </div>

@@ -168,6 +168,17 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
       } else {
         await registerUser();
         notifySuccess('Account created successfully!');
+
+        // Signup and login share the same `username` field in state.
+        // Prefill it with the email just used to sign up (instead of leaving
+        // the stale signup username value), and clear the passwords.
+        setFormData((prev) => ({
+          ...prev,
+          username: prev.email,
+          password: '',
+          confirmPassword: '',
+        }));
+
         onClose('login');
       }
     } catch (err: unknown) {
