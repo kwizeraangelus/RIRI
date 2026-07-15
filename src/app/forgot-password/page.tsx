@@ -123,7 +123,7 @@ export default function ForgotPasswordPage() {
       <footer className="bg-[#050A14] text-white py-16 mt-20">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="text-6xl font-bold uppercase italic tracking-wider mb-4">RIRI</div>
-          <p className="text-gray-300 text-lg">Rwanda Innovation & Research Institute</p>
+          <p className="text-gray-300 text-lg">Discover · Innovate · InspireDiscover · Innovate · Inspire</p>
           <p className="text-sm text-gray-500 mt-8">© 2026 RIRI • All rights reserved</p>
         </div>
       </footer>
