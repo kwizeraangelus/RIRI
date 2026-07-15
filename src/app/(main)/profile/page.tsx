@@ -492,7 +492,7 @@ export default function ProfilePage() {
                 <Field label="Last Name"  name="last_name"    value={f.last_name}    editing={editing} onChange={handleFieldChange} placeholder="Doe" />
               </div>
               <Field label="Username"    name="username"     value={profile.username} editing={false} onChange={() => {}} />
-              <Field label="Email"       name="email"        value={f.email}         editing={editing} onChange={handleFieldChange} icon={<Mail size={11}/>} type="email" placeholder="you@example.com" />
+              
               <Field label="Current location"    name="location"     value={f.location}      editing={editing} onChange={handleFieldChange} icon={<MapPin size={11}/>} placeholder="Kigali, Rwanda" />
               <Field label="Phone"       name="phone_number" value={f.phone_number}  editing={editing} onChange={handleFieldChange} icon={<Phone size={11}/>} type="tel" placeholder="+250 7XX XXX XXX" />
 
