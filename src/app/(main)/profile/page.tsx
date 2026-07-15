@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  User, Mail, Phone, MapPin, BookOpen, Briefcase, Award,
+  User, Mail, Phone, MapPin, BookOpen, Award,
   Edit3, Save, X, Camera, FileText, ExternalLink,
   Upload, Loader2, Check, AlertCircle, Lock, Eye, EyeOff,
 } from 'lucide-react';
@@ -28,6 +28,10 @@ interface UserProfile {
   orcid?: string;
   cv?: string;
   resume?: string;
+  Position?: string;
+  qualification?: string;
+  ResearchArea?: string;
+  Field?: string;
 }
 
 // ── ✅ FIX 1: point to NestJS port, not Next.js port ──────────────────────────
@@ -54,6 +58,7 @@ const CATEGORY_COLOR: Record<string, string> = {
 };
 
 const ACADEMIC = ['university', 'UNIVERSITY'];
+const RESEARCHER = ['researcher', 'RESEARCHER'];
 
 function safeParseUser(str: string | null): UserProfile | null {
   if (!str || str === 'undefined' || str === 'null') return null;
@@ -150,12 +155,13 @@ export default function ProfilePage() {
   const [editing,   setEditing]   = useState(false);
   const [saving,    setSaving]    = useState(false);
   const [toast,     setToast]     = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const [tab,       setTab]       = useState<'info' | 'academic' | 'documents' | 'password'>('info');
+  const [tab,       setTab]       = useState<'info' | 'academic' | 'researcher' | 'documents' | 'password'>('info');
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
 
   const [f, setF] = useState({
     first_name: '', last_name: '', email: '', phone_number: '',
-    age: '', location: '', institution: '', bio: '', orcid: '', university_name: '',graduation_university: '',
+    age: '', location: '', institution: '', bio: '', orcid: '', university_name: '', graduation_university: '',
+    Position: '', qualification: '', ResearchArea: '', Field: '',
   });
   const [pw,     setPw]     = useState({ current: '', next: '', confirm: '' });
   const [showPw, setShowPw] = useState({ current: false, next: false, confirm: false });
@@ -174,6 +180,10 @@ export default function ProfilePage() {
       orcid:           u.orcid           || '',
       university_name: u.university_name || '',
       graduation_university: u.graduation_university || '',
+      Position:        u.Position        || '',
+      qualification:   u.qualification    || '',
+      ResearchArea:    u.ResearchArea     || '',
+      Field:  u.Field   || '',
     });
   }
 
@@ -204,29 +214,42 @@ export default function ProfilePage() {
   const handleSave = async () => {
     if (!profile) return;
 
-    // Basic client-side email validation before hitting the API
-    if (f.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) {
+    // Email is required — don't allow saving it empty
+    if (!f.email.trim()) {
+      notify('Email cannot be empty', 'error');
+      return;
+    }
+    // Basic client-side email format validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) {
       notify('Please enter a valid email address', 'error');
       return;
     }
 
     setSaving(true);
     try {
+      // ── FIX: send the real current value for every field, including empty
+      // strings. Using `value || undefined` here was wrong — JSON.stringify
+      // drops `undefined` keys entirely, so clearing a field never reached
+      // the backend and the old value stuck around after save/reload.
       const res = await fetch(`${API}/profile/${profile.id}`, {
         method: 'PATCH',
         headers: { ...authHeader(), 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          first_name:      f.first_name      || undefined,
-          last_name:       f.last_name       || undefined,
-          email:           f.email           || undefined,
-          phone_number:    f.phone_number    || undefined,
-          age:             f.age ? Number(f.age) : undefined,
-          location:        f.location        || undefined,
-          institution:     f.institution     || undefined,
-          bio:             f.bio             || undefined,
-          orcid:           f.orcid           || undefined,
-          university_name: f.university_name || undefined,
-          graduation_university: f.graduation_university || undefined,
+          first_name:      f.first_name.trim(),
+          last_name:       f.last_name.trim(),
+          email:           f.email.trim(),
+          phone_number:    f.phone_number.trim(),
+          age:             f.age.trim() ? Number(f.age) : null,
+          location:        f.location.trim(),
+          institution:     f.institution.trim(),
+          bio:             f.bio.trim(),
+          orcid:           f.orcid.trim(),
+          university_name: f.university_name.trim(),
+          graduation_university: f.graduation_university.trim(),
+          Position:        f.Position.trim(),
+          qualification:   f.qualification.trim(),
+          ResearchArea:    f.ResearchArea.trim(),
+          Field:  f.Field.trim(),
         }),
       });
       if (!res.ok) {
@@ -343,12 +366,13 @@ export default function ProfilePage() {
   const fullName   = (profile.first_name || profile.last_name)
     ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim()
     : profile.username;
-  const showAcademic = ACADEMIC.includes(profile.user_category);
+  const showAcademic   = ACADEMIC.includes(profile.user_category);
+  const showResearcher = RESEARCHER.includes(profile.user_category);
 
   const tabs = [
     { key: 'info'      as const, label: 'Personal Info', icon: <User size={14} /> },
-    ...(showAcademic ? [{ key: 'academic' as const, label: 'Academic', icon: <BookOpen size={14} /> }] : []),
-
+    ...(showAcademic   ? [{ key: 'academic'   as const, label: 'Academic',   icon: <BookOpen size={14} /> }] : []),
+    ...(showResearcher ? [{ key: 'researcher' as const, label: 'Researcher details', icon: <Award size={14} /> }] : []),
     { key: 'password'  as const, label: 'Password',      icon: <Lock size={14} /> },
   ];
 
@@ -471,13 +495,7 @@ export default function ProfilePage() {
               <Field label="Email"       name="email"        value={f.email}         editing={editing} onChange={handleFieldChange} icon={<Mail size={11}/>} type="email" placeholder="you@example.com" />
               <Field label="Current location"    name="location"     value={f.location}      editing={editing} onChange={handleFieldChange} icon={<MapPin size={11}/>} placeholder="Kigali, Rwanda" />
               <Field label="Phone"       name="phone_number" value={f.phone_number}  editing={editing} onChange={handleFieldChange} icon={<Phone size={11}/>} type="tel" placeholder="+250 7XX XXX XXX" />
-             
-            </Card>
 
-            <Card title="About" icon={<Briefcase size={15} />}>
-              <Field label="Affiliation Institution" name="institution" value={f.institution} editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali Institute of Science and Technology" />
-              <Field label="Graduation University" name="graduation_university" value={f.graduation_university} editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali Institute of Science and Technology" />
-              <Field label="Bio"     name="bio"     value={f.bio}     editing={editing} onChange={handleFieldChange} type="textarea" placeholder="Write a short bio about yourself…" />
               <div style={{ marginTop: 8, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,.07)' }}>
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,.32)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Account</p>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -489,6 +507,27 @@ export default function ProfilePage() {
                   </span>
                 </div>
               </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Researcher */}
+        {tab === 'researcher' && showResearcher && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(290px,1fr))', gap: 18 }}>
+            <Card title="Researcher Details" icon={<Award size={15} />}>
+              <Field label="Position" name="Position" value={f.Position} editing={editing} onChange={handleFieldChange} placeholder="e.g. Senior Lecturer, Postdoctoral Fellow" />
+              <Field label="Qualification" name="qualification" value={f.qualification} editing={editing} onChange={handleFieldChange} placeholder="e.g. PhD in Computer Science" />
+              <Field label="Affiliation Institution" name="institution" value={f.institution} editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali Institute of Science and Technology" />
+              <Field label="Research Area" name="ResearchArea" value={f.ResearchArea} editing={editing} onChange={handleFieldChange} placeholder="e.g. Artificial Intelligence" />
+              <Field label="Field Study" name="Field" value={f.Field} editing={editing} onChange={handleFieldChange} placeholder="e.g. Computer Science" />
+              <Field label="Graduation University" name="graduation_university" value={f.graduation_university} editing={editing} onChange={handleFieldChange} placeholder="e.g. Kigali Institute of Science and Technology" />
+              <Field label="ORCID" name="orcid" value={f.orcid} editing={editing} onChange={handleFieldChange} placeholder="0000-0000-0000-0000" />
+              {!editing && profile.orcid && (
+                <a href={`https://orcid.org/${profile.orcid}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#FFD700', textDecoration: 'none', marginTop: -8, marginBottom: 16 }}>
+                  View on ORCID <ExternalLink size={12} />
+                </a>
+              )}
+              <Field label="Bio" name="bio" value={f.bio} editing={editing} onChange={handleFieldChange} type="textarea" placeholder="Write a short bio about yourself…" />
             </Card>
           </div>
         )}
