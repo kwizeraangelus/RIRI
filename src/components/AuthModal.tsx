@@ -45,6 +45,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
   const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
   const isLogin = type === 'login';
@@ -167,19 +168,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
         onClose();
       } else {
         await registerUser();
-        notifySuccess('Account created successfully!');
-
-        // Signup and login share the same `username` field in state.
-        // Prefill it with the email just used to sign up (instead of leaving
-        // the stale signup username value), and clear the passwords.
-        setFormData((prev) => ({
-          ...prev,
-          username: prev.email,
-          password: '',
-          confirmPassword: '',
-        }));
-
-        onClose('login');
+        setSignupSuccess(true);
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
@@ -191,6 +180,35 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
   };
 
   if (!type) return null;
+
+  if (signupSuccess) {
+    return (
+      <div
+        className="fixed inset-0 z-[100] bg-black/70 flex items-start justify-center pt-20 overflow-y-auto"
+        onClick={() => onClose()}
+      >
+        <div
+          className="w-full max-w-md bg-white text-black rounded-2xl shadow-2xl m-6 p-8 text-center space-y-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+            <UserPlus size={40} className="text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold">Check your inbox</h2>
+          <p className="text-gray-600">
+            We sent a confirmation link to <strong>{formData.email}</strong>.
+            Click it to activate your account, then log in.
+          </p>
+          <button
+            onClick={() => onClose('login')}
+            className="inline-block bg-[#FFD700] text-black px-8 py-3 rounded-full font-bold hover:bg-yellow-400 transition-all"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
