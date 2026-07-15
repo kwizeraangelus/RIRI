@@ -1,16 +1,51 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Loader2, CheckCircle2, XCircle, Mail } from 'lucide-react';
 import { getApiUrl } from '@/utils/api';
 
+type Status = 'verifying' | 'success' | 'error';
+
 export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<VerifyEmailFallback />}>
+      <VerifyEmailContent />
+    </Suspense>
+  );
+}
+
+function VerifyEmailFallback() {
+  return (
+    <div className="min-h-screen bg-[#E0F2FE] text-gray-900">
+      <div className="h-28 bg-[#050A14]" aria-hidden="true" />
+      <section className="relative -mt-28 pt-36 pb-20 text-center">
+        <div className="max-w-4xl mx-auto px-6">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-[#050A14] mb-6">
+            Verify <span className="text-[#FFD700]">Email</span>
+          </h1>
+        </div>
+      </section>
+      <section className="py-10 px-4 sm:px-6">
+        <div className="max-w-md mx-auto">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100 text-center space-y-4">
+            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+              <Loader2 size={40} className="text-blue-600 animate-spin" />
+            </div>
+            <h2 className="text-2xl font-bold text-[#050A14]">Loading...</h2>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
 
-  const [status, setStatus] = useState('verifying');
+  const [status, setStatus] = useState<Status>('verifying');
   const [message, setMessage] = useState('');
 
   // Resend flow (shown when verification fails)
@@ -20,6 +55,8 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     if (!token) {
+      setStatus('error');
+      setMessage('No verification token was provided. Please use the link from your email.');
       return;
     }
 
@@ -33,7 +70,7 @@ export default function VerifyEmailPage() {
           throw new Error(data.message || 'Invalid or expired verification link');
         }
         setStatus('success');
-      } catch (err) {
+      } catch (err: unknown) {
         setStatus('error');
         setMessage(err instanceof Error ? err.message : 'Something went wrong');
       }
@@ -42,14 +79,7 @@ export default function VerifyEmailPage() {
     verify();
   }, [token]);
 
-  useEffect(() => {
-    if (!token) {
-      setStatus('error');
-      setMessage('No verification token was provided. Please use the link from your email.');
-    }
-  }, [token]);
-
-  const handleResend = async (e) => {
+  const handleResend = async (e: React.FormEvent) => {
     e.preventDefault();
     setResendLoading(true);
     try {
