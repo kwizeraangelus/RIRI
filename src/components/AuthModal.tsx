@@ -199,12 +199,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
             We sent a confirmation link to <strong>{formData.email}</strong>.
             Click it to activate your account, then log in.
           </p>
-          <button
-            onClick={() => onClose('login')}
-            className="inline-block bg-[#FFD700] text-black px-8 py-3 rounded-full font-bold hover:bg-yellow-400 transition-all"
-          >
-            Go to Login
-          </button>
+         
         </div>
       </div>
     );
