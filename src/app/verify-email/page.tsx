@@ -135,12 +135,7 @@ function VerifyEmailContent() {
                 <p className="text-gray-600">
                   Your account is now active. You can log in whenever you're ready.
                 </p>
-                <Link
-                  href="/"
-                  className="inline-block mt-4 bg-[#FFD700] text-[#050A14] px-8 py-3 rounded-full font-bold hover:bg-yellow-400 transition-all"
-                >
-                  Go to Login
-                </Link>
+                
               </div>
             )}
 
@@ -216,7 +211,7 @@ function VerifyEmailContent() {
       <footer className="bg-[#050A14] text-white py-16 mt-20">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="text-6xl font-bold uppercase italic tracking-wider mb-4">RIRI</div>
-          <p className="text-gray-300 text-lg">Rwanda Innovation & Research Institute</p>
+          <p className="text-gray-300 text-lg">Rwanda and Innovation for Inspire</p>
           <p className="text-sm text-gray-500 mt-8">© 2026 RIRI • All rights reserved</p>
         </div>
       </footer>
