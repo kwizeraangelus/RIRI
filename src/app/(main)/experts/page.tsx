@@ -77,6 +77,7 @@ export default function ExpertsPage() {
                           src={expert.profileImage}
                           alt={expert.name}
                           fill
+                          unoptimized
                           className="object-cover"
                         />
                       </div>

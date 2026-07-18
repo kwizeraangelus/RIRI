@@ -237,6 +237,55 @@ export default function AdminExpertsPage() {
       setError(err instanceof Error ? err.message : 'Failed to save expert');
     }
   };
+  const handleEditClick = async (id: string) => {
+  try {
+    const res = await fetch(getApiUrl(`/experts/${id}`));
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+
+    setFormData({
+      name: data.name || '',
+      title: data.title || '',
+      location: data.location || '',
+      bio: data.bio || '',
+      profileImage: data.profileImage,
+      yearOfExperience: data.yearOfExperience || 0,
+      expertise: (data.expertise || []).join(', '),
+      portfolio: (data.portfolio || []).map((p: any) => ({
+        title: p.title,
+        description: p.description,
+        technologies: (p.technologies || []).join(', '),
+      })),
+      workExperience: (data.workExperience || []).map((w: any) => ({
+        position: w.position,
+        company: w.company,
+        startYear: w.startYear,
+        endYear: w.endYear,
+        description: w.description,
+        technologies: (w.technologies || []).join(', '),
+      })),
+      education: data.education || [],
+      certifications: (data.certifications || []).map((c: any) => ({
+        name: c.name,
+        issuer: c.issuer,
+        dateObtained: c.dateObtained ? String(c.dateObtained).split('T')[0] : '',
+      })),
+      skills: Object.fromEntries(
+        Object.entries(data.skills || {}).map(([k, v]) =>
+          [k, Array.isArray(v) ? v.join(', ') : (v ?? '')]
+        )
+      ),
+      preferredEnvironment: (data.preferredEnvironment || []).join(', '),
+    });
+
+    setEditingId(id);
+    setImagePreview(null);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch {
+    setError('Failed to load expert for editing');
+  }
+};
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this expert?')) return;
@@ -288,15 +337,19 @@ export default function AdminExpertsPage() {
       const body = new FormData();
       body.append('file', file);
 
-      const res = await fetch(getApiUrl('/experts/upload-profile-image'), {
+      const requestUrl = editingId
+        ? getApiUrl(`/experts/${editingId}/upload-profile-image`)
+        : getApiUrl('/experts/upload-profile-image');
+
+      const res = await fetch(requestUrl, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body,
       });
 
       if (!res.ok) throw new Error('Upload failed');
-      const { url } = await res.json();          // expects { url: "https://..." }
-      setFormData(prev => ({ ...prev, profileImage: url }));
+      const { url: uploadedUrl } = await res.json();          // expects { url: "https://..." }
+      setFormData(prev => ({ ...prev, profileImage: uploadedUrl }));
     } catch (err) {
       setError('Image upload failed. Please try again.');
       setImagePreview(null);
@@ -594,13 +647,15 @@ export default function AdminExpertsPage() {
                       ? <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-medium">Verified</span>
                       : <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs font-medium">Pending</span>}
                   </td>
+                  
                   <td className="px-5 py-4 flex gap-3 flex-wrap">
-                    <Link href={`/experts/${expert.id}`} className="text-blue-600 hover:underline text-xs">View</Link>
-                    {!expert.verified && (
-                      <button onClick={() => handleVerify(expert.id)} className="text-green-600 hover:underline text-xs">Verify</button>
-                    )}
-                    <button onClick={() => handleDelete(expert.id)} className="text-red-600 hover:underline text-xs">Delete</button>
-                  </td>
+                  <Link href={`/experts/${expert.id}`} className="text-blue-600 hover:underline text-xs">View</Link>
+                  <button onClick={() => handleEditClick(expert.id)} className="text-indigo-600 hover:underline text-xs">Edit</button>
+                  {!expert.verified && (
+                    <button onClick={() => handleVerify(expert.id)} className="text-green-600 hover:underline text-xs">Verify</button>
+                  )}
+                  <button onClick={() => handleDelete(expert.id)} className="text-red-600 hover:underline text-xs">Delete</button>
+                </td>
                 </tr>
               ))}
             </tbody>

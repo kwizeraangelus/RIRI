@@ -113,6 +113,7 @@ export default function ExpertDetailPage() {
                     src={expert.profileImage}
                     alt={expert.name}
                     fill
+                     unoptimized
                     className="object-cover rounded-lg"
                   />
                 </div>

@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
   
   images: {
     remotePatterns: [
+       {
+        protocol: 'https',
+        hostname: 'pub-9385971443a8400dac08aad37bb4f49c.r2.dev',
+      },
       {
         protocol: "http",
         hostname: "localhost",

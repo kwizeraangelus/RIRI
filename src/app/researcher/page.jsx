@@ -98,6 +98,7 @@ const [removePdf, setRemovePdf] = useState(false);
   const [Position, setPosition]       = useState('');
   const [ResearchArea, setResearchArea] = useState('');
   const [removeProfileImage, setRemoveProfileImage] = useState(false);
+  const [isSavingPub, setIsSavingPub] = useState(false);
 
   // ── Fetch everything on mount ─────────────────────────────────────────────
   useEffect(() => { fetchAll(); }, []);
@@ -240,7 +241,7 @@ const [removePdf, setRemovePdf] = useState(false);
   
   if (!publicationForm.pdf && removePdf) {
   fd.append('remove_pdf', 'true'); // NEW
-}
+} setIsSavingPub(true);
   try {
     const res = await fetch(url, {
       method: isEditing ? 'PATCH' : 'POST',
@@ -263,6 +264,8 @@ const [removePdf, setRemovePdf] = useState(false);
     }
   } catch {
     alert('Network error');
+  }finally{
+    setIsSavingPub(true);
   }
 };
 
@@ -1094,11 +1097,30 @@ const handleQuickPhotoSave = async () => {
                     )}
 
                     <div className="flex gap-4 pt-2">
-                      <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md transition hover:from-blue-700 hover:to-indigo-700">
-                        {editingPublicationId ? 'Update Publication' : 'Save Publication'}
-                      </button>
-                      <button type="button" onClick={() => { setShowAddPublication(false); resetPubForm(); }} className="flex-1 bg-slate-200 text-slate-700 font-semibold py-3 rounded-lg hover:bg-slate-300 transition">Cancel</button>
-                    </div>
+  <button
+    type="submit"
+    disabled={isSavingPub}
+    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md transition hover:from-blue-700 hover:to-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+  >
+    {isSavingPub && (
+      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+      </svg>
+    )}
+    {isSavingPub
+      ? (editingPublicationId ? 'Updating...' : 'Saving...')
+      : (editingPublicationId ? 'Update Publication' : 'Save Publication')}
+  </button>
+  <button
+    type="button"
+    onClick={() => { setShowAddPublication(false); resetPubForm(); }}
+    disabled={isSavingPub}
+    className="flex-1 bg-slate-200 text-slate-700 font-semibold py-3 rounded-lg hover:bg-slate-300 transition disabled:opacity-60 disabled:cursor-not-allowed"
+  >
+    Cancel
+  </button>
+</div>
                   </form>
                 </div>
               )}
