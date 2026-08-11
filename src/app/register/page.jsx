@@ -12,13 +12,19 @@ export default function RegisterPage() {
   const [passwordError, setPasswordError] = useState(false);
 
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    first_name: '',
-    last_name: '',
-    phone_number: '',
-    university_name: '',
-  });
+  username: '',
+  email: '',
+  first_name: '',
+  last_name: '',
+  phone_number: '',
+  university_name: '',
+  position: '',
+  institution: '',
+  field: '',
+  research_area: '',
+  qualification: '',
+  location: '',
+});
 
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
@@ -33,12 +39,27 @@ export default function RegisterPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  useEffect(() => {
-    setShowUniversity(user_category === 'university');
-    if (user_category !== 'university') {
-      setFormData((prev) => ({ ...prev, university_name: '' }));
+
+const [showResearcher, setShowResearcher] = useState(false);
+
+useEffect(() => {
+  setShowUniversity(user_category === 'university');
+  setShowResearcher(user_category === 'researcher');
+
+  setFormData((prev) => {
+    const next = { ...prev };
+    if (user_category !== 'university') next.university_name = '';
+    if (user_category !== 'researcher') {
+      next.position = '';
+      next.institution = '';
+      next.field = '';
+      next.research_area = '';
+      next.qualification = '';
+      next.location = '';
     }
-  }, [user_category]);
+    return next;
+  });
+}, [user_category]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -204,6 +225,73 @@ export default function RegisterPage() {
               />
             </div>
           )}
+
+          {showResearcher && (
+  <>
+    <div>
+      <label className="block text-sm font-bold mb-1">Position</label>
+      <input
+        type="text"
+        name="position"
+        required
+        value={formData.position}
+        onChange={handleInputChange}
+        className={`w-full px-3 py-2 border rounded-md font-bold focus:ring-2 focus:ring-[${STRONG_YELLOW}]`}
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-bold mb-1">Affiliation / Institution</label>
+      <input
+        type="text"
+        name="institution"
+        required
+        value={formData.institution}
+        onChange={handleInputChange}
+        className={`w-full px-3 py-2 border rounded-md font-bold focus:ring-2 focus:ring-[${STRONG_YELLOW}]`}
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-bold mb-1">Field</label>
+      <input
+        type="text"
+        name="field"
+        value={formData.field}
+        onChange={handleInputChange}
+        className={`w-full px-3 py-2 border rounded-md font-bold focus:ring-2 focus:ring-[${STRONG_YELLOW}]`}
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-bold mb-1">Research Area</label>
+      <input
+        type="text"
+        name="research_area"
+        value={formData.research_area}
+        onChange={handleInputChange}
+        className={`w-full px-3 py-2 border rounded-md font-bold focus:ring-2 focus:ring-[${STRONG_YELLOW}]`}
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-bold mb-1">Qualification</label>
+      <input
+        type="text"
+        name="qualification"
+        value={formData.qualification}
+        onChange={handleInputChange}
+        className={`w-full px-3 py-2 border rounded-md font-bold focus:ring-2 focus:ring-[${STRONG_YELLOW}]`}
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-bold mb-1">Location</label>
+      <input
+        type="text"
+        name="location"
+        value={formData.location}
+        onChange={handleInputChange}
+        className={`w-full px-3 py-2 border rounded-md font-bold focus:ring-2 focus:ring-[${STRONG_YELLOW}]`}
+      />
+    </div>
+  </>
+)}
 
           {/* Password */}
           <div>
