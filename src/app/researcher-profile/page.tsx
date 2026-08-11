@@ -1,10 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getApiUrl } from '@/utils/api';
 
 export default function ResearcherProfilePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F7F5EF] flex items-center justify-center">
+          <p className="text-[#6B6F76] text-sm">Loading…</p>
+        </div>
+      }
+    >
+      <ResearcherProfileForm />
+    </Suspense>
+  );
+}
+
+function ResearcherProfileForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
 

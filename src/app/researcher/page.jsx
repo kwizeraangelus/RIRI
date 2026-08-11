@@ -265,7 +265,7 @@ const [removePdf, setRemovePdf] = useState(false);
   } catch {
     alert('Network error');
   }finally{
-    setIsSavingPub(true);
+    setIsSavingPub(false);
   }
 };
 

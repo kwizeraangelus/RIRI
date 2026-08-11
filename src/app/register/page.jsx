@@ -34,12 +34,15 @@ export default function RegisterPage() {
   };
 
 
-const [showResearcher, setShowResearcher] = useState(false);
+ const [showResearcher, setShowResearcher] = useState(false);
 
- useEffect(() => {
+  useEffect(() => {
     setShowUniversity(user_category === 'university');
+    setShowResearcher(user_category === 'researcher');
     if (user_category !== 'university') {
       setFormData((prev) => ({ ...prev, university_name: '' }));
+    }
+  }, [user_category]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,7 +65,6 @@ const [showResearcher, setShowResearcher] = useState(false);
     try {
       const response = await fetch(getApiUrl('/api/register'), {
         method: 'POST',
-        
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submitData),
       });
