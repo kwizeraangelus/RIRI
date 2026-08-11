@@ -30,22 +30,16 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-  last_name: '',
-  first_name: '',
-  username: '',
-  email: '',
-  password: '',
-  phone_number: '',
-  confirmPassword: '',
-  user_category: '',
-  university_name: '',
-  position: '',
-  institution: '',
-  field: '',
-  research_area: '',
-  qualification: '',
-  location: '',
-});
+    last_name: '',
+    first_name: '',
+    username: '',
+    email: '',
+    password: '',
+    phone_number: '',
+    confirmPassword: '',
+    user_category: '',
+     university_name: '',
+  });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,55 +70,35 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
   };
 
   const registerUser = async () => {
-  const isResearcher = formData.user_category === 'researcher';
-  const res = await fetch(getApiUrl('/api/signup'), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      first_name: formData.first_name,
-      last_name: formData.last_name,
-      username: formData.username,
-      email: formData.email,
-      password: formData.password,
-      confirmPassword: formData.confirmPassword,
-      phone_number: formData.phone_number,
-      user_category: formData.user_category.toLowerCase(),
-      university_name:
+    const res = await fetch(getApiUrl('/api/signup'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        phone_number: formData.phone_number,
+        user_category: formData.user_category.toLowerCase(),
+         university_name:
         formData.user_category === 'university'
           ? formData.university_name
           : undefined,
-      position: isResearcher ? formData.position : undefined,
-      institution: isResearcher ? formData.institution : undefined,
-      field: isResearcher ? formData.field : undefined,
-      research_area: isResearcher ? formData.research_area : undefined,
-      qualification: isResearcher ? formData.qualification : undefined,
-      location: isResearcher ? formData.location : undefined,
-    }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || err.detail || 'Registration failed');
-  }
-  return res.json();
-};
-
+     }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || err.detail || 'Registration failed');
+    }
+    return res.json();
+  };
   useEffect(() => {
-  setFormData((prev) => {
-    const next = { ...prev };
-    if (prev.user_category !== 'university' && prev.university_name) {
-      next.university_name = '';
+    if (formData.user_category !== 'university' && formData.university_name) {
+      setFormData((prev) => ({ ...prev, university_name: '' }));
     }
-    if (prev.user_category !== 'researcher') {
-      next.position = '';
-      next.institution = '';
-      next.field = '';
-      next.research_area = '';
-      next.qualification = '';
-      next.location = '';
-    }
-    return next;
-  });
-}, [formData.user_category]);
+  }, [formData.user_category]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,7 +166,12 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
         notifySuccess(`Welcome back, ${user.username || user.email}!`);
         onClose();
       } else {
-        await registerUser();
+        const result = await registerUser();
+        if (formData.user_category === 'researcher' && result.userId && result.profileToken) {
+          onClose();
+          router.push(`/researcher-profile?uid=${result.userId}&token=${result.profileToken}`);
+          return;
+        }
         setSignupSuccess(true);
       }
     } catch (err: unknown) {
@@ -335,61 +314,6 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
     className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
     disabled={loading}
   />
-)}
-
-{formData.user_category === 'researcher' && (
-  <>
-    <input
-      type="text"
-      placeholder="Position"
-      value={formData.position}
-      onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-      required
-      className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
-      disabled={loading}
-    />
-    <input
-      type="text"
-      placeholder="Affiliation / Institution"
-      value={formData.institution}
-      onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
-      required
-      className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
-      disabled={loading}
-    />
-    <input
-      type="text"
-      placeholder="Field"
-      value={formData.field}
-      onChange={(e) => setFormData({ ...formData, field: e.target.value })}
-      className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
-      disabled={loading}
-    />
-    <input
-      type="text"
-      placeholder="Research Area"
-      value={formData.research_area}
-      onChange={(e) => setFormData({ ...formData, research_area: e.target.value })}
-      className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
-      disabled={loading}
-    />
-    <input
-      type="text"
-      placeholder="Qualification"
-      value={formData.qualification}
-      onChange={(e) => setFormData({ ...formData, qualification: e.target.value })}
-      className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
-      disabled={loading}
-    />
-    <input
-      type="text"
-      placeholder="Location"
-      value={formData.location}
-      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-      className="w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg"
-      disabled={loading}
-    />
-  </>
 )}
             </>
           )}
