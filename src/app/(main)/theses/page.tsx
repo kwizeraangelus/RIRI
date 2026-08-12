@@ -100,6 +100,8 @@ const FIELD_KEYWORDS: Record<string, string[]> = {
   'Education':                ['education', 'pedagogy', 'teaching', 'curriculum', 'learning'],
 };
 
+const RESULTS_PER_PAGE_OPTIONS = [1, 5, 10, 20, 40, 60, 80, 100];
+
 // ──────────────────────────────────────────────────────
 // Helpers
 // ──────────────────────────────────────────────────────
@@ -302,111 +304,97 @@ const MiniPublicationCard: React.FC<Publication & { onClick: () => void }> = ({
 );
 
 // ──────────────────────────────────────────────────────
-// PublicationCard — shown in the main grid
+// PublicationListItem — DSpace-style row shown in the main results list
 // ──────────────────────────────────────────────────────
-const PublicationCard: React.FC<Publication & { onRate?: (id: number, rating: number) => Promise<void> }> = ({
-  id, title, year, authors, description, supervisor_name, university_name, degree_type, submission_type,
-  average_rating = 0, rating_count = 0, onRate,
+const PublicationListItem: React.FC<
+  Publication & {
+    expanded: boolean;
+    onToggleExpand: () => void;
+    onRate?: (id: number, rating: number) => Promise<void>;
+  }
+> = ({
+  id, title, year, authors, description, university_name, degree_type,
+  average_rating = 0, rating_count = 0, expanded, onToggleExpand, onRate,
 }) => {
   const router = useRouter();
 
   return (
-    <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 cursor-pointer flex flex-col h-full">
-      {/* Coloured header strip */}
-      <div className="h-10 bg-gradient-to-br from-blue-50 to-indigo-50 relative overflow-hidden">
-        {degree_type && (
-          <div className="absolute top-3 right-3">
+    <div className="flex gap-5 py-6 border-b border-gray-200 last:border-b-0">
+      {/* Thumbnail */}
+      <button
+        onClick={() => router.push(`/books/${id}`)}
+        className="hidden sm:flex flex-shrink-0 w-[110px] h-[140px] bg-white border border-gray-300 rounded-sm shadow-sm items-center justify-center overflow-hidden"
+        aria-label={`Open ${title}`}
+      >
+        <svg className="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.2} d="M9 12h6m-6 4h6m-7 5h8a2 2 0 002-2V7.414a1 1 0 00-.293-.707l-3.414-3.414A1 1 0 0013.586 3H7a2 2 0 00-2 2v13a2 2 0 002 2z" />
+        </svg>
+      </button>
+
+      {/* Content */}
+      <div className="min-w-0 flex-1">
+        
+
+        <h3
+          onClick={() => router.push(`/books/${id}`)}
+          className="text-lg sm:text-xl font-medium text-blue-700 hover:underline cursor-pointer leading-snug mb-1"
+        >
+          {title}
+        </h3>
+
+        <p className="text-sm text-gray-500 mb-2">
+  {university_name && (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        router.push(`/university/${encodeURIComponent(university_name)}`);
+      }}
+      className="font-semibold text-green-700 hover:underline text-left p-0 bg-transparent border-none cursor-pointer block"
+    >
+      <span className="text-gray-500 font-medium">University: </span>
+      {university_name},
+    </button>
+  )}
+  {!university_name && year ? <>({year}) </> : null}
+  {university_name && year ? <span className="text-gray-500"> {year}</span> : null} 
+   {authors}
+</p>
+
+        <p className={`text-sm text-gray-700 leading-relaxed ${expanded ? '' : 'line-clamp-2'}`}>
+          {description || 'No description available.'}
+        </p>
+
+        <div className="mt-2 flex flex-wrap items-center gap-4">
+          <button
+            onClick={onToggleExpand}
+            className="inline-flex items-center gap-1 text-blue-600 hover:underline text-sm font-medium"
+          >
+            <svg
+              className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`}
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+            {expanded ? 'Show less' : 'Show more'}
+          </button>
+
+          {degree_type && (
             <span
-              className={`px-5 py-2 rounded-full text-xs font-bold text-white shadow-lg uppercase tracking-wider ${
+              className={`px-2.5 py-0.5 rounded text-[10px] font-semibold text-white uppercase tracking-wide ${
                 degree_type === 'thesis' ? 'bg-blue-600' : 'bg-purple-600'
               }`}
             >
               {degree_type === 'thesis' ? 'Thesis' : 'FYP'}
             </span>
-          </div>
-        )}
-      </div>
-
-      <div className="p-6 flex flex-col flex-1">
-        <h3 className="text-2xl font-bold text-gray-900 mb-4 line-clamp-2 group-hover:text-blue-700 transition">
-          {title}
-        </h3>
-
-        <div className="space-y-3 text-base flex-1">
-          {university_name && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                router.push(`/university/${encodeURIComponent(university_name)}`);
-              }}
-              className="font-semibold text-green-700 hover:underline text-left p-0 bg-transparent border-none cursor-pointer block"
-            >
-              <span className="text-gray-500 font-medium">University: </span>
-              {university_name}
-            </button>
           )}
 
-          <p className="text-gray-700">
-            <span className="text-gray-500 font-medium">Author: </span>
-            {authors}
-          </p>
-
-          {supervisor_name && (
-            <p className="text-gray-700">
-              <span className="text-gray-500 font-medium">Supervisor: </span>
-              {supervisor_name}
-            </p>
-          )}
-
-          {submission_type && (
-            <p className="text-indigo-700 font-semibold">
-              <span className="text-gray-500 font-medium">Field: </span>
-              {formatFieldName(submission_type)}
-            </p>
-          )}
-          {degree_type && (
-            <p className="font-semibold">
-              <span className="text-gray-500 font-medium">Type: </span>
-              <span className={degree_type === 'thesis' ? 'text-blue-700' : 'text-purple-700'}>
-                {degree_type === 'thesis' ? 'Thesis' : 'FYP'}
-              </span>
-            </p>
-          )}
-          {year && (
-            <p className="text-gray-700 font-semibold">
-              <span className="text-gray-500 font-medium">Academic year: </span>
-              {formatFieldName(year.toString())}
-            </p>
-          )}
-
-          {/* Rating — click stars to submit your own rating */}
-          <div className="pt-1">
-            <StarRating
-              average={average_rating}
-              count={rating_count}
-              interactive={!!onRate}
-              
-            />
-          </div>
-
-          <p className="text-gray-600 line-clamp-3 text-base mt-4 leading-relaxed">
-            {description || 'No description available.'}
-          </p>
-        </div>
-
-        <div className="mt-8">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              router.push(`/books/${id}`);
-            }}
-            className="inline-flex items-center px-6 py-3 bg-gradient-to-br from-blue-50 to-indigo-100 text-black font-bold rounded-full hover:bg-yellow-400 transition-all shadow-md hover:shadow-lg transform hover:scale-105"
-          >
-            Abstract
-            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          <StarRating
+            average={average_rating}
+            count={rating_count}
+            interactive={!!onRate}
+            onRate={onRate ? (rating) => onRate(id, rating) : undefined}
+            size="sm"
+          />
         </div>
       </div>
     </div>
@@ -433,6 +421,14 @@ export default function ThesesPage() {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
 
+  // ── List view controls (results-per-page / sort / pagination / expand) ──
+  const [resultsPerPage, setResultsPerPage] = useState(20);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [showSettings, setShowSettings] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+  const settingsRef = useRef<HTMLDivElement | null>(null);
+
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const MAX_QUICK_RESULTS = 6;
 
@@ -442,6 +438,17 @@ export default function ThesesPage() {
     const storedToken = localStorage.getItem('access_token');
     const user = safeParseUser(storedUserStr);
     setAuthUser(user && storedToken ? user : null);
+  }, []);
+
+  // ── Close the settings dropdown on outside click ──
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+        setShowSettings(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   // ── API URL builder (field/degree only — search is client-side) ──
@@ -490,6 +497,11 @@ export default function ThesesPage() {
   useEffect(() => { fetchPublications(); }, [fetchPublications]);
   useEffect(() => { fetchCounts(); }, [fetchCounts]);
 
+  // Reset to page 1 whenever the underlying result set changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [degreeFilter, selectedField, resultsPerPage, sortOrder]);
+
   // Cleanup debounce on unmount
   useEffect(() => () => {
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
@@ -512,6 +524,30 @@ export default function ThesesPage() {
   const clearSearch = () => {
     setInputValue('');
     setShowSearchResults(false);
+  };
+
+  // ── Sort + paginate the currently-filtered publications for the list view ──
+  const sortedPublications = useMemo(() => {
+    const sorted = [...allPublications].sort((a, b) =>
+      (a.title || '').localeCompare(b.title || '')
+    );
+    return sortOrder === 'desc' ? sorted.reverse() : sorted;
+  }, [allPublications, sortOrder]);
+
+  const totalResults = sortedPublications.length;
+  const totalPages = Math.max(1, Math.ceil(totalResults / resultsPerPage));
+  const pageStartIndex = (currentPage - 1) * resultsPerPage;
+  const pagePublications = sortedPublications.slice(pageStartIndex, pageStartIndex + resultsPerPage);
+  const rangeStart = totalResults === 0 ? 0 : pageStartIndex + 1;
+  const rangeEnd = Math.min(pageStartIndex + resultsPerPage, totalResults);
+
+  const toggleExpand = (id: number) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   // ── Submit a rating for a publication ──
@@ -703,7 +739,7 @@ export default function ThesesPage() {
             })}
           </div>
 
-          {/* Field filters + publications grid (hidden while search dropdown is open) */}
+          {/* Field filters + publications list (hidden while search dropdown is open) */}
           {!showSearchResults && (
             <>
               {/* Field filter buttons */}
@@ -749,7 +785,72 @@ export default function ThesesPage() {
                 })}
               </div>
 
-              {/* Publications grid */}
+              {/* Results toolbar — back link, "Now showing", settings gear */}
+              {!isLoading && allPublications.length > 0 && (
+                <div className="flex items-center justify-between flex-wrap gap-3 mb-2 bg-white rounded-2xl shadow-md px-5 py-4">
+                  <button
+                    onClick={() => { setDegreeFilter('all'); setSelectedField(null); }}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-semibold hover:bg-slate-800 transition"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    All browse results
+                  </button>
+
+                  <p className="text-gray-600 text-sm">
+                    Now showing {rangeStart} - {rangeEnd} of {totalResults}
+                  </p>
+
+                  <div className="relative" ref={settingsRef}>
+                    <button
+                      onClick={() => setShowSettings((v) => !v)}
+                      className="p-2.5 rounded-lg bg-slate-800 text-white hover:bg-slate-900 transition"
+                      aria-label="Result display settings"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </button>
+
+                    {showSettings && (
+                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-200 py-3 z-50">
+                        <p className="px-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                          Results Per Page
+                        </p>
+                        {RESULTS_PER_PAGE_OPTIONS.map((n) => (
+                          <button
+                            key={n}
+                            onClick={() => { setResultsPerPage(n); setShowSettings(false); }}
+                            className="w-full flex items-center gap-2 px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                          >
+                            <span className="w-4">{resultsPerPage === n ? '✓' : ''}</span>
+                            {n}
+                          </button>
+                        ))}
+
+                        <p className="px-4 pt-3 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide border-t border-gray-100 mt-2">
+                          Sort Options
+                        </p>
+                        {(['asc', 'desc'] as const).map((order) => (
+                          <button
+                            key={order}
+                            onClick={() => { setSortOrder(order); setShowSettings(false); }}
+                            className="w-full flex items-center gap-2 px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                          >
+                            <span className="w-4">{sortOrder === order ? '✓' : ''}</span>
+                            {order === 'asc' ? 'Ascending' : 'Descending'}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Publications list */}
               {isLoading ? (
                 <div className="text-center py-32">
                   <div className="inline-block animate-spin rounded-full h-16 w-16 border-8 border-[#FFD700] border-t-transparent" />
@@ -761,10 +862,39 @@ export default function ThesesPage() {
                   <p className="text-gray-500 mt-4">Try adjusting your filters.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
-                  {allPublications.map((pub) => (
-                    <PublicationCard key={pub.id} {...pub}  />
+                <div className="bg-white rounded-2xl shadow-lg px-5 sm:px-8">
+                  {pagePublications.map((pub) => (
+                    <PublicationListItem
+                      key={pub.id}
+                      {...pub}
+                      expanded={expandedIds.has(pub.id)}
+                      onToggleExpand={() => toggleExpand(pub.id)}
+                      onRate={handleRate}
+                    />
                   ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {!isLoading && totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8 flex-wrap">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 rounded-lg bg-white border-2 border-gray-300 text-sm font-semibold text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#FFD700]"
+                  >
+                    Previous
+                  </button>
+                  <span className="px-4 py-2 text-sm text-gray-600">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 rounded-lg bg-white border-2 border-gray-300 text-sm font-semibold text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#FFD700]"
+                  >
+                    Next
+                  </button>
                 </div>
               )}
             </>
