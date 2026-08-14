@@ -100,7 +100,7 @@ const FIELD_KEYWORDS: Record<string, string[]> = {
   'Education':                ['education', 'pedagogy', 'teaching', 'curriculum', 'learning'],
 };
 
-const RESULTS_PER_PAGE_OPTIONS = [1, 5, 10, 20, 40, 60, 80, 100];
+
 
 // ──────────────────────────────────────────────────────
 // Helpers
@@ -351,7 +351,7 @@ const PublicationListItem: React.FC<
       {university_name},
     </button>
   )}
- {!university_name && year ? <>({year}) </> : null}
+ {!university_name && year ? <>{year} </> : null}
 {university_name && year ? <span className="text-gray-500"> {year} </span> : null}
 {authors && <span className="text-gray-500"> · </span>}
 {authors}
