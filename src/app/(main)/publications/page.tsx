@@ -26,6 +26,10 @@ export default function PublicationsPage() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [query, setQuery] = useState<string>('');
 
+  // ── Pagination (10 per page, same style as the Theses page) ──
+  const resultsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+
   useEffect(() => {
     const fetchPubs = async () => {
       try {
@@ -56,6 +60,16 @@ export default function PublicationsPage() {
       );
     });
   }, [query, publications]);
+
+  // Reset to page 1 whenever the filtered result set changes (new search, data reload, etc.)
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [query, publications]);
+
+  const totalResults = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalResults / resultsPerPage));
+  const pageStartIndex = (currentPage - 1) * resultsPerPage;
+  const pagePublications = filtered.slice(pageStartIndex, pageStartIndex + resultsPerPage);
 
   const highlight = (text: string, q: string): ReactNode => {
     if (!q.trim() || !text) return text;
@@ -119,7 +133,7 @@ export default function PublicationsPage() {
             </h2>
             {!loading && (
               <span className="text-sm text-gray-500 bg-white border border-gray-200 rounded-full px-3 py-1">
-                {filtered.length} {query.trim() ? 'found' : 'items'}
+                {totalResults} {query.trim() ? 'found' : 'items'}
               </span>
             )}
           </div>
@@ -150,83 +164,130 @@ export default function PublicationsPage() {
               )}
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
-              {filtered.map((pub) => {
-                const isOpen = openId === pub.id;
-                const authors = Array.isArray(pub.authors) ? pub.authors.join(', ') : pub.authors || 'Unknown';
-                const q = query.trim().toLowerCase();
+            <>
+              <div className="flex flex-col gap-2">
+                {pagePublications.map((pub) => {
+                  const isOpen = openId === pub.id;
+                  const authors = Array.isArray(pub.authors) ? pub.authors.join(', ') : pub.authors || 'Unknown';
+                  const q = query.trim().toLowerCase();
 
-                return (
-                  <div
-                    key={pub.id}
-                    className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden transition-shadow hover:shadow-md"
-                  >
-                    {/* ROW */}
-                    <button
-                      onClick={() => toggle(pub.id)}
-                      className="w-full flex items-start justify-between px-6 py-5 gap-4 text-left hover:bg-gray-50 transition-colors"
+                  return (
+                    <div
+                      key={pub.id}
+                      className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden transition-shadow hover:shadow-md"
                     >
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-black text-base sm:text-lg break-words">
-                          {highlight(pub.title || 'Untitled', q)}
-                        </p>
-                        <p className="text-black text-sm italic mt-1 text-left truncate">
-                          {highlight(authors, q)}
-                        </p>
-                      </div>
-                      <svg
-                        className={`w-5 h-5 text-black flex-shrink-0 mt-1 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                      {/* ROW */}
+                      <button
+                        onClick={() => toggle(pub.id)}
+                        className="w-full flex items-start justify-between px-6 py-5 gap-4 text-left hover:bg-gray-50 transition-colors"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-
-                    {/* EXPANDED DETAIL */}
-                    {isOpen && (
-                      <div className="px-6 pb-6 pt-3 bg-gray-50 border-t border-gray-100 text-base text-gray-600 space-y-3">
-                        {pub.publication_type && (
-                          <span className="inline-block text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-3 py-1 rounded">
-                            {pub.publication_type}
-                          </span>
-                        )}
-                        <p><span className="text-black font-bold">Authors:</span> {highlight(authors, q)}</p>
-                        {(pub.journal_name || pub.publisher) && (
-                          <p>
-                            <span className="text-black font-bold">Journal / Publisher:</span>{' '}
-                            {highlight(pub.journal_name || pub.publisher || '', q)}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-black text-base sm:text-lg break-words">
+                            {highlight(pub.title || 'Untitled', q)}
                           </p>
-                        )}
-                        {pub.doi && (
-                          <p>
-                            <span className="text-black font-bold">DOI:</span>{' '}
+                          <p className="text-black text-sm italic mt-1 text-left truncate">
+                            {highlight(authors, q)}
+                          </p>
+                        </div>
+                        <svg
+                          className={`w-5 h-5 text-black flex-shrink-0 mt-1 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+
+                      {/* EXPANDED DETAIL */}
+                      {isOpen && (
+                        <div className="px-6 pb-6 pt-3 bg-gray-50 border-t border-gray-100 text-base text-gray-600 space-y-3">
+                          {pub.publication_type && (
+                            <span className="inline-block text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-3 py-1 rounded">
+                              {pub.publication_type}
+                            </span>
+                          )}
+                          <p><span className="text-black font-bold">Authors:</span> {highlight(authors, q)}</p>
+                          {(pub.journal_name || pub.publisher) && (
+                            <p>
+                              <span className="text-black font-bold">Journal / Publisher:</span>{' '}
+                              {highlight(pub.journal_name || pub.publisher || '', q)}
+                            </p>
+                          )}
+                          {pub.doi && (
+                            <p>
+                              <span className="text-black font-bold">DOI:</span>{' '}
+                              <a
+                                href={`https://doi.org/${pub.doi}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-mono text-blue-600 hover:underline"
+                              >
+                                {pub.doi}
+                              </a>
+                            </p>
+                          )}
+                          {pub.pdf_path && (
                             <a
-                              href={`https://doi.org/${pub.doi}`}
+                              href={pub.pdf_path}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="font-mono text-blue-600 hover:underline"
+                              className="inline-flex items-center gap-1 text-[#050A14] font-semibold hover:underline mt-2 text-base"
                             >
-                              {pub.doi}
+                              📑 Read PDF
                             </a>
-                          </p>
-                        )} 
-                        {pub.pdf_path && (
-  <a
-    href={pub.pdf_path}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="inline-flex items-center gap-1 text-[#050A14] font-semibold hover:underline mt-2 text-base"
-  >
-    📑 Read PDF
-  </a>
-)}
-                        
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                          )}
+
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Pagination – 10 items per page, same style as the Theses page */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-1.5 mt-8 mb-2">
+                  <button
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    First
+                  </button>
+
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-2.5 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label="Previous"
+                  >
+                    &lt;
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`min-w-[34px] px-2.5 py-1.5 text-sm border rounded ${
+                        currentPage === page
+                          ? 'bg-teal-500 text-white border-teal-500 font-medium'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-2.5 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label="Next"
+                  >
+                    &gt;
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

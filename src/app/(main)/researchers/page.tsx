@@ -24,6 +24,9 @@ export default function ResearchersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+
+
+
   useEffect(() => {
     fetchResearchers();
   }, []);
@@ -46,7 +49,7 @@ export default function ResearchersPage() {
       setLoading(false);
     }
   };
-
+   
   const filtered = researchers.filter(r => {
     const term = searchTerm.toLowerCase();
     return (
@@ -57,6 +60,34 @@ export default function ResearchersPage() {
       (r.Field && r.Field.toLowerCase().includes(term))
     );
   });
+
+  const PersonAvatar: React.FC<{ image?: string; name: string }> = ({ image, name }) => {
+  const [imgError, setImgError] = useState(false);
+  const hasImage = !!image && !imgError;
+
+  return (
+    <div className="w-36 h-44 bg-gray-100 rounded-xl overflow-hidden mb-4 flex items-center justify-center">
+  {image ? (
+    <img
+      src={image}
+      alt={name}
+      className="w-full h-full object-cover"
+      onError={(e) => {
+        e.currentTarget.style.display = 'none';
+        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+      }}
+    />
+  ) : null}
+  <svg
+    className={`w-16 h-16 text-gray-300 ${image ? 'hidden' : ''}`}
+    fill="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.866 0-7 2.239-7 5v2h14v-2c0-2.761-3.134-5-7-5z" />
+  </svg>
+</div>
+  );
+};
 
   if (loading) return <div className="text-center py-20 text-3xl">Loading Researchers...</div>;
   if (error) return <div className="text-center py-20 text-red-600 text-3xl">Error: {error}</div>;
@@ -105,48 +136,39 @@ export default function ResearchersPage() {
                 className="flex flex-col md:flex-row gap-8 border-b border-gray-200 pb-10 last:border-none bg-white rounded-2xl p-6 shadow-sm"
               >
                 {/* Left Column: Image + Button */}
-                <div className="flex flex-col items-center md:items-start w-full md:w-52 flex-shrink-0">
-                  <div className="w-36 h-44 bg-gray-100 rounded-xl overflow-hidden mb-4">
-                    <img 
-                      src={person.image ||  "https://placeholder.co"} 
-                      alt={person.name} 
-                      className="w-full h-full object-cover" 
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://via.placeholder.com/120x150/003087/ffffff?text=No+Image';
-                      }}
-                    />
-                  </div>
-                  
-                  <Link href={`/researchers/${person.id}`} className="w-full md:w-auto">
-                    <button className="w-full md:w-auto bg-red-700 hover:bg-red-800 text-white font-medium px-6 py-3 rounded-xl text-lg transition-colors">
-                      VIEW PROFILE
-                    </button>
-                  </Link>
-                </div>
+               <div className="flex flex-col items-center md:items-start w-full md:w-52 flex-shrink-0">
+  <PersonAvatar image={person.image} name={person.name} />
 
-                {/* Right Column: Text Content */}
-                <div className="flex-1 pt-1">
-                  <h3 className="text-4xl font-semibold text-gray-900 mb-4">{person.name}</h3>
+  <Link href={`/researchers/${person.id}`} className="w-full md:w-auto">
+    <button className="w-full md:w-auto bg-red-700 hover:bg-red-800 text-white font-medium px-6 py-3 rounded-xl text-lg transition-colors">
+      VIEW PROFILE
+    </button>
+  </Link>
+</div>
 
-                  <div className="space-y-2 text-lg">
-                    <div className="text-gray-500">
-                      <span className="font-medium text-gray-700">Qualification:</span> {person.qualification}
-                    </div>
-                    <div className="text-gray-500">
-                      <span className="font-medium text-gray-700">E-Mail ID:</span>{' '}
-                      <a href={`mailto:${person.email}`} className="text-blue-600 hover:underline">{person.email}</a>
-                    </div>
-                    <div className="text-gray-500">
-                      <span className="font-medium text-gray-700">Position:</span> {person.Position}
-                    </div>
-                    <div className="text-gray-500">
-                      <span className="font-medium text-gray-700">Research Area:</span> {person.ResearchArea}
-                    </div>
-                    <div className="text-gray-500">
-                      <span className="font-medium text-gray-700">Field:</span> {person.Field}
-                    </div>
-                  </div>
-                </div>
+{/* Right Column: Text Content */}
+<div className="flex-1 pt-1">
+  <h3 className="text-4xl font-semibold text-gray-900 mb-4">{person.name}</h3>
+
+  <div className="space-y-2 text-lg">
+    <div className="text-gray-500">
+      <span className="font-medium text-gray-700">Qualification:</span> {person.qualification}
+    </div>
+    <div className="text-gray-500">
+      <span className="font-medium text-gray-700">E-Mail ID:</span>{' '}
+      <a href={`mailto:${person.email}`} className="text-blue-600 hover:underline">{person.email}</a>
+    </div>
+    <div className="text-gray-500">
+      <span className="font-medium text-gray-700">Position:</span> {person.Position}
+    </div>
+    <div className="text-gray-500">
+      <span className="font-medium text-gray-700">Research Area:</span> {person.ResearchArea}
+    </div>
+    <div className="text-gray-500">
+      <span className="font-medium text-gray-700">Field:</span> {person.Field}
+    </div>
+  </div>
+</div>
               </div>
             ))
           )}

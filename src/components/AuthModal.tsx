@@ -300,9 +300,9 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
                 <option value="" disabled>Select Account Type</option>
                 <option value="innovator">Innovator</option>
                 <option value="researcher">Researcher</option>
-                <option value="university">University</option>
+                
                 <option value="conf_organizer">Conference Organizer</option>
-                <option value="public_visitor">Public Visitor</option>
+                
               </select>
               {formData.user_category === 'university' && (
   <input

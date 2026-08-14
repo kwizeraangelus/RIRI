@@ -11,6 +11,7 @@ type ResearcherDetail = {
   qualification: string;
   email: string;
   graduation_university: string;
+  graduation_country: string;
   contact: string;
   Position: string;
   ResearchArea: string;
@@ -101,6 +102,10 @@ export default function PublicResearcherProfile() {
               <div>
                 <p className="font-semibold text-gray-700 text-lg">Graduation University</p>
                 <p className="text-gray-600">{researcher.graduation_university}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-700 text-lg">Graduation Country</p>
+                <p className="text-gray-600">{researcher.graduation_country}</p>
               </div>
               <div>
                 <p className="font-semibold text-gray-700 text-lg">Qualification</p>

@@ -251,14 +251,10 @@ const StarRating: React.FC<{
           );
         })}
       </div>
-      {count > 0 ? (
+      {count > 0 && (
         <span className="text-xs text-gray-500">
-          {average.toFixed(1)} ({count})
+          {average.toFixed(1)}
         </span>
-      ) : interactive ? (
-        <span className="text-xs text-gray-400">Rate this</span>
-      ) : (
-        <span className="text-xs text-gray-400">rates</span>
       )}
     </div>
   );
@@ -313,7 +309,7 @@ const PublicationListItem: React.FC<
     onRate?: (id: number, rating: number) => Promise<void>;
   }
 > = ({
-  id, title, year, authors, description, university_name, degree_type,
+  id, title, year, authors, description, supervisor_name, university_name, degree_type,
   average_rating = 0, rating_count = 0, expanded, onToggleExpand, onRate,
 }) => {
   const router = useRouter();
@@ -355,9 +351,17 @@ const PublicationListItem: React.FC<
       {university_name},
     </button>
   )}
-  {!university_name && year ? <>({year}) </> : null}
-  {university_name && year ? <span className="text-gray-500"> {year}</span> : null} 
-   {authors}
+ {!university_name && year ? <>({year}) </> : null}
+{university_name && year ? <span className="text-gray-500"> {year} </span> : null}
+{authors && <span className="text-gray-500"> · </span>}
+{authors}
+{supervisor_name && (
+  <>
+    <span className="text-gray-500">  </span>
+    <span className="text-gray-500">Supervisor: </span>
+    {supervisor_name}
+  </>
+)}
 </p>
 
         <p className={`text-sm text-gray-700 leading-relaxed ${expanded ? '' : 'line-clamp-2'}`}>
@@ -422,7 +426,7 @@ export default function ThesesPage() {
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
 
   // ── List view controls (results-per-page / sort / pagination / expand) ──
-  const [resultsPerPage, setResultsPerPage] = useState(20);
+  const resultsPerPage = 10; // fixed – always 10 theses per page
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [showSettings, setShowSettings] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -533,6 +537,7 @@ export default function ThesesPage() {
     );
     return sortOrder === 'desc' ? sorted.reverse() : sorted;
   }, [allPublications, sortOrder]);
+  
 
   const totalResults = sortedPublications.length;
   const totalPages = Math.max(1, Math.ceil(totalResults / resultsPerPage));
@@ -626,11 +631,9 @@ export default function ThesesPage() {
     <div className="min-h-screen bg-[#E0F2FE] text-gray-900 relative overflow-x-hidden">
 
       {/* Hero */}
-      <section className="relative -mt-28 pt-36 pb-20 text-center">
+      <section className="relative -mt-28 pt-36 pb-6 text-center">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-[#050A14] mb-6">
-            Browse <span className="text-[#FFD700]">Theses</span>
-          </h1>
+
           <p className="text-base sm:text-lg md:text-xl text-gray-700 max-w-2xl mx-auto">
             Explore theses and Final Year Projects (FYP) from Rwandan-based Universities and
             Rwandans who studied in foreign universities
@@ -639,7 +642,7 @@ export default function ThesesPage() {
       </section>
 
       {/* Main content */}
-      <section className="py-10 sm:py-12 px-4 sm:px-6">
+      <section className="pt-2 pb-10 sm:pb-12 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
 
           {/* Search bar */}
@@ -786,117 +789,77 @@ export default function ThesesPage() {
               </div>
 
               {/* Results toolbar — back link, "Now showing", settings gear */}
-              {!isLoading && allPublications.length > 0 && (
-                <div className="flex items-center justify-between flex-wrap gap-3 mb-2 bg-white rounded-2xl shadow-md px-5 py-4">
-                  <button
-                    onClick={() => { setDegreeFilter('all'); setSelectedField(null); }}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-semibold hover:bg-slate-800 transition"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    All browse results
-                  </button>
-
-                  <p className="text-gray-600 text-sm">
-                    Now showing {rangeStart} - {rangeEnd} of {totalResults}
-                  </p>
-
-                  <div className="relative" ref={settingsRef}>
-                    <button
-                      onClick={() => setShowSettings((v) => !v)}
-                      className="p-2.5 rounded-lg bg-slate-800 text-white hover:bg-slate-900 transition"
-                      aria-label="Result display settings"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </button>
-
-                    {showSettings && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-200 py-3 z-50">
-                        <p className="px-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">
-                          Results Per Page
-                        </p>
-                        {RESULTS_PER_PAGE_OPTIONS.map((n) => (
-                          <button
-                            key={n}
-                            onClick={() => { setResultsPerPage(n); setShowSettings(false); }}
-                            className="w-full flex items-center gap-2 px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
-                          >
-                            <span className="w-4">{resultsPerPage === n ? '✓' : ''}</span>
-                            {n}
-                          </button>
-                        ))}
-
-                        <p className="px-4 pt-3 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide border-t border-gray-100 mt-2">
-                          Sort Options
-                        </p>
-                        {(['asc', 'desc'] as const).map((order) => (
-                          <button
-                            key={order}
-                            onClick={() => { setSortOrder(order); setShowSettings(false); }}
-                            className="w-full flex items-center gap-2 px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
-                          >
-                            <span className="w-4">{sortOrder === order ? '✓' : ''}</span>
-                            {order === 'asc' ? 'Ascending' : 'Descending'}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+              
 
               {/* Publications list */}
-              {isLoading ? (
-                <div className="text-center py-32">
-                  <div className="inline-block animate-spin rounded-full h-16 w-16 border-8 border-[#FFD700] border-t-transparent" />
-                  <p className="mt-6 text-xl text-[#050A14] font-medium">Loading publications...</p>
-                </div>
-              ) : allPublications.length === 0 ? (
-                <div className="text-center py-32 bg-white/90 rounded-3xl shadow-2xl">
-                  <p className="text-3xl font-bold text-gray-600">No publications found</p>
-                  <p className="text-gray-500 mt-4">Try adjusting your filters.</p>
-                </div>
-              ) : (
-                <div className="bg-white rounded-2xl shadow-lg px-5 sm:px-8">
-                  {pagePublications.map((pub) => (
-                    <PublicationListItem
-                      key={pub.id}
-                      {...pub}
-                      expanded={expandedIds.has(pub.id)}
-                      onToggleExpand={() => toggleExpand(pub.id)}
-                      onRate={handleRate}
-                    />
-                  ))}
-                </div>
-              )}
+{isLoading ? (
+  <div className="text-center py-32">
+    <div className="inline-block animate-spin rounded-full h-16 w-16 border-8 border-[#FFD700] border-t-transparent" />
+    <p className="mt-6 text-xl text-[#050A14] font-medium">Loading publications...</p>
+  </div>
+) : allPublications.length === 0 ? (
+  <div className="text-center py-32 bg-white/90 rounded-3xl shadow-2xl">
+    <p className="text-3xl font-bold text-gray-600">No publications found</p>
+    <p className="text-gray-500 mt-4">Try adjusting your filters.</p>
+  </div>
+) : (
+  <div className="bg-white rounded-2xl shadow-lg px-5 sm:px-8">
+    {pagePublications.map((pub) => (
+      <PublicationListItem
+        key={pub.id}
+        {...pub}
+        expanded={expandedIds.has(pub.id)}
+        onToggleExpand={() => toggleExpand(pub.id)}
+        onRate={handleRate}
+      />
+    ))}
+  </div>
+)}
 
-              {/* Pagination */}
-              {!isLoading && totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-8 flex-wrap">
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 rounded-lg bg-white border-2 border-gray-300 text-sm font-semibold text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#FFD700]"
-                  >
-                    Previous
-                  </button>
-                  <span className="px-4 py-2 text-sm text-gray-600">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <button
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 rounded-lg bg-white border-2 border-gray-300 text-sm font-semibold text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#FFD700]"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
+              {/* Pagination – below the list, 10 items per page */}
+{!isLoading && totalPages > 1 && (
+  <div className="flex items-center justify-center gap-1.5 mt-8 mb-6">
+    <button
+      onClick={() => setCurrentPage(1)}
+      disabled={currentPage === 1}
+      className="px-3 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      First
+    </button>
+
+    <button
+      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+      disabled={currentPage === 1}
+      className="px-2.5 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+      aria-label="Previous"
+    >
+      &lt;
+    </button>
+
+    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+      <button
+        key={page}
+        onClick={() => setCurrentPage(page)}
+        className={`min-w-[34px] px-2.5 py-1.5 text-sm border rounded ${
+          currentPage === page
+            ? 'bg-teal-500 text-white border-teal-500 font-medium'
+            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+        }`}
+      >
+        {page}
+      </button>
+    ))}
+
+    <button
+      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+      disabled={currentPage === totalPages}
+      className="px-2.5 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+      aria-label="Next"
+    >
+      &gt;
+    </button>
+  </div>
+)}
             </>
           )}
         </div>

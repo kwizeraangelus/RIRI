@@ -2,14 +2,15 @@
 
 import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { UserPlus } from 'lucide-react';
 import { getApiUrl } from '@/utils/api';
 
 export default function ResearcherProfilePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#F7F5EF] flex items-center justify-center">
-          <p className="text-[#6B6F76] text-sm">Loading…</p>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <p className="text-gray-500 text-sm">Loading…</p>
         </div>
       }
     >
@@ -100,7 +101,6 @@ function ResearcherProfileForm() {
       }
 
       setSuccess(true);
-      setTimeout(() => router.push('/'), 1800);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
@@ -109,139 +109,197 @@ function ResearcherProfileForm() {
   };
 
   const inputClass = (name: string) =>
-    `w-full border rounded-[3px] bg-[#F7F5EF] px-3 py-2.5 text-[14.5px] outline-none transition-colors focus:border-[#B8863B] focus:bg-white ${
-      errors[name] ? 'border-[#B3402E]' : 'border-[#C8C3B2]'
+    `w-full px-5 py-4 border rounded-xl focus:ring-4 focus:ring-green-500 text-lg outline-none transition-colors ${
+      errors[name] ? 'border-red-400' : 'border-gray-300'
     }`;
 
-  return (
-    <div className="min-h-screen bg-[#F7F5EF] text-[#1C2B39] px-5 py-14">
-      <div className="max-w-[640px] mx-auto">
-        <div className="mb-10">
-          <p className="font-mono text-xs tracking-[0.14em] uppercase text-[#8A6428] mb-2">
-            RIRI &middot; Researcher directory
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-start justify-center pt-20 px-6">
+        <div className="w-full max-w-md bg-white text-black rounded-2xl shadow-2xl p-8 text-center space-y-4">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+            <UserPlus size={40} className="text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold">Profile saved</h2>
+          <p className="text-gray-600">
+            We just sent a confirmation link to your email. Click it to activate your account,
+            then log in.
           </p>
-          <h1 className="font-serif text-[34px] leading-[1.15] mb-2">Researcher profile</h1>
-          <p className="text-[15px] text-[#6B6F76] max-w-[46ch]">
-            Tell viewers who you are, and your academic and research focus. This appears on
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#E0F2FE] py-14 px-5">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-2xl mx-auto bg-white text-black rounded-2xl shadow-2xl overflow-hidden"
+      >
+        <div className="p-8 border-b">
+          <h1 className="text-3xl font-bold flex items-center gap-3">
+            <UserPlus className="text-green-600" size={32} />
+            Researcher profile
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Tell viewers who you are, your academic and research focus. This appears on
             your public RIRI researcher profile.
           </p>
         </div>
 
-        {success ? (
-          <div className="bg-white border border-[#DEDACD] border-l-[3px] border-l-[#2F5233] rounded p-6">
-            <p className="font-serif text-base text-[#2F5233] mb-1.5">Profile saved</p>
-            <p className="text-sm text-[#6B6F76]">
-              Your researcher profile is ready. Redirecting you now…
-            </p>
+        {apiError && (
+          <div className="mx-8 mt-6 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+            {apiError}
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="bg-white border border-[#DEDACD] rounded-[4px]">
-            <div className="flex items-center gap-5 px-10 py-8 border-b border-[#DEDACD]">
-              <label
-                htmlFor="photoInput"
-                className="w-[84px] h-[84px] rounded-full border-[1.5px] border-dashed border-[#C8C3B2] flex items-center justify-center flex-shrink-0 cursor-pointer overflow-hidden bg-[#F7F5EF]"
-              >
-                {avatarPreview ? (
-                  <img src={avatarPreview} className="w-full h-full object-cover" alt="" />
-                ) : (
-                  <span className="text-[11px] text-[#6B6F76]">Photo</span>
-                )}
-              </label>
-              <input type="file" id="photoInput" accept="image/*" className="hidden" onChange={handlePhotoChange} />
-              <div>
-                <p className="text-sm font-medium">Profile photo</p>
-                <p className="text-xs text-[#6B6F76] mt-0.5">Square image, at least 400&times;400px.</p>
-              </div>
-            </div>
-
-            <div className="px-10 py-7 border-b border-[#DEDACD]">
-              <div className="flex items-baseline gap-3 mb-5">
-                <span className="font-serif text-[13px] text-[#8A6428]">I</span>
-                <span className="font-serif text-[17px]">Affiliation</span>
-              </div>
-              <Field label="Position" name="Position" value={formData.Position} onChange={handleChange} className={inputClass('Position')} placeholder="Senior lecturer, IT-Networking" />
-              <Field label="Affiliation institution" name="institution" value={formData.institution} onChange={handleChange} className={inputClass('institution')} placeholder="University of Lay Adventists of Kigali" />
-              <Field label="Current location" name="location" value={formData.location} onChange={handleChange} className={inputClass('location')} placeholder="Kigali, Rwanda" last />
-            </div>
-
-            <div className="px-10 py-7 border-b border-[#DEDACD]">
-              <div className="flex items-baseline gap-3 mb-5">
-                <span className="font-serif text-[13px] text-[#8A6428]">II</span>
-                <span className="font-serif text-[17px]">Academic credentials</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3.5 mb-4">
-                <Field label="Qualification" name="qualification" value={formData.qualification} onChange={handleChange} className={inputClass('qualification')} placeholder="EngD, Computer Science" bare />
-                <Field label="Graduation university" name="graduation_university" value={formData.graduation_university} onChange={handleChange} className={inputClass('graduation_university')} placeholder="Xi'an University of Technology" bare />
-              </div>
-              <Field label="Country" name="graduation_country" value={formData.graduation_country} onChange={handleChange} className={inputClass('graduation_country')} placeholder="China" last />
-            </div>
-
-            <div className="px-10 py-7 border-b border-[#DEDACD]">
-              <div className="flex items-baseline gap-3 mb-5">
-                <span className="font-serif text-[13px] text-[#8A6428]">III</span>
-                <span className="font-serif text-[17px]">Research focus</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3.5">
-                <Field label="Research field" name="Field" value={formData.Field} onChange={handleChange} className={inputClass('Field')} placeholder="Computer Science" bare last />
-                <Field label="Research area" name="ResearchArea" value={formData.ResearchArea} onChange={handleChange} className={inputClass('ResearchArea')} placeholder="Network security, privacy-preserving AI" bare last />
-              </div>
-            </div>
-
-            <div className="px-10 py-7 border-b border-[#DEDACD]">
-              <div className="flex items-baseline gap-3 mb-5">
-                <span className="font-serif text-[13px] text-[#8A6428]">IV</span>
-                <span className="font-serif text-[17px]">Academic identity</span>
-              </div>
-              <div>
-                <label className="block text-[12.5px] font-medium text-[#6B6F76] mb-1.5">
-                  Platform ID <span className="italic font-normal">(optional)</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.orcid}
-                  onChange={(e) => handleChange('orcid', e.target.value)}
-                  placeholder="e.g. ORCID | ResearchID | SciProfiles | Etc"
-                  className={`${inputClass('orcid')} font-mono text-[13.5px]`}
-                />
-              </div>
-            </div>
-
-            <div className="px-10 py-7 border-b border-[#DEDACD]">
-              <div className="flex items-baseline gap-3 mb-5">
-                <span className="font-serif text-[13px] text-[#8A6428]">V</span>
-                <span className="font-serif text-[17px]">About</span>
-              </div>
-              <div>
-                <label className="block text-[12.5px] font-medium text-[#6B6F76] mb-1.5">Bio</label>
-                <textarea
-                  value={formData.bio}
-                  onChange={(e) => handleChange('bio', e.target.value)}
-                  maxLength={600}
-                  placeholder="Summarize your research focus, key projects, and what you're looking to collaborate on."
-                  className={`${inputClass('bio')} min-h-[96px] resize-y leading-[1.55]`}
-                />
-                <span className="block text-right text-[11.5px] text-[#6B6F76] font-mono mt-1">
-                  {formData.bio.length}/600
-                </span>
-              </div>
-            </div>
-
-            <div className="px-10 py-6 flex items-center justify-between gap-4">
-              <p className="text-[12.5px] text-[#6B6F76] max-w-[30ch]">
-                Fields marked optional can be left blank. Everything else is required for your listing.
-              </p>
-              {apiError && <p className="text-sm text-[#B3402E]">{apiError}</p>}
-              <button
-                type="submit"
-                disabled={loading}
-                className="bg-[#1C2B39] text-white text-[14.5px] font-medium rounded-[3px] px-6 py-3 hover:opacity-90 transition-opacity flex-shrink-0 disabled:opacity-60"
-              >
-                {loading ? 'Saving…' : 'Save profile'}
-              </button>
-            </div>
-          </form>
         )}
-      </div>
+
+        <div className="p-8 space-y-8">
+          <div className="flex items-center gap-5">
+            <label
+              htmlFor="photoInput"
+              className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center flex-shrink-0 cursor-pointer overflow-hidden bg-gray-50 hover:border-green-500 transition-colors"
+            >
+              {avatarPreview ? (
+                <img src={avatarPreview} className="w-full h-full object-cover" alt="" />
+              ) : (
+                <span className="text-xs text-gray-500">Photo</span>
+              )}
+            </label>
+            <input
+              type="file"
+              id="photoInput"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoChange}
+            />
+            <div>
+              <p className="text-lg font-semibold">Profile photo</p>
+              <p className="text-sm text-gray-500 mt-0.5">Square image, at least 400&times;400px.</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-lg font-bold text-green-700">Affiliation</h2>
+            <Field
+              label="Position"
+              name="Position"
+              value={formData.Position}
+              onChange={handleChange}
+              className={inputClass('Position')}
+              placeholder="Senior lecturer"
+            />
+            <Field
+              label="Affiliation institution"
+              name="institution"
+              value={formData.institution}
+              onChange={handleChange}
+              className={inputClass('institution')}
+              placeholder="Institution name"
+            />
+            <Field
+              label="Current location"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              className={inputClass('location')}
+              placeholder="Kigali, Rwanda"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-lg font-bold text-green-700">Academic credentials</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field
+                label="Qualification"
+                name="qualification"
+                value={formData.qualification}
+                onChange={handleChange}
+                className={inputClass('qualification')}
+                placeholder="EngD, Computer Science"
+              />
+              <Field
+                label="Graduation university"
+                name="graduation_university"
+                value={formData.graduation_university}
+                onChange={handleChange}
+                className={inputClass('graduation_university')}
+                placeholder="Xi'an University of Technology"
+              />
+            </div>
+            <Field
+              label="Country"
+              name="graduation_country"
+              value={formData.graduation_country}
+              onChange={handleChange}
+              className={inputClass('graduation_country')}
+              placeholder="China"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-lg font-bold text-green-700">Research focus</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field
+                label="Research field"
+                name="Field"
+                value={formData.Field}
+                onChange={handleChange}
+                className={inputClass('Field')}
+                placeholder="Computer Science"
+              />
+              <Field
+                label="Research area"
+                name="ResearchArea"
+                value={formData.ResearchArea}
+                onChange={handleChange}
+                className={inputClass('ResearchArea')}
+                placeholder="Network security, privacy-preserving AI"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-lg font-bold text-green-700">Academic identity</h2>
+            <label className="block text-sm font-medium text-gray-600">
+              Platform ID <span className="italic font-normal">(optional)</span>
+            </label>
+            <input
+              type="text"
+              value={formData.orcid}
+              onChange={(e) => handleChange('orcid', e.target.value)}
+              placeholder="e.g. ORCID | ResearchID | SciProfiles | Etc"
+              className={inputClass('orcid')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-lg font-bold text-green-700">About</h2>
+            <label className="block text-sm font-medium text-gray-600">Bio</label>
+            <textarea
+              value={formData.bio}
+              onChange={(e) => handleChange('bio', e.target.value)}
+              maxLength={600}
+              placeholder="Summarize your research focus, key projects, and what you're looking to collaborate on."
+              className={`${inputClass('bio')} min-h-[110px] resize-y leading-relaxed`}
+            />
+            <span className="block text-right text-xs text-gray-500 font-mono">
+              {formData.bio.length}/600
+            </span>
+          </div>
+
+          <p className="text-sm text-gray-500">
+            Fields marked optional can be left blank. Everything else is required for your listing.
+          </p>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-4 font-bold text-lg rounded-xl transition-all bg-gradient-to-r from-green-500 to-emerald-600 text-white disabled:opacity-60"
+          >
+            {loading ? 'Saving…' : 'Save profile'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
@@ -253,8 +311,6 @@ function Field({
   onChange,
   className,
   placeholder,
-  bare,
-  last,
 }: {
   label: string;
   name: string;
@@ -262,12 +318,10 @@ function Field({
   onChange: (name: string, value: string) => void;
   className: string;
   placeholder: string;
-  bare?: boolean;
-  last?: boolean;
 }) {
   return (
-    <div className={bare ? '' : `${last ? '' : 'mb-4'}`}>
-      <label className="block text-[12.5px] font-medium text-[#6B6F76] mb-1.5">{label}</label>
+    <div>
+      <label className="block text-sm font-medium text-gray-600 mb-1.5">{label}</label>
       <input
         type="text"
         value={value}

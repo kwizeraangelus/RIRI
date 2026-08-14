@@ -93,6 +93,7 @@ const [removePdf, setRemovePdf] = useState(false);
   const [qualification, setQualification] = useState('');
   const [institution, setInstitution] = useState('');
   const [graduation_university, setgraduation_university] = useState('');
+  const [graduation_country, setgraduation_country] = useState('');
   const [Field, setField]             = useState('');
   const [location, setlocation] = useState('');
   const [Position, setPosition]       = useState('');
@@ -613,6 +614,7 @@ const handleQuickPhotoSave = async () => {
     setQualification(user?.qualification || '');
     setResearchArea(user?.ResearchArea || '');
     setgraduation_university(user?.graduation_university || '');
+    setgraduation_country(user?.graduation_country || '');
     setRemoveProfileImage(false);
     setIsEditing(true);
   };
@@ -624,6 +626,7 @@ const handleQuickPhotoSave = async () => {
     formData.append('qualification', qualification || '');
     formData.append('institution', institution || '');
     formData.append('graduation_university', graduation_university || ''),
+    formData.append('graduation_country', graduation_country || '');
     formData.append('Field', Field || '');
     formData.append('Position', Position || '');
     formData.append('location', location || '');
@@ -853,7 +856,7 @@ const handleQuickPhotoSave = async () => {
                       {user?.institution      && <div><span className="text-slate-500">Affiliation Institution: </span><span className="font-medium text-slate-700">{user.institution}</span></div>}
                       {user?.ResearchArea  && <div><span className="text-slate-500">Research Area: </span><span className="font-medium text-slate-700">{user.ResearchArea}</span></div>}
                        {user?.graduation_university  && <div><span className="text-slate-500">Graduation University: </span><span className="font-medium text-slate-700">{user.graduation_university}</span></div>}
-                                            
+                       {user?.graduation_country  && <div><span className="text-slate-500">Graduation Country: </span><span className="font-medium text-slate-700">{user.graduation_country}</span></div>}
                       {user?.location  && <div><span className="text-slate-500">Location: </span><span className="font-medium text-slate-700">{user.location}</span></div>}
                     </div>
                   )}
@@ -877,6 +880,7 @@ const handleQuickPhotoSave = async () => {
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Research Area" value={ResearchArea} onChange={e => setResearchArea(e.target.value)} />
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Field" value={Field} onChange={e => setField(e.target.value)} />
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Graduation University" value={graduation_university} onChange={e => setgraduation_university(e.target.value)} />
+                  <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Graduation Country" value={graduation_country} onChange={e => setgraduation_country(e.target.value)} />
                   <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="Current Location" value={location} onChange={e => setlocation(e.target.value)} />
                    <input type="text" className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none text-sm" placeholder="ORCID / Platform ID (optional)" value={platformId} onChange={e => setPlatformId(e.target.value)} />
                    <textarea className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none resize-none text-sm" placeholder="Bio…" value={bio} onChange={e => setBio(e.target.value)} rows={3} />
