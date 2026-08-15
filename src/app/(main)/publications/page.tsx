@@ -85,7 +85,7 @@ export default function PublicationsPage() {
     <div className="min-h-screen bg-[#E0F2FE] text-gray-900">
 
       {/* HERO */}
-      <section className="relative pt-20 pb-20 text-center">
+      <section className="relative pt-20 pb-2 text-center">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-[#050A14] mb-6">
             Explore Research <span className="text-[#FFD700]">Library</span>
@@ -133,7 +133,7 @@ export default function PublicationsPage() {
             </h2>
             {!loading && (
               <span className="text-sm text-gray-500 bg-white border border-gray-200 rounded-full px-3 py-1">
-                {totalResults} {query.trim() ? 'found' : 'items'}
+                {totalResults} {query.trim() ? 'found' : 'publications'}
               </span>
             )}
           </div>
