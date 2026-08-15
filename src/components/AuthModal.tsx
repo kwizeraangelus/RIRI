@@ -410,7 +410,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
                 onClick={() => onClose('signup')}
                 className="text-[#FFD700] font-semibold hover:underline"
               >
-                Sign up
+                Next
               </button>
             </p>
           )}
