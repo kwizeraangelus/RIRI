@@ -399,7 +399,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
               <span className="flex items-center justify-center gap-2">
                 <Loader2 className="animate-spin" /> Processing...
               </span>
-            ) : isLogin ? 'Log In' : 'Create Account'}
+            ) : isLogin ? 'Log In' : 'Next'}
           </button>
 
           {isLogin && (
@@ -410,7 +410,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
                 onClick={() => onClose('signup')}
                 className="text-[#FFD700] font-semibold hover:underline"
               >
-                Next
+                Sign up
               </button>
             </p>
           )}
