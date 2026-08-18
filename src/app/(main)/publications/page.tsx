@@ -85,13 +85,10 @@ export default function PublicationsPage() {
     <div className="min-h-screen bg-[#E0F2FE] text-gray-900">
 
       {/* HERO */}
-      <section className="relative pt-20 pb-2 text-center">
+      <section className="relative pt-20 pb-1 text-center">
         <div className="max-w-4xl mx-auto px-6">
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-[#050A14] mb-6">
-            Explore Research <span className="text-[#FFD700]">Library</span>
-          </h1>
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto mb-10">
-            Explore the latest journals, books, and innovations from Rwanda&apos;s leading researchers.
+                 <p className="tex-lg sm:text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto mb-10">
+            Explore research articles, conference papers from Rwanda&apos;s leading researchers which are published in various journals.
           </p>
 
           {/* SEARCH BAR */}
@@ -128,14 +125,9 @@ export default function PublicationsPage() {
         <div className="max-w-4xl mx-auto">
 
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-[#050A14]">
-              {query.trim() ? `Results for "${query.trim()}"` : 'Research Library'}
-            </h2>
-            {!loading && (
-              <span className="text-sm text-gray-500 bg-white border border-gray-200 rounded-full px-3 py-1">
+            <span className="text-sm text-gray-500 bg-white border border-gray-200 rounded-full px-3 py-1">
                 {totalResults} {query.trim() ? 'found' : 'publications'}
               </span>
-            )}
           </div>
 
           {loading ? (

@@ -452,12 +452,10 @@ export default function UniversityDashboard() {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full shadow-lg"></div>
+           
             <h1 className="text-2xl font-bold text-gray-800">University Portal</h1>
           </div>
-          <div className="bg-blue-50 text-blue-700 px-5 py-2 rounded-full font-medium">
-            {user?.user?.username}
-          </div>
+
         </div>
       </header>
 
@@ -475,7 +473,7 @@ export default function UniversityDashboard() {
                   : 'bg-white text-gray-800 border-2 border-blue-200 hover:border-blue-600'
               }`}
             >
-              🎓 Research
+              🎓 Theses/FYP
             </button>
             <button
               onClick={() => setActiveTab('events')}
@@ -495,7 +493,7 @@ export default function UniversityDashboard() {
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8">
                 <h3 className="text-xl font-bold text-amber-900 mb-3">Important Guidelines</h3>
                 <p className="text-amber-800 leading-relaxed">
-                  Submit original work only. Include Abstract, Introduction, Methodology, Results, Conclusion & References. Review within 48 hours.
+                  Submit original work only. Include Abstract, Introduction, Methodology, Results, Conclusion & References.
                 </p>
               </div>
 
@@ -506,12 +504,12 @@ export default function UniversityDashboard() {
                 }}
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xl py-6 rounded-2xl shadow-xl transition transform hover:scale-105 flex items-center justify-center gap-3"
               >
-                <span className="text-3xl">🎓</span> {showUploadForm ? 'Cancel Upload' : 'Upload New Research'}
+                <span className="text-3xl">🎓</span> {showUploadForm ? 'Cancel Upload' : 'Upload New Theses/FYP'}
               </button>
 
               {showUploadForm && (
                 <div className="bg-white rounded-2xl shadow-2xl border-2 border-blue-100 p-8">
-                  <h3 className="text-2xl font-bold text-gray-800 text-center mb-10">Submit Your Research</h3>
+                  <h3 className="text-2xl font-bold text-gray-800 text-center mb-10">Add New Thesis/FYP</h3>
 
                   {!degreeType && (
                     <div className="text-center mb-12">
@@ -520,7 +518,7 @@ export default function UniversityDashboard() {
                         <button onClick={() => setDegreeType('thesis')} className="py-8 bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold text-2xl rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition">
                           Thesis
                         </button>
-                        <button onClick={() => setDegreeType('dissertation')} className="py-8 bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-2xl rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition">
+                        <button onClick={() => setDegreeType('FYP')} className="py-8 bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold text-2xl rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition">
                           FYP
                         </button>
                       </div>
@@ -542,7 +540,7 @@ export default function UniversityDashboard() {
                         ))}
                         <button
                           onClick={() => handleFieldChange('other')}
-                          className="py-6 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 hover:border-gray-500 font-bold rounded-xl transition hover:scale-105"
+                          className="py-6 bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 hover:border-blue-500 text-blue-800 font-bold rounded-xl transition hover:scale-105"
                         >
                           Other
                         </button>
@@ -569,14 +567,12 @@ export default function UniversityDashboard() {
                           {degreeType.charAt(0).toUpperCase() + degreeType.slice(1)} -{' '}
                           {selectedField === 'other' ? formData.other_field : selectedField.replace(/_/g, ' ')}
                         </p>
-                      </div>
-
-                      <input name="university_name" placeholder="University Name " onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                      </div>                     
                       <input name="title" placeholder="Title " onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
-                      <input name="authors" placeholder="Authors " onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
-                      <input name="supervisor_name" placeholder="Supervisor Name *" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl bg-blue-50 text-gray-900" />
-                      <input name="year" type="number" placeholder="Year " onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
-                      <textarea name="description" placeholder="Brief description / Abstract " rows={4} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none text-gray-900" />
+                      <input name="authors" placeholder="Author(s). Separate authors with semicolon (;) " onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                      <input name="supervisor_name" placeholder="Supervisor Name" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                      <input name="year" type="number" placeholder="Year example: 2026" onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl text-gray-900" />
+                      <textarea name="description" placeholder="Abstract " rows={4} onChange={handleInputChange} required className="w-full p-4 border border-gray-300 rounded-xl resize-none text-gray-900" />
                        <label className="block text-sm font-semibold text-slate-700 mb-2"> <span className="text-gray-500">limit size 16 MB</span></label>                      
                       <input type="file" name="file" accept=".pdf,.doc,.docx" onChange={handleInputChange} required className="w-full p-4 border-2 border-dashed border-blue-300 rounded-xl bg-blue-300 file:bg-blue-600 file:text-white file:py-3 file:px-8 file:rounded-lg" />
                        
@@ -793,7 +789,7 @@ export default function UniversityDashboard() {
           </div>
 
           <div className="space-y-4 text-gray-700">
-            <div><strong>Name:</strong> {user?.username}</div>
+            <div><strong>University:</strong> {user?.username}</div>
             <div><strong>Email:</strong> {user?.email}</div>
             {user?.age && <div><strong>Age:</strong> {user.age}</div>}
             {user?.phone_number && <div><strong>Phone:</strong> {user.phone_number}</div>}

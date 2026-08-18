@@ -338,30 +338,29 @@ const PublicationListItem: React.FC<
           {title}
         </h3>
 
-        <p className="text-sm text-gray-500 mb-2">
+       <p className="text-sm text-gray-500 mb-2">
   {university_name && (
     <button
       onClick={(e) => {
         e.stopPropagation();
         router.push(`/university/${encodeURIComponent(university_name)}`);
       }}
-      className="font-semibold text-green-700 hover:underline text-left p-0 bg-transparent border-none cursor-pointer block"
+      className="font-semibold text-green-700 hover:underline text-left p-0 bg-transparent border-none cursor-pointer inline"
     >
-      <span className="text-gray-500 font-medium">University: </span>
+      <span className="text-gray-500 font-medium"></span>
       {university_name},
     </button>
   )}
- {!university_name && year ? <>{year} </> : null}
-{university_name && year ? <span className="text-gray-500"> {year} </span> : null}
-{authors && <span className="text-gray-500"> · </span>}
-{authors}
-{supervisor_name && (
-  <>
-    <span className="text-gray-500">  </span>
-    <span className="text-gray-500">Supervisor: </span>
-    {supervisor_name}
-  </>
-)}
+  {!university_name && year ? <>{year} </> : null}
+  {university_name && year ? <span className="text-gray-500"> ({year})</span> : null}
+  {authors && <span className="text-gray-700"> . </span>}
+  {authors && <span className="text-black">{authors}</span>}. 
+  {supervisor_name && (
+    <>
+      <span className="text-gray-500 italic"> </span>
+      {supervisor_name}
+    </>
+  )}
 </p>
 
         <p className={`text-sm text-gray-700 leading-relaxed ${expanded ? '' : 'line-clamp-2'}`}>

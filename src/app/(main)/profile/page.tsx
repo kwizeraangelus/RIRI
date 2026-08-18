@@ -371,7 +371,7 @@ export default function ProfilePage() {
 
   const tabs = [
     { key: 'info'      as const, label: 'Personal Info', icon: <User size={14} /> },
-    ...(showAcademic   ? [{ key: 'academic'   as const, label: 'Academic',   icon: <BookOpen size={14} /> }] : []),
+    
     ...(showResearcher ? [{ key: 'researcher' as const, label: 'Researcher details', icon: <Award size={14} /> }] : []),
     { key: 'password'  as const, label: 'Password',      icon: <Lock size={14} /> },
   ];
@@ -435,12 +435,10 @@ export default function ProfilePage() {
             </div>
 
             {/* Name + badges */}
-            <div style={{ flex: 1, minWidth: 200 }}>
+            <div style={{ flex : 1, minWidth: 200 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
                 <h1 style={{ fontSize: 26, fontWeight: 700, margin: 0 }}>{fullName}</h1>
-                <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', padding: '4px 12px', borderRadius: 20, background: `${catColor}22`, border: `1px solid ${catColor}44`, color: catColor }}>
-                  {CATEGORY_LABEL[profile.user_category] || profile.user_category}
-                </span>
+               
                 {profile.is_staff && (
                   <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', padding: '4px 12px', borderRadius: 20, background: 'rgba(255,215,0,.15)', border: '1px solid rgba(255,215,0,.3)', color: '#FFD700' }}>Staff</span>
                 )}
@@ -496,17 +494,6 @@ export default function ProfilePage() {
               <Field label="Current location"    name="location"     value={f.location}      editing={editing} onChange={handleFieldChange} icon={<MapPin size={11}/>} placeholder="Kigali, Rwanda" />
               <Field label="Phone"       name="phone_number" value={f.phone_number}  editing={editing} onChange={handleFieldChange} icon={<Phone size={11}/>} type="tel" placeholder="+250 7XX XXX XXX" />
 
-              <div style={{ marginTop: 8, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,.07)' }}>
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,.32)', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 10 }}>Account</p>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12, padding: '3px 11px', borderRadius: 16, background: profile.is_active !== false ? 'rgba(16,185,129,.15)' : 'rgba(239,68,68,.15)', border: `1px solid ${profile.is_active !== false ? 'rgba(16,185,129,.3)' : 'rgba(239,68,68,.3)'}`, color: profile.is_active !== false ? '#10B981' : '#EF4444', fontWeight: 600 }}>
-                    {profile.is_active !== false ? 'Active' : 'Inactive'}
-                  </span>
-                  <span style={{ fontSize: 12, padding: '3px 11px', borderRadius: 16, background: `${catColor}18`, border: `1px solid ${catColor}33`, color: catColor, fontWeight: 600 }}>
-                    {CATEGORY_LABEL[profile.user_category] || profile.user_category}
-                  </span>
-                </div>
-              </div>
             </Card>
           </div>
         )}

@@ -186,7 +186,7 @@ function ResearcherProfileForm() {
               value={formData.Position}
               onChange={handleChange}
               className={inputClass('Position')}
-              placeholder="Senior lecturer"
+              placeholder="e.g. Senior lecturer"
             />
             <Field
               label="Affiliation institution"
@@ -194,7 +194,7 @@ function ResearcherProfileForm() {
               value={formData.institution}
               onChange={handleChange}
               className={inputClass('institution')}
-              placeholder="Institution name"
+              placeholder="e.g. Institution name"
             />
             <Field
               label="Current location"
@@ -202,7 +202,7 @@ function ResearcherProfileForm() {
               value={formData.location}
               onChange={handleChange}
               className={inputClass('location')}
-              placeholder="Kigali, Rwanda"
+              placeholder="e.g. Kigali, Rwanda"
             />
           </div>
 
@@ -215,7 +215,7 @@ function ResearcherProfileForm() {
                 value={formData.qualification}
                 onChange={handleChange}
                 className={inputClass('qualification')}
-                placeholder="EngD, Computer Science"
+                placeholder="e.g. EngD, PhD"
               />
               <Field
                 label="Graduation university"
@@ -223,7 +223,7 @@ function ResearcherProfileForm() {
                 value={formData.graduation_university}
                 onChange={handleChange}
                 className={inputClass('graduation_university')}
-                placeholder="Xi'an University of Technology"
+                placeholder="e.g. University of Rwanda"
               />
             </div>
             <Field
@@ -232,7 +232,7 @@ function ResearcherProfileForm() {
               value={formData.graduation_country}
               onChange={handleChange}
               className={inputClass('graduation_country')}
-              placeholder="China"
+              placeholder="e.g. Rwanda"
             />
           </div>
 
@@ -245,7 +245,7 @@ function ResearcherProfileForm() {
                 value={formData.Field}
                 onChange={handleChange}
                 className={inputClass('Field')}
-                placeholder="Computer Science"
+                placeholder=""
               />
               <Field
                 label="Research area"
@@ -253,7 +253,7 @@ function ResearcherProfileForm() {
                 value={formData.ResearchArea}
                 onChange={handleChange}
                 className={inputClass('ResearchArea')}
-                placeholder="Network security, privacy-preserving AI"
+                placeholder=""
               />
             </div>
           </div>
@@ -274,7 +274,7 @@ function ResearcherProfileForm() {
 
           <div className="space-y-2">
             <h2 className="text-lg font-bold text-green-700">About</h2>
-            <label className="block text-sm font-medium text-gray-600">Bio</label>
+            <label className="block text-sm font-medium text-gray-600">Bio<span className="italic font-normal">(optional)</span></label>
             <textarea
               value={formData.bio}
               onChange={(e) => handleChange('bio', e.target.value)}

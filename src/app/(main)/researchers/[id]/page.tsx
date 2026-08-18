@@ -104,7 +104,7 @@ export default function PublicResearcherProfile() {
                 <p className="text-gray-600">{researcher.graduation_university}</p>
               </div>
               <div>
-                <p className="font-semibold text-gray-700 text-lg">Graduation Country</p>
+                <p className="font-semibold text-gray-700 text-lg">Country</p>
                 <p className="text-gray-600">{researcher.graduation_country}</p>
               </div>
               <div>

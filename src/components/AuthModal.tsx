@@ -321,7 +321,7 @@ export default function AuthModal({ type, onClose, onAuthSuccess }: AuthModalPro
           {isLogin && (
             <input
               type="text"
-              placeholder="Username or Email"
+              placeholder="Email"
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               required
