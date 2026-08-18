@@ -405,6 +405,144 @@ const PublicationListItem: React.FC<
 };
 
 // ──────────────────────────────────────────────────────
+// FieldMultiSelect — single "select" input that opens a checkbox dropdown
+// letting the user pick one or more CORE_FIELDS at once
+// ──────────────────────────────────────────────────────
+const FieldMultiSelect: React.FC<{
+  selected: string[];
+  counts: Counts;
+  onToggle: (field: string) => void;
+  onClear: () => void;
+}> = ({ selected, counts, onToggle, onClear }) => {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const label =
+    selected.length === 0
+      ? 'select field(s)'
+      : selected.length === 1
+      ? selected[0]
+      : `${selected.length} fields selected`;
+
+  return (
+    <div className="relative flex flex-col items-center" ref={containerRef}>
+      {/* "Select" trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className={`flex items-center justify-between gap-2 px-5 py-2.5 rounded-full bg-white shadow-md text-sm font-bold transition-all whitespace-nowrap ${
+          selected.length > 0
+            ? 'border-2 border-[#050A14] text-[#050A14]'
+            : 'border-2 border-gray-300 text-gray-600 hover:border-[#FFD700]'
+        }`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className="truncate max-w-[10rem] sm:max-w-[14rem]">{label}</span>
+        <svg
+          className={`w-4 h-4 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Dropdown with checkboxes — laid out 2 per row */}
+      {open && (
+        <div className="absolute top-full right-0 mt-2 w-[min(24rem,90vw)] bg-white rounded-2xl shadow-2xl border border-gray-200 z-30 overflow-hidden">
+          <div
+            className="max-h-72 overflow-y-auto p-3 grid grid-cols-2 gap-2"
+            role="listbox"
+            aria-multiselectable="true"
+          >
+            {CORE_FIELDS.map((field) => {
+              const key = FIELD_TO_KEY[field];
+              const count = counts[key] ?? 0;
+              const isChecked = selected.includes(field);
+              const isEmpty = count === 0;
+
+              return (
+                <label
+                  key={field}
+                  className={`flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg border ${
+                    isEmpty
+                      ? 'opacity-50 cursor-not-allowed border-gray-100'
+                      : isChecked
+                      ? 'border-[#050A14] bg-gray-50 cursor-pointer'
+                      : 'border-gray-100 hover:bg-gray-50 cursor-pointer'
+                  }`}
+                >
+                  <span className="flex items-center gap-2 min-w-0">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      disabled={isEmpty}
+                      onChange={() => onToggle(field)}
+                      className="w-4 h-4 flex-shrink-0 accent-[#050A14] rounded"
+                    />
+                    <span className="text-xs font-medium text-gray-800 leading-tight">{field}</span>
+                  </span>
+                  <span className="text-[10px] text-gray-400 flex-shrink-0">{count}</span>
+                </label>
+              );
+            })}
+          </div>
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
+            <button
+              type="button"
+              onClick={onClear}
+              disabled={selected.length === 0}
+              className="text-xs font-medium text-gray-500 hover:text-red-500 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Clear all
+            </button>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="text-xs font-semibold text-blue-600 hover:underline"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Selected fields as removable chips */}
+      {selected.length > 0 && (
+        <div className="flex flex-wrap justify-center gap-2 mt-3 max-w-md">
+          {selected.map((field) => (
+            <span
+              key={field}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#050A14] text-[#FFD700] text-xs font-medium"
+            >
+              {field}
+              <button
+                type="button"
+                onClick={() => onToggle(field)}
+                aria-label={`Remove ${field}`}
+                className="hover:text-white leading-none"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ──────────────────────────────────────────────────────
 // ThesesPage — main page component
 // ──────────────────────────────────────────────────────
 export default function ThesesPage() {
@@ -420,7 +558,8 @@ export default function ThesesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [degreeFilter, setDegreeFilter] = useState<'all' | 'thesis' | 'dissertation'>('all');
-  const [selectedField, setSelectedField] = useState<string | null>(null);
+  // Multiple fields can now be selected at once (was: selectedField: string | null)
+  const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
 
@@ -458,12 +597,14 @@ export default function ThesesPage() {
   const buildApiUrl = useCallback((): string => {
     const params = new URLSearchParams();
     if (degreeFilter !== 'all') params.append('degree_type', degreeFilter);
-    if (selectedField && FIELD_KEYWORDS[selectedField]) {
-      params.append('field_keywords', FIELD_KEYWORDS[selectedField].join(','));
+    if (selectedFields.length > 0) {
+      // Merge keywords from every selected field into one list
+      const keywords = selectedFields.flatMap((field) => FIELD_KEYWORDS[field] || []);
+      if (keywords.length > 0) params.append('field_keywords', keywords.join(','));
     }
     const base = getApiUrl('/api/innovations/public-list/');
     return params.toString() ? `${base}?${params.toString()}` : base;
-  }, [degreeFilter, selectedField]);
+  }, [degreeFilter, selectedFields]);
 
   // ── Fetch publications ──
   const fetchPublications = useCallback(async () => {
@@ -503,7 +644,7 @@ export default function ThesesPage() {
   // Reset to page 1 whenever the underlying result set changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [degreeFilter, selectedField, resultsPerPage, sortOrder]);
+  }, [degreeFilter, selectedFields, resultsPerPage, sortOrder]);
 
   // Cleanup debounce on unmount
   useEffect(() => () => {
@@ -528,6 +669,15 @@ export default function ThesesPage() {
     setInputValue('');
     setShowSearchResults(false);
   };
+
+  // ── Toggle / clear the multi-select field filter ──
+  const toggleField = useCallback((field: string) => {
+    setSelectedFields((prev) =>
+      prev.includes(field) ? prev.filter((f) => f !== field) : [...prev, field]
+    );
+  }, []);
+
+  const clearFields = useCallback(() => setSelectedFields([]), []);
 
   // ── Sort + paginate the currently-filtered publications for the list view ──
   const sortedPublications = useMemo(() => {
@@ -722,71 +872,41 @@ export default function ThesesPage() {
             )}
           </div>
 
-          {/* Degree filter pills — All / Theses / FYP */}
-          <div className="flex justify-center gap-3 sm:gap-4 mb-12 flex-wrap">
-            {DEGREE_TABS.map((tab) => {
-              const isActive = degreeFilter === tab.key;
-              const styles = degreeTabStyles[tab.key];
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => setDegreeFilter(tab.key)}
-                  className={`px-6 sm:px-7 py-2.5 rounded-full font-bold text-sm sm:text-base transition-all ${
-                    isActive ? styles.active : styles.inactive
-                  }`}
-                >
-                  {tab.label} ({tab.count})
-                </button>
-              );
-            })}
+          {/* Degree pills (left) + Field filter select (right) — sits directly under the search bar, same width, no overflow */}
+          <div className="flex flex-wrap items-center justify-center gap-3 max-w-2xl mx-auto mb-12">
+            {/* Degree filter pills — All / Theses / FYP */}
+            <div className="flex justify-center gap-2 sm:gap-3 flex-wrap">
+              {DEGREE_TABS.map((tab) => {
+                const isActive = degreeFilter === tab.key;
+                const styles = degreeTabStyles[tab.key];
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setDegreeFilter(tab.key)}
+                    className={`px-5 sm:px-6 py-2.5 rounded-full font-bold text-sm sm:text-base transition-all ${
+                      isActive ? styles.active : styles.inactive
+                    }`}
+                  >
+                    {tab.label} ({tab.count})
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Field filter — single select input with a checkbox dropdown (multi-select), hidden while searching */}
+            {!showSearchResults && (
+              <FieldMultiSelect
+                selected={selectedFields}
+                counts={counts}
+                onToggle={toggleField}
+                onClear={clearFields}
+              />
+            )}
           </div>
 
-          {/* Field filters + publications list (hidden while search dropdown is open) */}
+          {/* Publications list (hidden while search dropdown is open) */}
           {!showSearchResults && (
             <>
-              {/* Field filter buttons */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mb-16">
-                {CORE_FIELDS.map((field) => {
-                  const key = FIELD_TO_KEY[field];
-                  const count = counts[key] ?? 0;
-                  const isActive = selectedField === field;
-                  const isEmpty = count === 0;
-
-                  return (
-                    <button
-                      key={field}
-                      onClick={() => setSelectedField((prev) => prev === field ? null : field)}
-                      disabled={isEmpty}
-                      className={[
-                        'py-5 px-3 rounded-2xl font-bold text-xs transition-all shadow-xl',
-                        'flex flex-col items-center justify-center gap-1 min-h-[80px]',
-                        isActive
-                          ? 'bg-[#050A14] text-[#FFD700] scale-105 shadow-2xl'
-                          : isEmpty
-                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed opacity-60'
-                          : 'bg-white text-[#050A14] border-4 border-gray-300 hover:border-[#FFD700] hover:scale-105',
-                      ].join(' ')}
-                    >
-                      <span
-                        style={{
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.04em',
-                          textAlign: 'center',
-                          wordBreak: 'break-word',
-                          whiteSpace: 'normal',
-                          lineHeight: '1.35',
-                          display: 'block',
-                          width: '100%',
-                        }}
-                      >
-                        {field}
-                      </span>
-                      <span className="text-[11px] opacity-70 mt-1">{count} items</span>
-                    </button>
-                  );
-                })}
-              </div>
-
               {/* Results toolbar — back link, "Now showing", settings gear */}
               
 

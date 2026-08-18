@@ -119,6 +119,7 @@ export default function AdminDashboard() {
   // User form states
   const [showUserForm, setShowUserForm] = useState<boolean>(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [isUniversityCreation, setIsUniversityCreation] = useState<boolean>(false);
   const [userForm, setUserForm] = useState<UserForm>({
     username: '',
     email: '',
@@ -159,6 +160,38 @@ export default function AdminDashboard() {
   if (!path) return '';
   return path.startsWith('http') ? path : getApiUrl(path);
 };
+
+  // Generates a strong random password for auto-created university accounts
+  const generateStrongPassword = (): string => {
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const numbers = '0123456789';
+    const symbols = '!@#$%^&*()_+-=';
+    const all = upper + lower + numbers + symbols;
+
+    let password = '';
+    password += upper[Math.floor(Math.random() * upper.length)];
+    password += lower[Math.floor(Math.random() * lower.length)];
+    password += numbers[Math.floor(Math.random() * numbers.length)];
+    password += symbols[Math.floor(Math.random() * symbols.length)];
+    for (let i = 0; i < 8; i++) {
+      password += all[Math.floor(Math.random() * all.length)];
+    }
+    // Shuffle so the fixed character-class prefix isn't predictable
+    return password.split('').sort(() => Math.random() - 0.5).join('');
+  };
+
+  // Generates a unique-ish username from the university name since the
+  // backend still requires one, even though the field is hidden from admins
+  const generateUsernameFromUniversity = (uniName: string): string => {
+    const base = uniName
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+    const suffix = Math.floor(1000 + Math.random() * 9000);
+    return `${base || 'university'}_${suffix}`;
+  };
 
   // =========== FETCH FUNCTIONS ===========
   const fetchDashboard = async (): Promise<void> => {
@@ -292,8 +325,25 @@ export default function AdminDashboard() {
   };
 
   // =========== USER MANAGEMENT FUNCTIONS ===========
+  const resetUserForm = (): void => {
+    setUserForm({
+      username: '',
+      email: '',
+      first_name: '',
+      last_name: '',
+      phone_number: '',
+      password: '',
+      confirm_password: '',
+      user_category: 'researcher',
+      university_name: '',
+      is_active: true,
+      is_staff: false
+    });
+  };
+
   const handleEditUser = (user: User): void => {
     setEditingUser(user);
+    setIsUniversityCreation(false);
     setUserForm({
       username: user.username || '',
       email: user.email || '',
@@ -392,6 +442,10 @@ export default function AdminDashboard() {
       alert('Email is required');
       return;
     }
+    if (isUniversityCreation && !userForm.university_name.trim()) {
+      alert('University name is required');
+      return;
+    }
     if (!userForm.password) {
       alert('Password is required');
       return;
@@ -416,21 +470,14 @@ export default function AdminDashboard() {
       const data = await res.json();
 
       if (res.ok) {
-        alert(data.message || 'User created successfully!');
+        alert(
+          isUniversityCreation
+            ? `University account created successfully!\nUsername: ${userForm.username}\nPassword: ${userForm.password}\nMake sure to share these credentials securely.`
+            : (data.message || 'User created successfully!')
+        );
         setShowUserForm(false);
-        setUserForm({
-          username: '',
-          email: '',
-          first_name: '',
-          last_name: '',
-          phone_number: '',
-          password: '',
-          confirm_password: '',
-          user_category: 'researcher',
-          university_name: '',
-          is_active: true,
-          is_staff: false
-        });
+        setIsUniversityCreation(false);
+        resetUserForm();
         fetchUsers();
       } else {
         alert(data.error || 'Failed to create user');
@@ -999,57 +1046,84 @@ export default function AdminDashboard() {
           {/* USER MANAGEMENT TAB */}
           {activeTab === 'users' && (
             <div>
-              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
                 <h3 className="text-xl font-bold text-[#4a772e]">User Management</h3>
-                <button
-                  onClick={() => {
-                    setEditingUser(null);
-                    setUserForm({
-                      username: '',
-                      email: '',
-                      first_name: '',
-                      last_name: '',
-                      phone_number: '',
-                      password: '',
-                      confirm_password: '',
-                      user_category: 'researcher',
-                      university_name: '',
-                      is_active: true,
-                      is_staff: false
-                    });
-                    setShowUserForm(true);
-                  }}
-                  className="px-4 py-2 bg-[#4a772e] text-white rounded-lg text-sm font-bold hover:bg-[#3a5f24] transition-colors flex items-center gap-2 mt-2 md:mt-0"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                  </svg>
-                  Add New User
-                </button>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button
+                    onClick={() => {
+                      setEditingUser(null);
+                      setIsUniversityCreation(false);
+                      resetUserForm();
+                      setShowUserForm(true);
+                    }}
+                    className="px-4 py-2 bg-[#4a772e] text-white rounded-lg text-sm font-bold hover:bg-[#3a5f24] transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add New User
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingUser(null);
+                      setIsUniversityCreation(true);
+                      const generatedPassword = generateStrongPassword();
+                      setUserForm({
+                        username: generateUsernameFromUniversity(''),
+                        email: '',
+                        first_name: '',
+                        last_name: '',
+                        phone_number: '',
+                        password: generatedPassword,
+                        confirm_password: generatedPassword,
+                        user_category: 'university',
+                        university_name: '',
+                        is_active: true,
+                        is_staff: false
+                      });
+                      setShowUserForm(true);
+                    }}
+                    className="px-4 py-2 bg-[#3a5f24] text-white rounded-lg text-sm font-bold hover:bg-[#2d4a1c] transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 21V10m0 0L8 6m4 4l4-4M4 21h16" />
+                    </svg>
+                    Add New University
+                  </button>
+                </div>
               </div>
 
               {/* EDIT/CREATE USER FORM */}
               {showUserForm && (
                 <div className="mb-6 p-4 md:p-6 bg-white rounded-xl border-2 border-[#e0e0b7] shadow-lg">
                   <h4 className="text-lg font-bold text-[#4a772e] mb-4">
-                    {editingUser ? 'Edit User' : 'Add New User'}
+                    {isUniversityCreation ? 'Add New University' : editingUser ? 'Edit User' : 'Add New User'}
                   </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Column 1 */}
-                    <div className="space-y-3">
+
+                  {isUniversityCreation ? (
+                    /* ===== SIMPLIFIED UNIVERSITY CREATION FORM ===== */
+                    <div className="space-y-4 max-w-xl">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Username <span className="text-red-500">*</span>
+                          University Name <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
-                          placeholder="Username"
-                          value={userForm.username}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, username: e.target.value })}
+                          placeholder="University name"
+                          value={userForm.university_name}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            const uniName = e.target.value;
+                            setUserForm(prev => ({
+                              ...prev,
+                              university_name: uniName,
+                              username: generateUsernameFromUniversity(uniName)
+                            }));
+                          }}
                           className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
                           required
                         />
                       </div>
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Email <span className="text-red-500">*</span>
@@ -1063,30 +1137,7 @@ export default function AdminDashboard() {
                           required
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                        <input
-                          type="text"
-                          placeholder="First name"
-                          value={userForm.first_name}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, first_name: e.target.value })}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                        <input
-                          type="text"
-                          placeholder="Last name"
-                          value={userForm.last_name}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, last_name: e.target.value })}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
-                        />
-                      </div>
-                    </div>
 
-                    {/* Column 2 */}
-                    <div className="space-y-3">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                         <input
@@ -1100,110 +1151,189 @@ export default function AdminDashboard() {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          User Category <span className="text-red-500">*</span>
+                          Password <span className="text-xs font-normal text-gray-500">(auto-generated, strong)</span>
                         </label>
-                        <select
-                          value={userForm.user_category}
-                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setUserForm({ ...userForm, user_category: e.target.value, is_staff: e.target.value === 'admin' })}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
-                        >
-                          <option value="researcher">Researcher</option>
-                          <option value="university">University</option>
-                          <option value="conf_organizer">Conference Organizer</option>
-                          <option value="public_visitor">Public Visitor</option>
-                          <option value="admin">Admin</option>
-                          <option value="innovator">Innovator</option>
-                        </select>
-                      </div>
-
-                      {userForm.user_category === 'university' && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">University Name</label>
+                        <div className="flex gap-2">
                           <input
                             type="text"
-                            placeholder="University name"
-                            value={userForm.university_name}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, university_name: e.target.value })}
+                            readOnly
+                            value={userForm.password}
+                            className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 font-mono text-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const p = generateStrongPassword();
+                              setUserForm(prev => ({ ...prev, password: p, confirm_password: p }));
+                            }}
+                            className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors whitespace-nowrap"
+                          >
+                            Regenerate
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Copy this password and share it securely with the university contact — it won&apos;t be shown again after creation.
+                        </p>
+                      </div>
+
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={userForm.is_active}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, is_active: e.target.checked })}
+                          className="w-4 h-4 text-[#4a772e] rounded focus:ring-[#4a772e]"
+                        />
+                        <span className="text-sm font-medium">Active Account</span>
+                      </label>
+                    </div>
+                  ) : (
+                    /* ===== STANDARD USER FORM ===== */
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Column 1 */}
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Username <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Username"
+                            value={userForm.username}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, username: e.target.value })}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Email <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            placeholder="Email address"
+                            value={userForm.email}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, email: e.target.value })}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                          <input
+                            type="text"
+                            placeholder="First name"
+                            value={userForm.first_name}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, first_name: e.target.value })}
                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
                           />
                         </div>
-                      )}
-
-                      {!editingUser && (
-                        <>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Password <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                              type="password"
-                              placeholder="Password"
-                              value={userForm.password}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, password: e.target.value })}
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
-                              required
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Confirm Password <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                              type="password"
-                              placeholder="Confirm password"
-                              value={userForm.confirm_password}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, confirm_password: e.target.value })}
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
-                              required
-                            />
-                          </div>
-                        </>
-                      )}
-
-                      <div className="flex flex-wrap items-center gap-4 pt-2">
-                        <label className="flex items-center gap-2">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
                           <input
-                            type="checkbox"
-                            checked={userForm.is_active}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, is_active: e.target.checked })}
-                            className="w-4 h-4 text-[#4a772e] rounded focus:ring-[#4a772e]"
+                            type="text"
+                            placeholder="Last name"
+                            value={userForm.last_name}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, last_name: e.target.value })}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
                           />
-                          <span className="text-sm font-medium">Active Account</span>
-                        </label>
+                        </div>
+                      </div>
 
-                        {userForm.user_category === 'admin' && (
+                      {/* Column 2 */}
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                          <input
+                            type="tel"
+                            placeholder="Phone number"
+                            value={userForm.phone_number}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, phone_number: e.target.value })}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            User Category <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            value={userForm.user_category}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setUserForm({ ...userForm, user_category: e.target.value, is_staff: e.target.value === 'admin' })}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
+                          >
+                            <option value="researcher">Researcher</option>
+                            <option value="conf_organizer">Conference Organizer</option>
+                            <option value="public_visitor">Public Visitor</option>
+                            <option value="admin">Admin</option>
+                            <option value="innovator">Innovator</option>
+                          </select>
+                        </div>
+
+                        {!editingUser && (
+                          <>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Password <span className="text-red-500">*</span>
+                              </label>
+                              <input
+                                type="password"
+                                placeholder="Password"
+                                value={userForm.password}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, password: e.target.value })}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Confirm Password <span className="text-red-500">*</span>
+                              </label>
+                              <input
+                                type="password"
+                                placeholder="Confirm password"
+                                value={userForm.confirm_password}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, confirm_password: e.target.value })}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
+                                required
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        <div className="flex flex-wrap items-center gap-4 pt-2">
                           <label className="flex items-center gap-2">
                             <input
                               type="checkbox"
-                              checked={userForm.is_staff}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, is_staff: e.target.checked })}
+                              checked={userForm.is_active}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, is_active: e.target.checked })}
                               className="w-4 h-4 text-[#4a772e] rounded focus:ring-[#4a772e]"
                             />
-                            <span className="text-sm font-medium">Staff Access</span>
+                            <span className="text-sm font-medium">Active Account</span>
                           </label>
-                        )}
+
+                          {userForm.user_category === 'admin' && (
+                            <label className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={userForm.is_staff}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, is_staff: e.target.checked })}
+                                className="w-4 h-4 text-[#4a772e] rounded focus:ring-[#4a772e]"
+                              />
+                              <span className="text-sm font-medium">Staff Access</span>
+                            </label>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="mt-6 pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
                     <button
                       onClick={() => {
                         setShowUserForm(false);
                         setEditingUser(null);
-                        setUserForm({
-                          username: '',
-                          email: '',
-                          first_name: '',
-                          last_name: '',
-                          phone_number: '',
-                          password: '',
-                          confirm_password: '',
-                          user_category: 'researcher',
-                          university_name: '',
-                          is_active: true,
-                          is_staff: false
-                        });
+                        setIsUniversityCreation(false);
+                        resetUserForm();
                       }}
                       className="px-5 py-2 bg-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-400 transition-colors"
                     >
@@ -1213,7 +1343,7 @@ export default function AdminDashboard() {
                       onClick={editingUser ? handleUpdateUser : handleCreateUser}
                       className="px-5 py-2 bg-[#4a772e] text-white rounded-lg text-sm font-bold hover:bg-[#3a5f24] transition-colors"
                     >
-                      {editingUser ? 'Update User' : 'Create User'}
+                      {isUniversityCreation ? 'Create University' : editingUser ? 'Update User' : 'Create User'}
                     </button>
                   </div>
                 </div>

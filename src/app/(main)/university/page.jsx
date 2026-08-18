@@ -783,13 +783,13 @@ export default function UniversityDashboard() {
               />
             ) : (
               <div className="bg-gradient-to-br from-blue-400 to-indigo-500 w-full h-full flex items-center justify-center text-white text-5xl font-bold">
-                {user?.username?.[0]?.toUpperCase() || 'U'}
+                {user?.university_name?.[0]?.toUpperCase() || 'U'}
               </div>
             )}
           </div>
 
           <div className="space-y-4 text-gray-700">
-            <div><strong>University:</strong> {user?.username}</div>
+            <div><strong>University:</strong> {user?.university_name}</div>
             <div><strong>Email:</strong> {user?.email}</div>
             {user?.age && <div><strong>Age:</strong> {user.age}</div>}
             {user?.phone_number && <div><strong>Phone:</strong> {user.phone_number}</div>}

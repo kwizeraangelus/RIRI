@@ -24,6 +24,10 @@ export default function ResearchersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // ── Pagination (10 per page, same style as the Publications page) ──
+  const resultsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+
 
 
 
@@ -60,6 +64,16 @@ export default function ResearchersPage() {
       (r.Field && r.Field.toLowerCase().includes(term))
     );
   });
+
+  // Reset to page 1 whenever the filtered result set changes (new search, data reload, etc.)
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, researchers]);
+
+  const totalResults = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalResults / resultsPerPage));
+  const pageStartIndex = (currentPage - 1) * resultsPerPage;
+  const pageResearchers = filtered.slice(pageStartIndex, pageStartIndex + resultsPerPage);
 
   const PersonAvatar: React.FC<{ image?: string; name: string }> = ({ image, name }) => {
   const [imgError, setImgError] = useState(false);
@@ -119,7 +133,7 @@ export default function ResearchersPage() {
         </div>
         {searchTerm && (
           <p className="text-center text-base text-slate-500 mt-3">
-            {filtered.length} result{filtered.length !== 1 ? 's' : ''} for <span className="font-semibold text-slate-700">"{searchTerm}"</span>
+            {totalResults} result{totalResults !== 1 ? 's' : ''} for <span className="font-semibold text-slate-700">"{searchTerm}"</span>
           </p>
         )}
       </div>
@@ -130,7 +144,7 @@ export default function ResearchersPage() {
           {filtered.length === 0 ? (
             <div className="text-center py-12 text-2xl text-gray-500">No researchers found.</div>
           ) : (
-            filtered.map((person) => (
+            pageResearchers.map((person) => (
               <div 
                 key={person.id} 
                 className="flex flex-col md:flex-row gap-8 border-b border-gray-200 pb-10 last:border-none bg-white rounded-2xl p-6 shadow-sm"
@@ -173,6 +187,51 @@ export default function ResearchersPage() {
             ))
           )}
         </div>
+
+        {/* Pagination – 10 items per page, same style as the Publications page */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-1.5 mt-8 mb-4">
+            <button
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              First
+            </button>
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-2.5 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="Previous"
+            >
+              &lt;
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`min-w-[34px] px-2.5 py-1.5 text-sm border rounded ${
+                  currentPage === page
+                    ? 'bg-teal-500 text-white border-teal-500 font-medium'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-2.5 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="Next"
+            >
+              &gt;
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

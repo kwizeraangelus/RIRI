@@ -67,6 +67,8 @@ function safeParseUser(str: string | null): UserProfile | null {
 }
 
 function getInitial(u: UserProfile | null) {
+  const isUniversity = !!u && ACADEMIC.includes(u.user_category);
+  if (isUniversity) return (u?.university_name?.[0] || u?.username?.[0] || 'U').toUpperCase();
   return (u?.first_name?.[0] || u?.username?.[0] || 'U').toUpperCase();
 }
 
@@ -363,14 +365,18 @@ export default function ProfilePage() {
 
   const initial    = getInitial(profile);
   const catColor   = CATEGORY_COLOR[profile.user_category] || '#FFD700';
-  const fullName   = (profile.first_name || profile.last_name)
-    ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim()
-    : profile.username;
   const showAcademic   = ACADEMIC.includes(profile.user_category);
   const showResearcher = RESEARCHER.includes(profile.user_category);
 
+  // University accounts are identified by their university_name, not a person's first/last name
+  const fullName = showAcademic
+    ? (profile.university_name || profile.username)
+    : (profile.first_name || profile.last_name)
+      ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim()
+      : profile.username;
+
   const tabs = [
-    { key: 'info'      as const, label: 'Personal Info', icon: <User size={14} /> },
+    { key: 'info'      as const, label: showAcademic ? 'University Info' : 'Personal Info', icon: <User size={14} /> },
     
     ...(showResearcher ? [{ key: 'researcher' as const, label: 'Researcher details', icon: <Award size={14} /> }] : []),
     { key: 'password'  as const, label: 'Password',      icon: <Lock size={14} /> },
@@ -481,16 +487,31 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        {/* Personal Info */}
+        {/* Personal Info / University Info */}
         {tab === 'info' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(290px,1fr))', gap: 18 }}>
-            <Card title="Basic Details" icon={<User size={15} />}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 14px' }}>
-                <Field label="First Name" name="first_name"   value={f.first_name}   editing={editing} onChange={handleFieldChange} placeholder="Jane" />
-                <Field label="Last Name"  name="last_name"    value={f.last_name}    editing={editing} onChange={handleFieldChange} placeholder="Doe" />
-              </div>
-              <Field label="Username"    name="username"     value={profile.username} editing={false} onChange={() => {}} />
-              
+            <Card title={showAcademic ? 'University Details' : 'Basic Details'} icon={<User size={15} />}>
+              {showAcademic ? (
+                // University accounts: identified by university_name, no first/last name, no username field
+                <Field
+                  label="University Name"
+                  name="university_name"
+                  value={f.university_name}
+                  editing={editing}
+                  onChange={handleFieldChange}
+                  icon={<Award size={11} />}
+                  placeholder="e.g. Kigali Institute of Science and Technology"
+                />
+              ) : (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 14px' }}>
+                    <Field label="First Name" name="first_name"   value={f.first_name}   editing={editing} onChange={handleFieldChange} placeholder="Jane" />
+                    <Field label="Last Name"  name="last_name"    value={f.last_name}    editing={editing} onChange={handleFieldChange} placeholder="Doe" />
+                  </div>
+                  <Field label="Username"    name="username"     value={profile.username} editing={false} onChange={() => {}} />
+                </>
+              )}
+
               <Field label="Current location"    name="location"     value={f.location}      editing={editing} onChange={handleFieldChange} icon={<MapPin size={11}/>} placeholder="Kigali, Rwanda" />
               <Field label="Phone"       name="phone_number" value={f.phone_number}  editing={editing} onChange={handleFieldChange} icon={<Phone size={11}/>} type="tel" placeholder="+250 7XX XXX XXX" />
 
