@@ -193,6 +193,20 @@ export default function AdminDashboard() {
     return `${base || 'university'}_${suffix}`;
   };
 
+  // Breaks a password down into the individual strength requirements so we
+  // can show a live checklist while the admin types it themselves
+  const getPasswordChecks = (pw: string) => ({
+    length: pw.length >= 8,
+    upper: /[A-Z]/.test(pw),
+    lower: /[a-z]/.test(pw),
+    symbol: /[^A-Za-z0-9]/.test(pw)
+  });
+
+  const isPasswordStrong = (pw: string): boolean => {
+    const checks = getPasswordChecks(pw);
+    return checks.length && checks.upper && checks.lower && checks.symbol;
+  };
+
   // =========== FETCH FUNCTIONS ===========
   const fetchDashboard = async (): Promise<void> => {
     setLoading(true);
@@ -450,6 +464,10 @@ export default function AdminDashboard() {
       alert('Password is required');
       return;
     }
+    if (isUniversityCreation && !isPasswordStrong(userForm.password)) {
+      alert('Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a symbol.');
+      return;
+    }
     if (userForm.password !== userForm.confirm_password) {
       alert('Passwords do not match');
       return;
@@ -472,7 +490,7 @@ export default function AdminDashboard() {
       if (res.ok) {
         alert(
           isUniversityCreation
-            ? `University account created successfully!\nUsername: ${userForm.username}\nPassword: ${userForm.password}\nMake sure to share these credentials securely.`
+            ? `University account created successfully!\nUsername: ${userForm.username}\nShare the login details securely with the university contact.`
             : (data.message || 'User created successfully!')
         );
         setShowUserForm(false);
@@ -1067,15 +1085,14 @@ export default function AdminDashboard() {
                     onClick={() => {
                       setEditingUser(null);
                       setIsUniversityCreation(true);
-                      const generatedPassword = generateStrongPassword();
                       setUserForm({
                         username: generateUsernameFromUniversity(''),
                         email: '',
                         first_name: '',
                         last_name: '',
                         phone_number: '',
-                        password: generatedPassword,
-                        confirm_password: generatedPassword,
+                        password: '',
+                        confirm_password: '',
                         user_category: 'university',
                         university_name: '',
                         is_active: true,
@@ -1151,14 +1168,15 @@ export default function AdminDashboard() {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Password <span className="text-xs font-normal text-gray-500">(auto-generated, strong)</span>
+                          Password <span className="text-red-500">*</span>
                         </label>
                         <div className="flex gap-2">
                           <input
                             type="text"
-                            readOnly
+                            placeholder="Create a strong password"
                             value={userForm.password}
-                            className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 font-mono text-sm"
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm(prev => ({ ...prev, password: e.target.value }))}
+                            className="flex-1 p-3 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
                           />
                           <button
                             type="button"
@@ -1168,12 +1186,43 @@ export default function AdminDashboard() {
                             }}
                             className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors whitespace-nowrap"
                           >
-                            Regenerate
+                            Suggest One
                           </button>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Copy this password and share it securely with the university contact — it won&apos;t be shown again after creation.
-                        </p>
+
+                        {/* Live strength checklist */}
+                        {(() => {
+                          const checks = getPasswordChecks(userForm.password);
+                          const item = (ok: boolean, label: string) => (
+                            <span className={`inline-flex items-center gap-1 ${ok ? 'text-green-600' : 'text-gray-400'}`}>
+                              {ok ? '✓' : '○'} {label}
+                            </span>
+                          );
+                          return (
+                            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs mt-2">
+                              {item(checks.length, '8+ characters')}
+                              {item(checks.upper, 'Uppercase letter')}
+                              {item(checks.lower, 'Lowercase letter')}
+                              {item(checks.symbol, 'Symbol')}
+                            </div>
+                          );
+                        })()}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Confirm Password <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Re-enter password"
+                          value={userForm.confirm_password}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm(prev => ({ ...prev, confirm_password: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
+                        />
+                        {userForm.confirm_password && userForm.password !== userForm.confirm_password && (
+                          <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
+                        )}
                       </div>
 
                       <label className="flex items-center gap-2">
@@ -1262,12 +1311,26 @@ export default function AdminDashboard() {
                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
                           >
                             <option value="researcher">Researcher</option>
+                            <option value="university">University</option>
                             <option value="conf_organizer">Conference Organizer</option>
                             <option value="public_visitor">Public Visitor</option>
                             <option value="admin">Admin</option>
                             <option value="innovator">Innovator</option>
                           </select>
                         </div>
+
+                        {userForm.user_category === 'university' && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">University Name</label>
+                            <input
+                              type="text"
+                              placeholder="University name"
+                              value={userForm.university_name}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserForm({ ...userForm, university_name: e.target.value })}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
+                            />
+                          </div>
+                        )}
 
                         {!editingUser && (
                           <>
