@@ -404,7 +404,7 @@ const PublicationListItem: React.FC<
   );
 };
 
-// ──────────────────────────────────────────────────────
+/// ──────────────────────────────────────────────────────
 // FieldMultiSelect — single "select" input that opens a checkbox dropdown
 // letting the user pick one or more CORE_FIELDS at once
 // ──────────────────────────────────────────────────────
@@ -457,11 +457,20 @@ const FieldMultiSelect: React.FC<{
         </svg>
       </button>
 
-      {/* Dropdown with checkboxes — laid out 2 per row */}
+      {/* Dropdown — centered & full-width safe on mobile, right-aligned on larger screens */}
       {open && (
-        <div className="absolute top-full right-0 mt-2 w-[min(24rem,90vw)] bg-white rounded-2xl shadow-2xl border border-gray-200 z-30 overflow-hidden">
+        <div
+          className="
+            absolute top-full mt-2 z-50
+            left-1/2 -translate-x-1/2
+            sm:left-auto sm:right-0 sm:translate-x-0
+            w-[min(22rem,calc(100vw-1.5rem))]
+            bg-white rounded-2xl shadow-2xl border border-gray-200
+            overflow-hidden
+          "
+        >
           <div
-            className="max-h-72 overflow-y-auto p-3 grid grid-cols-2 gap-2"
+            className="max-h-[min(18rem,60vh)] overflow-y-auto overscroll-contain p-3 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-2"
             role="listbox"
             aria-multiselectable="true"
           >
@@ -490,13 +499,16 @@ const FieldMultiSelect: React.FC<{
                       onChange={() => onToggle(field)}
                       className="w-4 h-4 flex-shrink-0 accent-[#050A14] rounded"
                     />
-                    <span className="text-xs font-medium text-gray-800 leading-tight">{field}</span>
+                    <span className="text-xs font-medium text-gray-800 leading-tight break-words">
+                      {field}
+                    </span>
                   </span>
                   <span className="text-[10px] text-gray-400 flex-shrink-0">{count}</span>
                 </label>
               );
             })}
           </div>
+
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
             <button
               type="button"

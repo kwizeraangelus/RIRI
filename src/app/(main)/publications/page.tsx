@@ -61,7 +61,7 @@ export default function PublicationsPage() {
     });
   }, [query, publications]);
 
-  // Reset to page 1 whenever the filtered result set changes (new search, data reload, etc.)
+  // Reset to page 1 whenever the filtered result set changes
   useEffect(() => {
     setCurrentPage(1);
   }, [query, publications]);
@@ -84,10 +84,10 @@ export default function PublicationsPage() {
   return (
     <div className="min-h-screen bg-[#E0F2FE] text-gray-900">
 
-      {/* HERO */}
-      <section className="relative pt-20 pb-1 text-center">
+      {/* HERO – reduced top space */}
+      <section className="relative pt-8 pb-2 text-center">
         <div className="max-w-4xl mx-auto px-6">
-                 <p className="tex-lg sm:text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto mb-10">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto mb-6">
             Explore research articles, conference papers from Rwanda&apos;s leading researchers which are published in various journals.
           </p>
 
@@ -120,14 +120,14 @@ export default function PublicationsPage() {
         </div>
       </section>
 
-      {/* LIST */}
-      <section className="py-16 px-6">
+      {/* LIST – reduced space under search */}
+      <section className="pt-6 pb-16 px-6">
         <div className="max-w-4xl mx-auto">
 
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm text-gray-500 bg-white border border-gray-200 rounded-full px-3 py-1">
-                {totalResults} {query.trim() ? 'found' : 'publications'}
-              </span>
+              {totalResults} {query.trim() ? 'found' : 'publications'}
+            </span>
           </div>
 
           {loading ? (
@@ -227,7 +227,6 @@ export default function PublicationsPage() {
                               📑 Read PDF
                             </a>
                           )}
-
                         </div>
                       )}
                     </div>
@@ -235,7 +234,7 @@ export default function PublicationsPage() {
                 })}
               </div>
 
-              {/* Pagination – 10 items per page, same style as the Theses page */}
+              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-1.5 mt-8 mb-2">
                   <button
@@ -287,11 +286,7 @@ export default function PublicationsPage() {
       {/* FOOTER */}
       <footer className="bg-[#0c1e30] text-white pt-14 pb-8 px-4 sm:px-8">
         <div className="max-w-6xl mx-auto">
-
-          {/* Top grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-10 border-b border-white/10">
-
-            {/* Brand col */}
             <div className="lg:col-span-1">
               <p
                 className="font-bold uppercase text-white mb-1"
@@ -305,7 +300,6 @@ export default function PublicationsPage() {
               </p>
             </div>
 
-            {/* Quick links */}
             <div>
               <h4 className="text-[#FFD700] font-bold uppercase tracking-widest text-xs mb-5">Quick Links</h4>
               <ul className="space-y-3">
@@ -319,7 +313,6 @@ export default function PublicationsPage() {
               </ul>
             </div>
 
-            {/* Contact */}
             <div>
               <h4 className="text-[#FFD700] font-bold uppercase tracking-widest text-xs mb-5">Contact Us</h4>
               <ul className="space-y-3 text-sm text-gray-300">
@@ -338,7 +331,6 @@ export default function PublicationsPage() {
               </ul>
             </div>
 
-            {/* Social */}
             <div>
               <h4 className="text-[#FFD700] font-bold uppercase tracking-widest text-xs mb-5">Follow Us</h4>
               <div className="flex flex-wrap gap-3">
@@ -363,7 +355,6 @@ export default function PublicationsPage() {
             </div>
           </div>
 
-          {/* Bottom bar */}
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
             <p>© {new Date().getFullYear()} RIRI. All Rights Reserved.</p>
             <div className="flex gap-5">

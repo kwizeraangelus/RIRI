@@ -133,17 +133,22 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className={`${poppins.variable} font-sans text-white`}>
-      {/* NAV BAR — static, always solid blue */}
-      <nav className="w-full z-[9999] flex justify-between items-center px-8 lg:px-[50px] py-6 bg-[#0c1e30] shadow-2xl">
-        <Link href="/" className="flex flex-col leading-none group" style={{ width: 'fit-content' }}>
+      {/* NAV BAR — static, always solid blue.
+          Full desktop nav (logo + all links) only shows from `xl` (1280px) up.
+          Below that — including mid-size laptop screens — it falls back to the
+          hamburger menu instead of squeezing everything into one row, which is
+          what was causing the "disorder" on smaller/other computer screens. */}
+      <nav className="w-full z-[9999] flex justify-between items-center gap-4 px-6 md:px-8 xl:px-[50px] py-5 xl:py-6 bg-[#0c1e30] shadow-2xl overflow-hidden">
+        <Link href="/" className="flex flex-col leading-none group flex-shrink-0" style={{ width: 'fit-content' }}>
           <span
             className="font-bold uppercase group-hover:text-[#FFD700] transition"
             style={{
               fontFamily: "'Bell MT', 'Palatino Linotype', Georgia, serif",
-              fontSize: '68px',
+              // Scales smoothly with viewport instead of staying fixed at 68px,
+              // which is what overflowed on narrower desktop/laptop widths.
+              fontSize: 'clamp(32px, 4vw, 68px)',
               lineHeight: '1',
-              letterSpacing: '6px',
-              
+              letterSpacing: 'clamp(2px, 0.5vw, 6px)',
               textShadow: '2px 2px 0px rgba(255,215,0,0.15)',
             }}
           >
@@ -167,12 +172,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </span>
         </Link>
 
-        <ul className="hidden lg:flex gap-10 items-center">
+        <ul className="hidden xl:flex gap-4 2xl:gap-9 items-center flex-shrink min-w-0">
           {navLinks.map((link) => (
-            <li key={link.name}>
+            <li key={link.name} className="flex-shrink-0">
               <Link
                 href={link.href}
-                className={`text-[21px] capitalize transition ${pathname === link.href ? 'text-[#FFD700] font-bold border-b-2 border-[#FFD700]' : 'hover:text-[#FFD700]'}`}
+                className={`text-[15px] 2xl:text-[20px] capitalize whitespace-nowrap transition ${pathname === link.href ? 'text-[#FFD700] font-bold border-b-2 border-[#FFD700]' : 'hover:text-[#FFD700]'}`}
               >
                 {link.name}
               </Link>
@@ -180,12 +185,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           ))}
         </ul>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 xl:gap-6 flex-shrink-0">
           {!isLoggedIn ? (
             <div className="hidden md:flex gap-4">
               <button
                 onClick={() => setModalType('login')}
-                className="px-7 py-2.5 border border-white/30 rounded-full hover:bg-white/10 transition text-[19px] font-medium"
+                className="px-5 xl:px-7 py-2 xl:py-2.5 border border-white/30 rounded-full hover:bg-white/10 transition text-[16px] xl:text-[19px] font-medium whitespace-nowrap"
               >
                 Login
               </button>
@@ -194,9 +199,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className={`w-11 h-11 md:w-13 md:h-13 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition ${getInitialColor(userInitial)}`}
+                className={`w-10 h-10 xl:w-13 xl:h-13 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition ${getInitialColor(userInitial)}`}
               >
-                <span className="text-white font-bold text-2xl">{userInitial}</span>
+                <span className="text-white font-bold text-xl xl:text-2xl">{userInitial}</span>
               </button>
 
               {dropdownOpen && (
@@ -236,16 +241,16 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden relative z-[10000]"
+            className="xl:hidden relative z-[10000] flex-shrink-0"
           >
-            {mobileMenuOpen ? <X size={36} /> : <Menu size={36} />}
+            {mobileMenuOpen ? <X size={32} /> : <Menu size={32} />}
           </button>
         </div>
       </nav>
 
-      {/* MOBILE MENU OVERLAY */}
+      {/* MOBILE / SMALL-LAPTOP MENU OVERLAY — now covers everything below xl (1280px) */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[9998] bg-[#0c1e30] pt-24 px-8 space-y-6 lg:hidden overflow-y-auto">
+        <div className="fixed inset-0 z-[9998] bg-[#0c1e30] pt-24 px-8 space-y-6 xl:hidden overflow-y-auto">
           {navLinks.map((link) => (
             <Link
               key={link.name}
