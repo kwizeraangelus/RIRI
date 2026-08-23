@@ -138,7 +138,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           Below that — including mid-size laptop screens — it falls back to the
           hamburger menu instead of squeezing everything into one row, which is
           what was causing the "disorder" on smaller/other computer screens. */}
-      <nav className="w-full z-[9999] flex justify-between items-center gap-4 px-6 md:px-8 xl:px-[50px] py-5 xl:py-6 bg-[#0c1e30] shadow-2xl overflow-hidden">
+      <nav className="w-full z-[9999] flex justify-between items-center gap-4 px-6 md:px-8 xl:px-[50px] py-5 xl:py-6 bg-[#0c1e30] shadow-2xl">
         <Link href="/" className="flex flex-col leading-none group flex-shrink-0" style={{ width: 'fit-content' }}>
           <span
             className="font-bold uppercase group-hover:text-[#FFD700] transition"
