@@ -15,7 +15,7 @@ interface KPIs {
 interface PendingItem {
   id: number;
   title: string;
-  author_name?: string;
+  authors?: string;
   submission_type?: string;
   cover_image?: string;
   cover_image_url?: string;
@@ -780,7 +780,7 @@ export default function AdminDashboard() {
                         <div className="flex-1 p-4 md:p-6">
                           <h4 className="text-lg md:text-xl font-bold text-[#4a772e] mb-1">{item.title}</h4>
                           <p className="text-sm text-gray-700 mb-1">
-                            <span className="font-medium">Author:</span> {item.author_name || 'Unknown'}
+                            <span className="font-medium">Author:</span> {item.authors || 'Unknown'}
                           </p>
                           <p className="text-sm text-gray-600 mb-3">
                             <span className="font-medium">Type:</span> {item.submission_type || 'Unknown'}
@@ -1904,7 +1904,7 @@ export default function AdminDashboard() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            Approved Books
+            Approved theses/FYP
           </button>
 
           <button

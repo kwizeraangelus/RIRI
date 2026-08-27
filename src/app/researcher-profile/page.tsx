@@ -296,7 +296,7 @@ function ResearcherProfileForm() {
             disabled={loading}
             className="w-full py-4 font-bold text-lg rounded-xl transition-all bg-gradient-to-r from-green-500 to-emerald-600 text-white disabled:opacity-60"
           >
-            {loading ? 'Saving…' : 'Save profile'}
+            {loading ? 'Saving…' : 'Submit'}
           </button>
         </div>
       </form>

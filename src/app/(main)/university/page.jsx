@@ -81,9 +81,27 @@ export default function UniversityDashboard() {
   const [imagePreview, setImagePreview] = useState(null);
   const [removeProfileImage, setRemoveProfileImage] = useState(false); // NEW
 
+
+    const [uploadsPage, setUploadsPage] = useState(1);
+    const uploadsPerPage = 10;
+
+  const [expandedIds, setExpandedIds] = useState(new Set());
+
+const toggleExpand = (id) => {
+  setExpandedIds(prev => {
+    const next = new Set(prev);
+    next.has(id) ? next.delete(id) : next.add(id);
+    return next;
+  });
+};
+
   useEffect(() => {
     fetchUserAndData();
   }, []);
+
+  useEffect(() => {
+  setUploadsPage(1);
+}, [uploads.length]);
 
   const fetchUserAndData = async () => {
     const token = localStorage.getItem('token');
@@ -438,6 +456,10 @@ export default function UniversityDashboard() {
     }
   };
 
+  const uploadsTotalPages = Math.max(1, Math.ceil(uploads.length / uploadsPerPage));
+const uploadsStartIndex = (uploadsPage - 1) * uploadsPerPage;
+const pagedUploads = uploads.slice(uploadsStartIndex, uploadsStartIndex + uploadsPerPage);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#E0F2FE] flex items-center justify-center">
@@ -460,9 +482,8 @@ export default function UniversityDashboard() {
       </header>
 
       {/* Main Layout */}
-      <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Main Content with Tabs */}
-        <div className="lg:col-span-2 space-y-10">
+      <div className="max-w-7xl mx-auto px-6 py-10">
+  <div className="space-y-10">
           {/* Tab Buttons */}
           <div className="flex gap-4">
             <button
@@ -584,68 +605,134 @@ export default function UniversityDashboard() {
                 </div>
               )}
 
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <h3 className="text-3xl font-bold text-gray-800 text-center mb-10">My Uploads</h3>
-                {uploads.length === 0 ? (
-                  <p className="text-center text-gray-500 py-16 text-lg">No uploads yet. Start sharing your research!</p>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {uploads.map(upload => (
-                      <div key={upload.id} className="transform transition-all hover:scale-105">
-                        <div
-                          className="rounded-2xl overflow-hidden shadow-xl border-2 bg-gradient-to-br from-blue-50 to-indigo-50 relative cursor-pointer"
-                          style={{ borderColor: upload.status === 'approved' ? '#10b981' : upload.status === 'rejected' ? '#ef4444' : '#f59e0b' }}
-                          onClick={() => router.push(`/book/${upload.id}`)}
-                        >
-                          <div className="h-64 flex flex-col items-center justify-center">
-                            <span className="text-9xl">🎓</span>
-                            <p className="text-2xl font-medium text-gray-600 mt-4">THESIS</p>
-                          </div>
-                          <div className={`absolute top-4 right-4 px-5 py-2 rounded-full text-sm font-bold text-white shadow-lg ${getStatusBadge(upload.status)}`}>
-                            {upload.status.charAt(0).toUpperCase() + upload.status.slice(1)}
-                          </div>
-                        </div>
+              <div className="w-full bg-white rounded-2xl shadow-xl p-8">
+  <h3 className="text-3xl font-bold text-gray-800 text-center mb-10">My Uploads</h3>
+  {uploads.length === 0 ? (
+    <p className="text-center text-gray-500 py-16 text-lg">No uploads yet. Start sharing your research!</p>
+  ) : (
+    <div className="divide-y divide-gray-200">
+      {uploads.map(upload => {
+        const isExpanded = expandedIds.has(upload.id);
+        return (
+          <div key={upload.id} className="flex gap-5 py-6">
+            {/* Thumbnail */}
+            <button
+              onClick={() => router.push(`/book/${upload.id}`)}
+              className="hidden sm:flex flex-shrink-0 w-[110px] h-[140px] bg-gradient-to-br from-blue-50 to-indigo-50 border-2 rounded-lg shadow-sm items-center justify-center overflow-hidden"
+              style={{
+                borderColor:
+                  upload.status === 'approved' ? '#10b981' :
+                  upload.status === 'rejected' ? '#ef4444' : '#f59e0b',
+              }}
+              aria-label={`Open ${upload.title}`}
+            >
+              <span className="text-5xl">🎓</span>
+            </button>
 
-                        <div className="mt-6">
-                          <h4 className="font-bold text-gray-800 text-lg line-clamp-2 text-center">{upload.title}</h4>
-                          <p className="text-gray-600 mt-1 text-center">{upload.year}</p>
-                          {upload.supervisor_name && <p className="text-sm text-blue-700 mt-2 text-center">Supervisor: {upload.supervisor_name}</p>}
-
-                          {upload.feedback && (
-                            <div className={`mt-4 p-4 rounded-xl text-sm font-medium border-l-4 ${upload.status === 'rejected' ? 'bg-red-50 border-red-500 text-red-800' : 'bg-amber-50 border-amber-500 text-amber-800'}`}>
-                              <p className="font-bold">{upload.status === 'rejected' ? 'Reason:' : 'Note:'}</p>
-                              <p className="mt-1 whitespace-pre-wrap">{upload.feedback}</p>
-                            </div>
-                          )}
-
-                          {upload.status === 'approved' && !upload.feedback && (
-                            <div className="mt-4 p-4 rounded-xl bg-emerald-50 border-l-4 border-emerald-500 text-emerald-800 text-sm text-center">
-                              Congratulations! Your work is now public.
-                            </div>
-                          )}
-
-                          {/* Edit + Delete buttons */}
-                          <div className="mt-6 flex gap-3">
-                            <button
-                              onClick={() => openEditUpload(upload)}
-                              className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 rounded-xl transition"
-                            >
-                              ✏️ Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeleteUpload(upload)}
-                              disabled={deletingId === upload.id}
-                              className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition"
-                            >
-                              {deletingId === upload.id ? 'Deleting...' : '🗑️ Delete'}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+            {/* Content */}
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-3 mb-1">
+                <h4
+                  onClick={() => router.push(`/book/${upload.id}`)}
+                  className="text-lg sm:text-xl font-bold text-[#4a772e] cursor-pointer hover:underline leading-snug"
+                >
+                  {upload.title}
+                </h4>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold text-white shadow ${getStatusBadge(upload.status)}`}>
+                  {upload.status.charAt(0).toUpperCase() + upload.status.slice(1)}
+                </span>
               </div>
+
+              <p className="text-sm text-gray-500 mb-2">
+                {upload.university_name && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/university/${encodeURIComponent(upload.university_name)}`);
+                    }}
+                    className="font-semibold text-green-700 hover:underline text-left p-0 bg-transparent border-none cursor-pointer inline"
+                  >
+                    {upload.university_name},
+                  </button>
+                )}
+                {!upload.university_name && upload.year ? <>{upload.year} </> : null}
+                {upload.university_name && upload.year ? <span className="text-gray-500"> ({upload.year})</span> : null}
+                {upload.authors && <span className="text-gray-700"> . </span>}
+                {upload.authors && <span className="text-black">{upload.authors}</span>}.
+                {upload.supervisor_name && (
+                  <>
+                    <span className="text-gray-500 italic"> </span>
+                    {upload.supervisor_name}
+                  </>
+                )}
+              </p>
+
+              <p className={`text-sm text-gray-700 leading-relaxed ${isExpanded ? '' : 'line-clamp-2'}`}>
+                {upload.description || 'No description available.'}
+              </p>
+
+              <div className="mt-2 flex flex-wrap items-center gap-4">
+                <button
+                  onClick={() => toggleExpand(upload.id)}
+                  className="inline-flex items-center gap-1 text-blue-600 hover:underline text-sm font-medium"
+                >
+                  <svg
+                    className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                  {isExpanded ? 'Show less' : 'Show more'}
+                </button>
+
+                {upload.degree_type && (
+                  <span
+                    className={`px-2.5 py-0.5 rounded text-[10px] font-semibold text-white uppercase tracking-wide ${
+                      upload.degree_type === 'thesis' ? 'bg-blue-600' : 'bg-purple-600'
+                    }`}
+                  >
+                    {upload.degree_type === 'thesis' ? 'Thesis' : 'FYP'}
+                  </span>
+                )}
+
+                
+              </div>
+
+              {upload.feedback && (
+                <div className={`mt-3 p-3 rounded-lg text-sm font-medium border-l-4 ${
+                  upload.status === 'rejected'
+                    ? 'bg-red-50 border-red-500 text-red-800'
+                    : 'bg-amber-50 border-amber-500 text-amber-800'
+                }`}>
+                  <p className="font-bold">{upload.status === 'rejected' ? 'Reason:' : 'Note:'}</p>
+                  <p className="mt-1 whitespace-pre-wrap">{upload.feedback}</p>
+                </div>
+              )}
+
+             
+
+              <div className="flex gap-3 max-w-xs mt-3">
+                <button
+                  onClick={() => openEditUpload(upload)}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition"
+                >
+                  ✏️ Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteUpload(upload)}
+                  disabled={deletingId === upload.id}
+                  className="flex-1 bg-red-400 hover:bg-red-700 disabled:opacity-60 text-white font-bold py-2.5 rounded-xl text-sm transition"
+                >
+                  {deletingId === upload.id ? 'Deleting...' : '🗑️ Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  )}
+</div>
             </>
           )}
 
@@ -769,53 +856,13 @@ export default function UniversityDashboard() {
         </div>
 
         {/* Profile Sidebar */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 h-fit border sticky top-24">
-          <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">My Profile</h3>
-          <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-blue-500 shadow-xl">
-            {user?.profile_image ? (
-              <Image
-                src={user?.profile_image || user?.user?.profile_image}
-                alt="Profile"
-                width={128}
-                height={128}
-                className="w-full h-full object-cover"
-                unoptimized
-              />
-            ) : (
-              <div className="bg-gradient-to-br from-blue-400 to-indigo-500 w-full h-full flex items-center justify-center text-white text-5xl font-bold">
-                {user?.university_name?.[0]?.toUpperCase() || 'U'}
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-4 text-gray-700">
-            <div><strong>University:</strong> {user?.university_name}</div>
-            <div><strong>Email:</strong> {user?.email}</div>
-            {user?.age && <div><strong>Age:</strong> {user.age}</div>}
-            {user?.phone_number && <div><strong>Phone:</strong> {user.phone_number}</div>}
-            {user?.location && <div><strong>Location:</strong> {user.location}</div>}
-            {user?.university && <div><strong>University:</strong> {user.university}</div>}
-            {user?.details && (
-              <div>
-                <strong>Bio:</strong>
-                <p className="mt-2 text-gray-600 leading-relaxed whitespace-pre-wrap">{user.details}</p>
-              </div>
-            )}
-          </div>
-
-          <button
-           onClick={() => window.location.href = `/profile`}
-            className="mt-8 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg transition"
-          >
-            Edit Profile
-          </button>
-        </div>
+        
       </div>
 
       {/* Edit Profile Modal */}
       {showEditProfile && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+          <div className="bg-white rounded-2xl shasdow-2xl max-w-md w-full p-8">
             <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Edit Profile</h3>
             <form onSubmit={saveProfile} className="space-y-6">
              <div className="flex flex-col items-center">

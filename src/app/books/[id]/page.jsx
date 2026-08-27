@@ -45,7 +45,7 @@ export default function BookDetailPage() {
         return <Newspaper className="w-5 h-5" />;
       case 'phd':
       case 'thesis':
-      case 'dissertation':
+      case 'FYP':
         return <GraduationCap className="w-5 h-5" />;
       case 'book':
       case 'book chapter':

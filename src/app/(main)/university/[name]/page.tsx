@@ -17,7 +17,7 @@ interface Publication {
   file_url: string;
   supervisor_name?: string;
   submission_type?: string;
-  degree_type?: 'thesis' | 'dissertation';
+  degree_type?: 'thesis' | 'FYP';
   university_name?: string;
   year?: number;
 }
@@ -33,7 +33,7 @@ interface Researcher {
 interface UniversityStats {
   total: number;
   theses: number;
-  dissertations: number;
+  FYP: number;
   topFields: { field: string; count: number }[];
   recentYear?: number;
 }
@@ -47,7 +47,7 @@ export default function UniversityPage() {
   const [researchers, setResearchers] = useState<Researcher[]>([]);
   const [stats, setStats] = useState<UniversityStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'thesis' | 'dissertation'>('all');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'thesis' | 'FYP'>('all');
 
   useEffect(() => {
     fetchUniversityData();
@@ -76,14 +76,14 @@ export default function UniversityPage() {
 
       // Calculate stats
       const theses = uniPubs.filter(p => p.degree_type === 'thesis').length;
-      const dissertations = uniPubs.filter(p => p.degree_type === 'dissertation').length;
+      const FYP = uniPubs.filter(p => p.degree_type === 'FYP').length;
 
       const fieldCounts: Record<string, number> = {};
       uniPubs.forEach(pub => {
         if (pub.submission_type) {
           const field = pub.submission_type
             .replace('thesis-', '')
-            .replace('dissertation-', '')
+            .replace('FYP-', '')
             .split('-')[0] || 'Other';
           const formattedField = field
             .split('_')
@@ -103,7 +103,7 @@ export default function UniversityPage() {
       setStats({
         total: uniPubs.length,
         theses,
-        dissertations,
+        FYP,
         topFields,
         recentYear: years.length > 0 ? years[0] : undefined
       });
@@ -128,7 +128,7 @@ export default function UniversityPage() {
     if (!submissionType) return 'Unknown Field';
     return submissionType
       .replace('thesis-', '')
-      .replace('dissertation-', '')
+      .replace('FYP-', '')
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
@@ -137,7 +137,7 @@ export default function UniversityPage() {
   const getDegreeColor = (degreeType?: string) => {
     return degreeType === 'thesis'
       ? 'bg-blue-600'
-      : degreeType === 'dissertation'
+      : degreeType === 'FYP'
         ? 'bg-purple-600'
         : 'bg-gray-600';
   };
@@ -185,7 +185,7 @@ export default function UniversityPage() {
                 <div className="text-gray-200 font-semibold">Theses</div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="text-4xl font-bold text-purple-300 mb-2">{stats.dissertations}</div>
+                <div className="text-4xl font-bold text-purple-300 mb-2">{stats.FYP}</div>
                 <div className="text-gray-200 font-semibold">FYP</div>
               </div>
             </div>
@@ -204,8 +204,8 @@ export default function UniversityPage() {
           <button onClick={() => setActiveFilter('thesis')} className={`px-8 py-3 rounded-full text-lg font-bold transition-all shadow-lg ${activeFilter === 'thesis' ? 'bg-blue-600 text-white scale-105' : 'bg-white text-blue-600 border-2 border-blue-300 hover:border-blue-600 hover:scale-105'}`}>
             Theses ({stats?.theses || 0})
           </button>
-          <button onClick={() => setActiveFilter('dissertation')} className={`px-8 py-3 rounded-full text-lg font-bold transition-all shadow-lg ${activeFilter === 'dissertation' ? 'bg-purple-600 text-white scale-105' : 'bg-white text-purple-600 border-2 border-purple-300 hover:border-purple-600 hover:scale-105'}`}>
-            FYP ({stats?.dissertations || 0})
+          <button onClick={() => setActiveFilter('FYP')} className={`px-8 py-3 rounded-full text-lg font-bold transition-all shadow-lg ${activeFilter === 'FYP' ? 'bg-purple-600 text-white scale-105' : 'bg-white text-purple-600 border-2 border-purple-300 hover:border-purple-600 hover:scale-105'}`}>
+            FYP ({stats?.FYP|| 0})
           </button>
         </div>
 
