@@ -57,10 +57,10 @@ interface ApprovedBook {
   id: number;
   title: string;
   authors?: string;
-  supervisor?: string;
+  supervisor_name?: string;
   university?: string;
   year?: string | number;
-  category?: string;
+  submission_type?: string;
   rating?: number;
   likes_count?: number;
   views_count?: number;
@@ -101,7 +101,7 @@ interface Filters {
   title: string;
   university: string;
   author: string;
-  category: string;
+  submission_type: string;
 }
 
 
@@ -154,7 +154,7 @@ export default function AdminDashboard() {
     title: '',
     university: '',
     author: '',
-    category: ''
+    submission_type: ''
   });
   const resolveFileUrl = (path?: string): string => {
   if (!path) return '';
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
       if (filters.title) queryParams.append('title', filters.title);
       if (filters.university) queryParams.append('university', filters.university);
       if (filters.author) queryParams.append('author', filters.author);
-      if (filters.category) queryParams.append('category', filters.category);
+      if (filters.submission_type) queryParams.append('category', filters.submission_type);
       const token = localStorage.getItem('token');
 
       const res = await fetch(getApiUrl(`/api/admin/approved-books/?${queryParams}`), {
@@ -692,7 +692,7 @@ export default function AdminDashboard() {
       title: '',
       university: '',
       author: '',
-      category: ''
+      submission_type: ''
     });
   };
 
@@ -900,8 +900,8 @@ export default function AdminDashboard() {
                   />
                   <input
                     placeholder="Category"
-                    value={filters.category}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange('category', e.target.value)}
+                    value={filters.submission_type}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange('submission_type', e.target.value)}
                     className="p-2 border rounded text-sm focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
                   />
                 </div>
@@ -983,7 +983,7 @@ export default function AdminDashboard() {
                                 <span className="font-medium">Author:</span> {book.authors || 'Unknown'}
                               </div>
                               <div>
-                                <span className="font-medium">Supervisor:</span> {book.supervisor || 'Not specified'}
+                                <span className="font-medium">Supervisor:</span> {book.supervisor_name || 'Not specified'}
                               </div>
                               <div>
                                 <span className="font-medium">University:</span> {book.university || 'Not specified'}
@@ -992,7 +992,7 @@ export default function AdminDashboard() {
                                 <span className="font-medium">Year:</span> {book.year || 'Unknown'}
                               </div>
                               <div>
-                                <span className="font-medium">Category:</span> {book.category || 'Unknown'}
+                                <span className="font-medium">Category:</span> {book.submission_type || 'Unknown'}
                               </div>
                               <div className="flex items-center gap-2">
                                 <span className="font-medium">Rating:</span>

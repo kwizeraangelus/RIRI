@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { format } from 'date-fns';
 import { getApiUrl } from '@/utils/api';
 
+
+
 // ─── Tab IDs ────────────────────────────────────────────────────────────────
 const TABS = {
   PUBLICATIONS: 'publications',
@@ -36,6 +38,15 @@ export default function ResearcherDashboard() {
   });
   const [existingPdfUrl, setExistingPdfUrl] = useState(null); // NEW
 const [removePdf, setRemovePdf] = useState(false);
+
+
+const [addMethod, setAddMethod] = useState(null); // null | 'doi' | 'manual'
+const [doiInput, setDoiInput] = useState('');
+const [doiLoading, setDoiLoading] = useState(false);
+
+const [doiPreview, setDoiPreview] = useState(null);
+const [doiPreviewLoading, setDoiPreviewLoading] = useState(false);
+const [doiSaving, setDoiSaving] = useState(false);
 
   // ── Innovations ───────────────────────────────────────────────────────────
   const [innovations, setInnovations]         = useState([]);
@@ -267,6 +278,79 @@ const [removePdf, setRemovePdf] = useState(false);
     alert('Network error');
   }finally{
     setIsSavingPub(false);
+  }
+};
+
+const handlePreviewDoi = async (e) => {
+  e.preventDefault();
+  setDoiPreviewLoading(true);
+  try {
+    const res = await fetch(getApiUrl('/api/researches/preview-doi'), {
+      method: 'POST',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ doi: doiInput }),
+    });
+    if (res.ok) {
+      setDoiPreview(await res.json());
+    } else {
+      alert('Error: ' + JSON.stringify(await res.json()));
+    }
+  } catch {
+    alert('Network error');
+  } finally {
+    setDoiPreviewLoading(false);
+  }
+};
+
+const handleConfirmDoiSave = async () => {
+  setDoiSaving(true);
+  try {
+    const res = await fetch(getApiUrl('/api/researches/import-doi'), {
+      method: 'POST',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ doi: doiInput }),
+    });
+    if (res.ok) {
+      const savedPub = await res.json();
+      setPublications(p => [savedPub, ...p]);
+      setShowAddPublication(false);
+      setAddMethod(null);
+      setDoiInput('');
+      setDoiPreview(null);
+      alert('Publication saved!');
+    } else {
+      alert('Error: ' + JSON.stringify(await res.json()));
+    }
+  } catch {
+    alert('Network error');
+  } finally {
+    setDoiSaving(false);
+  }
+};
+
+const handleImportByDoi = async (e) => {
+  e.preventDefault();
+  setDoiLoading(true);
+  try {
+    const res = await fetch(getApiUrl('/api/researches/import-doi'), {
+      method: 'POST',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ doi: doiInput }),
+    });
+    if (res.ok) {
+      const savedPub = await res.json();
+      setPublications(p => [savedPub, ...p]);
+      setShowAddPublication(false);
+      setAddMethod(null);
+      setDoiInput('');
+      alert('Publication imported! Edit it anytime to attach a PDF or tweak details.');
+    } else {
+      alert('Error: ' + JSON.stringify(await res.json()));
+    }
+  } catch {
+    alert('Network error');
+  } finally {
+    setDoiLoading(false);
   }
 };
 
@@ -934,9 +1018,9 @@ const handleQuickPhotoSave = async () => {
                   </div>
                   <button
                     onClick={() => {
-                      if (showAddPublication) resetPubForm();
-                      setShowAddPublication(!showAddPublication);
-                    }}
+                        if (showAddPublication) { resetPubForm(); setAddMethod(null); }
+                        setShowAddPublication(!showAddPublication);
+                      }}
                     className={`px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-md ${
                       showAddPublication
                         ? 'bg-slate-200 text-slate-700 hover:bg-slate-300'
@@ -948,7 +1032,7 @@ const handleQuickPhotoSave = async () => {
               </div>
 
               {/* ============= ADD / EDIT PUBLICATION FORM ============= */}
-              {showAddPublication && (
+              {showAddPublication && (editingPublicationId || addMethod === 'manual') && (
                 <div className="bg-white rounded-2xl shadow-xl border-2 border-blue-100 p-8">
                   <h3 className="text-2xl font-bold text-slate-800 mb-1">
                     {editingPublicationId ? 'Edit Publication' : 'Add New Publication'}
@@ -1118,7 +1202,7 @@ const handleQuickPhotoSave = async () => {
   </button>
   <button
     type="button"
-    onClick={() => { setShowAddPublication(false); resetPubForm(); }}
+    onClick={() => { setShowAddPublication(false); resetPubForm(); setAddMethod(null); }}
     disabled={isSavingPub}
     className="flex-1 bg-slate-200 text-slate-700 font-semibold py-3 rounded-lg hover:bg-slate-300 transition disabled:opacity-60 disabled:cursor-not-allowed"
   >
@@ -1128,6 +1212,92 @@ const handleQuickPhotoSave = async () => {
                   </form>
                 </div>
               )}
+
+              {showAddPublication && !editingPublicationId && !addMethod && (
+  <div className="bg-white rounded-2xl shadow-xl border-2 border-blue-100 p-8">
+    <h3 className="text-xl font-bold text-slate-800 mb-1">Add Publication</h3>
+    <p className="text-sm text-slate-500 mb-6">How would you like to add it?</p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <button type="button" onClick={() => setAddMethod('doi')}
+        className="p-6 border-2 border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 text-left transition">
+        <div className="text-2xl mb-2"></div>
+        <div className="font-semibold text-slate-800">Import by DOI</div>
+        <div className="text-xs text-slate-500 mt-1">Pulls title, authors, journal automatically</div>
+      </button>
+      <button type="button" onClick={() => setAddMethod('manual')}
+        className="p-6 border-2 border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 text-left transition">
+        <div className="text-2xl mb-2"></div>
+        <div className="font-semibold text-slate-800">Enter Manually</div>
+        <div className="text-xs text-slate-500 mt-1">Fill in all the details yourself</div>
+      </button>
+    </div>
+  </div>
+)}
+
+{showAddPublication && addMethod === 'doi' && (
+  <div className="bg-white rounded-2xl shadow-xl border-2 border-blue-100 p-8">
+    <button type="button" onClick={() => { setAddMethod(null); setDoiPreview(null); }} className="text-xs text-slate-500 hover:text-slate-700 mb-4">← Back</button>
+    <h3 className="text-xl font-bold text-slate-800 mb-1">Import by DOI</h3>
+
+    {!doiPreview ? (
+      <>
+        <p className="text-sm text-slate-500 mb-6">Paste the DOI — we'll pull the metadata from Crossref for you to check before saving.</p>
+        <form onSubmit={handlePreviewDoi} className="space-y-4">
+          <input
+            type="text"
+            value={doiInput}
+            onChange={e => setDoiInput(e.target.value)}
+            placeholder="10.xxxx/xxxxx or https://doi.org/10.xxxx/xxxxx"
+            required
+            className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none"
+          />
+          <div className="flex gap-4">
+            <button type="submit" disabled={doiPreviewLoading}
+              className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 rounded-lg disabled:opacity-60">
+              {doiPreviewLoading ? 'Fetching…' : 'Fetch Details'}
+            </button>
+            <button type="button" onClick={() => { setShowAddPublication(false); setAddMethod(null); setDoiInput(''); }}
+              className="flex-1 bg-slate-200 text-slate-700 font-semibold py-3 rounded-lg">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </>
+    ) : (
+      <>
+        <p className="text-sm text-slate-500 mb-4">Check this is the right paper before saving:</p>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-2 text-sm">
+          <p className="font-bold text-slate-800 text-base">{doiPreview.title}</p>
+          {doiPreview.authors?.length > 0 && (
+            <p><span className="text-slate-500">Authors: </span>{doiPreview.authors.join(' • ')}</p>
+          )}
+          {doiPreview.journal_name && <p><span className="text-slate-500">Journal: </span>{doiPreview.journal_name}</p>}
+          {doiPreview.conference_info && <p><span className="text-slate-500">Conference: </span>{doiPreview.conference_info}</p>}
+          {doiPreview.book_title && <p><span className="text-slate-500">Book: </span>{doiPreview.book_title}</p>}
+          {doiPreview.publisher && <p><span className="text-slate-500">Publisher: </span>{doiPreview.publisher}</p>}
+          <p><span className="text-slate-500">DOI: </span><span className="font-mono text-blue-600">{doiPreview.doi}</span></p>
+          <p className="capitalize"><span className="text-slate-500">Type: </span>{doiPreview.publication_type}</p>
+          {doiPreview.abstract && (
+            <div className="pt-2 border-t border-slate-200 mt-2">
+              <p className="text-slate-500 mb-1">Abstract:</p>
+              <p className="text-slate-700 leading-relaxed">{doiPreview.abstract}</p>
+            </div>
+          )}
+        </div>
+        <div className="flex gap-4 mt-6">
+          <button type="button" onClick={handleConfirmDoiSave} disabled={doiSaving}
+            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 rounded-lg disabled:opacity-60">
+            {doiSaving ? 'Saving…' : "✓ Looks right — Save"}
+          </button>
+          <button type="button" onClick={() => setDoiPreview(null)}
+            className="flex-1 bg-slate-200 text-slate-700 font-semibold py-3 rounded-lg">
+            Try a different DOI
+          </button>
+        </div>
+      </>
+    )}
+  </div>
+)}
 
               {/* ============= PUBLICATION LIST (below the form) ============= */}
               <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
@@ -1210,6 +1380,8 @@ const handleQuickPhotoSave = async () => {
               </div>
             </div>
           )}
+
+          
 
           {/* ══ INNOVATIONS TAB ══ */}
           {activeTab === TABS.INNOVATIONS && (
