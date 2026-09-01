@@ -48,6 +48,12 @@ const [doiPreview, setDoiPreview] = useState(null);
 const [doiPreviewLoading, setDoiPreviewLoading] = useState(false);
 const [doiSaving, setDoiSaving] = useState(false);
 
+const [orcidInput, setOrcidInput] = useState('');
+const [orcidWorks, setOrcidWorks] = useState(null);
+const [selectedPutCodes, setSelectedPutCodes] = useState([]);
+const [orcidLoading, setOrcidLoading] = useState(false);
+const [orcidSaving, setOrcidSaving] = useState(false);
+
   // ── Innovations ───────────────────────────────────────────────────────────
   const [innovations, setInnovations]         = useState([]);
   const [showInnovationForm, setShowInnovationForm] = useState(false);
@@ -174,6 +180,10 @@ const [doiSaving, setDoiSaving] = useState(false);
     if (publicationForm.authors.length > 1)
       setPublicationForm(p => ({ ...p, authors: p.authors.filter((_, idx) => idx !== i) }));
   };
+
+
+
+  
   const handlePubInput = (e) => {
   const { name, value, files } = e.target;
 
@@ -207,6 +217,8 @@ const [doiSaving, setDoiSaving] = useState(false);
     setShowAbstractField(false);
     setEditingPublicationId(null);
   };
+
+  
 
   const handleEditClick = (pub) => {
     setPublicationForm({
@@ -280,6 +292,17 @@ const [doiSaving, setDoiSaving] = useState(false);
     setIsSavingPub(false);
   }
 };
+const [doiPdf, setDoiPdf] = useState(null);
+
+const handleDoiPdfChange = (e) => {
+  const file = e.target.files?.[0];
+  if (file && file.size > 16 * 1024 * 1024) {
+    alert("Oops! This file exceeds 16MB.");
+    e.target.value = '';
+    return;
+  }
+  setDoiPdf(file || null);
+};
 
 const handlePreviewDoi = async (e) => {
   e.preventDefault();
@@ -304,11 +327,14 @@ const handlePreviewDoi = async (e) => {
 
 const handleConfirmDoiSave = async () => {
   setDoiSaving(true);
+  const fd = new FormData();
+  fd.append('doi', doiInput);
+  if (doiPdf) fd.append('pdf', doiPdf);
   try {
     const res = await fetch(getApiUrl('/api/researches/import-doi'), {
       method: 'POST',
-      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-      body: JSON.stringify({ doi: doiInput }),
+      headers: authHeaders(), // no Content-Type — browser sets multipart boundary
+      body: fd,
     });
     if (res.ok) {
       const savedPub = await res.json();
@@ -317,6 +343,7 @@ const handleConfirmDoiSave = async () => {
       setAddMethod(null);
       setDoiInput('');
       setDoiPreview(null);
+      setDoiPdf(null);
       alert('Publication saved!');
     } else {
       alert('Error: ' + JSON.stringify(await res.json()));
@@ -351,6 +378,60 @@ const handleImportByDoi = async (e) => {
     alert('Network error');
   } finally {
     setDoiLoading(false);
+  }
+};
+
+
+
+const handlePreviewOrcid = async (e) => {
+  e.preventDefault();
+  setOrcidLoading(true);
+  try {
+    const res = await fetch(getApiUrl('/api/researches/preview-orcid'), {
+      method: 'POST',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orcid: orcidInput }),
+    });
+    if (res.ok) {
+      setOrcidWorks(await res.json());
+      setSelectedPutCodes([]);
+    } else {
+      alert('Error: ' + JSON.stringify(await res.json()));
+    }
+  } catch {
+    alert('Network error');
+  } finally {
+    setOrcidLoading(false);
+  }
+};
+
+const toggleWork = (putCode) => {
+  setSelectedPutCodes(p => p.includes(putCode) ? p.filter(c => c !== putCode) : [...p, putCode]);
+};
+
+const handleConfirmOrcidSave = async () => {
+  if (selectedPutCodes.length === 0) return;
+  setOrcidSaving(true);
+  try {
+    const res = await fetch(getApiUrl('/api/researches/import-orcid'), {
+      method: 'POST',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orcid: orcidInput, putCodes: selectedPutCodes }),
+    });
+    if (res.ok) {
+      const savedPubs = await res.json();
+      setPublications(p => [...savedPubs, ...p]);
+      setShowAddPublication(false);
+      setAddMethod(null);
+      setOrcidInput(''); setOrcidWorks(null); setSelectedPutCodes([]);
+      alert(`${savedPubs.length} publication(s) imported!`);
+    } else {
+      alert('Error: ' + JSON.stringify(await res.json()));
+    }
+  } catch {
+    alert('Network error');
+  } finally {
+    setOrcidSaving(false);
   }
 };
 
@@ -1031,6 +1112,64 @@ const handleQuickPhotoSave = async () => {
                 </div>
               </div>
 
+              {showAddPublication && addMethod === 'orcid' && (
+  <div className="bg-white rounded-2xl shadow-xl border-2 border-blue-100 p-8">
+    <button type="button" onClick={() => { setAddMethod(null); setOrcidWorks(null); setSelectedPutCodes([]); }} className="text-xs text-slate-500 hover:text-slate-700 mb-4">← Back</button>
+    <h3 className="text-xl font-bold text-slate-800 mb-1">Import by ORCID</h3>
+
+    {!orcidWorks ? (
+      <>
+        <p className="text-sm text-slate-500 mb-6">Enter an ORCID iD — we'll list the works on that record so you can pick which ones to add.</p>
+        <form onSubmit={handlePreviewOrcid} className="space-y-4">
+          <input type="text" value={orcidInput} onChange={e => setOrcidInput(e.target.value)}
+            placeholder="0000-0000-0000-0000" required
+            className="w-full p-3 border-2 border-slate-200 rounded-lg focus:border-blue-500 outline-none" />
+          <div className="flex gap-4">
+            <button type="submit" disabled={orcidLoading}
+              className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 rounded-lg disabled:opacity-60">
+              {orcidLoading ? 'Fetching…' : 'Fetch Works'}
+            </button>
+            <button type="button" onClick={() => { setShowAddPublication(false); setAddMethod(null); setOrcidInput(''); }}
+              className="flex-1 bg-slate-200 text-slate-700 font-semibold py-3 rounded-lg">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </>
+    ) : (
+      <>
+        <p className="text-sm text-slate-500 mb-4">
+          {orcidWorks.length === 0 ? 'No works found on this ORCID record.' : `Select which of these ${orcidWorks.length} works to import:`}
+        </p>
+        <div className="space-y-2 max-h-96 overflow-y-auto">
+          {orcidWorks.map(w => (
+            <label key={w.putCode} className={`flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer transition ${
+              selectedPutCodes.includes(w.putCode) ? 'border-blue-400 bg-blue-50' : 'border-slate-200 hover:border-slate-300'}`}>
+              <input type="checkbox" checked={selectedPutCodes.includes(w.putCode)} onChange={() => toggleWork(w.putCode)} className="mt-1" />
+              <div className="flex-1">
+                <p className="font-semibold text-slate-800 text-sm">{w.title}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{[w.journal, w.year, w.doi].filter(Boolean).join(' • ')}</p>
+              </div>
+            </label>
+          ))}
+        </div>
+        {orcidWorks.length > 0 && (
+          <div className="flex gap-4 mt-6">
+            <button type="button" onClick={handleConfirmOrcidSave} disabled={orcidSaving || selectedPutCodes.length === 0}
+              className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 rounded-lg disabled:opacity-60">
+              {orcidSaving ? 'Saving…' : `Import Selected (${selectedPutCodes.length})`}
+            </button>
+            <button type="button" onClick={() => { setOrcidWorks(null); setSelectedPutCodes([]); }}
+              className="flex-1 bg-slate-200 text-slate-700 font-semibold py-3 rounded-lg">
+              Try a different ORCID
+            </button>
+          </div>
+        )}
+      </>
+    )}
+  </div>
+)}
+
               {/* ============= ADD / EDIT PUBLICATION FORM ============= */}
               {showAddPublication && (editingPublicationId || addMethod === 'manual') && (
                 <div className="bg-white rounded-2xl shadow-xl border-2 border-blue-100 p-8">
@@ -1217,19 +1356,25 @@ const handleQuickPhotoSave = async () => {
   <div className="bg-white rounded-2xl shadow-xl border-2 border-blue-100 p-8">
     <h3 className="text-xl font-bold text-slate-800 mb-1">Add Publication</h3>
     <p className="text-sm text-slate-500 mb-6">How would you like to add it?</p>
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <button type="button" onClick={() => setAddMethod('doi')}
         className="p-6 border-2 border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 text-left transition">
         <div className="text-2xl mb-2"></div>
         <div className="font-semibold text-slate-800">Import by DOI</div>
         <div className="text-xs text-slate-500 mt-1">Pulls title, authors, journal automatically</div>
       </button>
-      <button type="button" onClick={() => setAddMethod('manual')}
+      <button type="button" onClick={() => setAddMethod('orcid')}
         className="p-6 border-2 border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 text-left transition">
         <div className="text-2xl mb-2"></div>
+        <div className="font-semibold text-slate-800">Import by ORCID</div>
+        <div className="text-xs text-slate-500 mt-1">Pick from all works on your ORCID record</div>
+      </button>
+      {/* <button type="button" onClick={() => setAddMethod('manual')}
+        className="p-6 border-2 border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 text-left transition">
+        <div className="text-2xl mb-2">✍️</div>
         <div className="font-semibold text-slate-800">Enter Manually</div>
         <div className="text-xs text-slate-500 mt-1">Fill in all the details yourself</div>
-      </button>
+      </button> */}
     </div>
   </div>
 )}
@@ -1277,12 +1422,30 @@ const handleQuickPhotoSave = async () => {
           {doiPreview.publisher && <p><span className="text-slate-500">Publisher: </span>{doiPreview.publisher}</p>}
           <p><span className="text-slate-500">DOI: </span><span className="font-mono text-blue-600">{doiPreview.doi}</span></p>
           <p className="capitalize"><span className="text-slate-500">Type: </span>{doiPreview.publication_type}</p>
+          <div className="mt-4">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Attach PDF <span className="text-gray-500">limit size 16 MB</span></label>
+            <input
+              type="file" accept="application/pdf"
+              onChange={handleDoiPdfChange}
+              className="w-full p-3 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 file:bg-blue-600 file:text-white file:py-2 file:px-6 file:rounded-lg file:border-0"
+            />
+            {doiPdf && (
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-xs text-green-600">✓ {doiPdf.name}</p>
+                <button type="button" onClick={() => setDoiPdf(null)} className="text-xs text-red-600 hover:text-red-800 font-medium underline">
+                  Clear
+                </button>
+              </div>
+            )}
+          </div>
           {doiPreview.abstract && (
             <div className="pt-2 border-t border-slate-200 mt-2">
               <p className="text-slate-500 mb-1">Abstract:</p>
               <p className="text-slate-700 leading-relaxed">{doiPreview.abstract}</p>
             </div>
           )}
+
+          
         </div>
         <div className="flex gap-4 mt-6">
           <button type="button" onClick={handleConfirmDoiSave} disabled={doiSaving}
@@ -1298,6 +1461,8 @@ const handleQuickPhotoSave = async () => {
     )}
   </div>
 )}
+
+
 
               {/* ============= PUBLICATION LIST (below the form) ============= */}
               <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">

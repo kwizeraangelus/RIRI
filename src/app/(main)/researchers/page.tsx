@@ -162,7 +162,7 @@ export default function ResearchersPage() {
 
 {/* Right Column: Text Content */}
 <div className="flex-1 pt-1">
-  <h3 className="text-4xl font-semibold text-gray-900 mb-4">{person.name}</h3>
+  <h3 className="text-2xl font-semibold text-gray-900 mb-4">{person.name}</h3>
 
   <div className="space-y-2 text-lg">
     <div className="text-gray-500">
