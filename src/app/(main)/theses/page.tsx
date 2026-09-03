@@ -18,7 +18,7 @@ interface Publication {
   file_url: string;
   supervisor_name?: string;
   submission_type?: string;
-  degree_type?: 'thesis' | 'FYP';
+  degree_type?: 'thesis' | 'dissertation';
   university_name?: string;
   average_rating?: number; // NEW - computed by backend (rating_sum / rating_count)
   rating_count?: number;   // NEW - number of ratings submitted
@@ -26,7 +26,7 @@ interface Publication {
 
 interface Counts {
   thesis: number;
-  FYP: number;
+  dissertation: number;
   engineering: number;
   medicine_health_sciences: number;
   arts_humanities: number;
@@ -74,10 +74,10 @@ const FIELD_TO_KEY: Record<string, keyof Counts> = {
 };
 
 // Maps Counts key → clean display label
-// NOTE: display label only — the underlying key/value stays "FYP" everywhere else
+// NOTE: display label only — the underlying key/value stays "dissertation" everywhere else
 const FIELD_DISPLAY_NAMES: Record<string, string> = {
   thesis:                   'Thesis',
-  FYP:             'FYP',
+  dissertation:             'FYP',
   engineering:              'Engineering',
   medicine_health_sciences: 'Medicine / Health Sciences',
   arts_humanities:          'Arts & Humanities',
@@ -93,7 +93,7 @@ const FIELD_KEYWORDS: Record<string, string[]> = {
   'Engineering':              ['engineering', 'electrical', 'mechanical', 'civil', 'iot', 'robotics'],
   'Medicine/Health Sciences': ['medicine', 'health', 'nursing', 'pharmacy', 'clinical', 'public health'],
   'Arts & Humanities':        ['law', 'literature', 'philosophy', 'history', 'arts', 'humanities', 'language'],
-  'Natural Sciences':         ['biology', 'chemistry', 'physics', 'mathematics', 'geology', 'environment'],
+  'Natural Sciences':         ['biology', 'chemistry', 'physics', 'mathematics', 'geology', 'environment', 'natural_sciences', 'natural science', 'natural'],
   'Social Sciences':          ['sociology', 'psychology', 'anthropology', 'political', 'social', 'development'],
   'Business & Economics':     ['business', 'economics', 'finance', 'management', 'accounting', 'marketing'],
   'Computer Science/IT':      ['computer', 'it', 'informatics', 'ai', 'software', 'data', 'cyber'],
@@ -117,8 +117,8 @@ const FIELD_KEYWORDS: Record<string, string[]> = {
 const formatFieldName = (submissionType?: string): string => {
   if (!submissionType) return 'Unknown Field';
 
-  // Strip degree prefix (e.g. "thesis-" or "FYP_")
-  const cleaned = submissionType.replace(/^(thesis|FYP)[_-]/i, '');
+  // Strip degree prefix (e.g. "thesis-" or "dissertation_")
+  const cleaned = submissionType.replace(/^(thesis|dissertation)[_-]/i, '');
 
   // Normalize to underscore key: replace spaces and slashes with _
   const normalized = cleaned.toLowerCase().replace(/[\s/]+/g, '_');
@@ -134,10 +134,10 @@ const formatFieldName = (submissionType?: string): string => {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 };
 
-/** Converts a raw degree_type value into the label shown in the UI ("thesis" -> "Thesis", "FYP" -> "FYP"). */
+/** Converts a raw degree_type value into the label shown in the UI ("thesis" -> "Thesis", "dissertation" -> "FYP"). */
 const formatDegreeType = (degreeType?: string): string => {
   if (!degreeType) return '';
-  return degreeType === 'thesis' ? 'Thesis' : degreeType === 'FYP' ? 'FYP' : degreeType;
+  return degreeType === 'thesis' ? 'Thesis' : degreeType === 'dissertation' ? 'FYP' : degreeType;
 };
 
 /** Converts a raw Counts key to a display label. */
@@ -333,7 +333,7 @@ const PublicationListItem: React.FC<
 
         <h3
           onClick={() => router.push(`/books/${id}`)}
-          className="text-lg sm:text-2xl font-medium text-blue-700 hover:underline cursor-pointer leading-snug mb-1"
+          className="text-lg sm:text-xl font-medium text-blue-700 hover:underline cursor-pointer leading-snug mb-1"
         >
           {title}
         </h3>
@@ -352,7 +352,7 @@ const PublicationListItem: React.FC<
     </button>
   )}
   {!university_name && year ? <>{year} </> : null}
-  {university_name && year ? <span className="text-gray-500 sm:text-xl"> ({year})</span> : null}
+  {university_name && year ? <span className="text-gray-500"> ({year})</span> : null}
   {authors && <span className="text-gray-700"> . </span>}
   {authors && <span className="text-black sm:text-xl">{authors}</span>}. 
   {supervisor_name && (
@@ -404,7 +404,7 @@ const PublicationListItem: React.FC<
   );
 };
 
-/// ──────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────
 // FieldMultiSelect — single "select" input that opens a checkbox dropdown
 // letting the user pick one or more CORE_FIELDS at once
 // ──────────────────────────────────────────────────────
@@ -429,7 +429,7 @@ const FieldMultiSelect: React.FC<{
 
   const label =
     selected.length === 0
-      ? 'Select Fields'
+      ? 'Filter by field'
       : selected.length === 1
       ? selected[0]
       : `${selected.length} fields selected`;
@@ -440,7 +440,7 @@ const FieldMultiSelect: React.FC<{
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className={`flex items-center justify-between gap-2 px-5 py-2.5 rounded-full bg-white shadow-md text-lg sm:text-xl font-bold transition-all whitespace-nowrap ${
+        className={`flex items-center justify-between gap-2 px-5 py-2.5 rounded-full bg-white shadow-md text-sm font-bold transition-all whitespace-nowrap ${
           selected.length > 0
             ? 'border-2 border-[#050A14] text-[#050A14]'
             : 'border-2 border-gray-300 text-gray-600 hover:border-[#FFD700]'
@@ -457,20 +457,11 @@ const FieldMultiSelect: React.FC<{
         </svg>
       </button>
 
-      {/* Dropdown — centered & full-width safe on mobile, right-aligned on larger screens */}
+      {/* Dropdown with checkboxes — laid out 2 per row */}
       {open && (
-        <div
-          className="
-            absolute top-full mt-2 z-50
-            left-1/2 -translate-x-1/2
-            sm:left-auto sm:right-0 sm:translate-x-0
-            w-[min(22rem,calc(100vw-1.5rem))]
-            bg-white rounded-2xl shadow-2xl border border-gray-200
-            overflow-hidden
-          "
-        >
+        <div className="absolute top-full right-0 mt-2 w-[min(24rem,90vw)] bg-white rounded-2xl shadow-2xl border border-gray-200 z-30 overflow-hidden">
           <div
-            className="max-h-[min(18rem,60vh)] overflow-y-auto overscroll-contain p-3 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-2"
+            className="max-h-72 overflow-y-auto p-3 grid grid-cols-2 gap-2"
             role="listbox"
             aria-multiselectable="true"
           >
@@ -499,16 +490,13 @@ const FieldMultiSelect: React.FC<{
                       onChange={() => onToggle(field)}
                       className="w-4 h-4 flex-shrink-0 accent-[#050A14] rounded"
                     />
-                    <span className="text-xs font-medium text-gray-800 leading-tight break-words">
-                      {field}
-                    </span>
+                    <span className="text-xs font-medium text-gray-800 leading-tight">{field}</span>
                   </span>
                   <span className="text-[10px] text-gray-400 flex-shrink-0">{count}</span>
                 </label>
               );
             })}
           </div>
-
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
             <button
               type="button"
@@ -562,14 +550,14 @@ export default function ThesesPage() {
 
   const [allPublications, setAllPublications] = useState<Publication[]>([]);
   const [counts, setCounts] = useState<Counts>({
-    thesis: 0, FYP: 0,
+    thesis: 0, dissertation: 0,
     engineering: 0, medicine_health_sciences: 0, arts_humanities: 0,
     natural_sciences: 0, social_sciences: 0, business_economics: 0,
     computer_science_it: 0, education: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [inputValue, setInputValue] = useState('');
-  const [degreeFilter, setDegreeFilter] = useState<'all' | 'thesis' | 'FYP'>('all');
+  const [degreeFilter, setDegreeFilter] = useState<'all' | 'thesis' | 'dissertation'>('all');
   // Multiple fields can now be selected at once (was: selectedField: string | null)
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -760,17 +748,17 @@ export default function ThesesPage() {
   const uploadDestination = getUploadDestination(authUser);
 
   // Total count for the "All" pill. When a degree filter is active the backend
-  // recomputes thesis/FYP counts scoped to that filter, so summing
+  // recomputes thesis/dissertation counts scoped to that filter, so summing
   // them always reflects what's currently loaded.
-  const totalDegreeCount = counts.thesis + counts.FYP;
+  const totalDegreeCount = counts.thesis + counts.dissertation;
 
-  const DEGREE_TABS: { key: 'all' | 'thesis' | 'FYP'; label: string; count: number }[] = [
+  const DEGREE_TABS: { key: 'all' | 'thesis' | 'dissertation'; label: string; count: number }[] = [
     { key: 'all', label: 'All', count: totalDegreeCount },
     { key: 'thesis', label: 'Theses', count: counts.thesis },
-    { key: 'FYP', label: 'FYP', count: counts.FYP },
+    { key: 'dissertation', label: 'FYP', count: counts.dissertation },
   ];
 
-  const degreeTabStyles: Record<'all' | 'thesis' | 'FYP', { active: string; inactive: string }> = {
+  const degreeTabStyles: Record<'all' | 'thesis' | 'dissertation', { active: string; inactive: string }> = {
     all: {
       active: 'bg-[#050A14] text-[#FFD700] border-2 border-[#050A14] shadow-lg scale-105',
       inactive: 'bg-white text-gray-500 border-2 border-gray-300 hover:border-gray-400',
@@ -779,7 +767,7 @@ export default function ThesesPage() {
       active: 'bg-blue-600 text-white border-2 border-blue-600 shadow-lg scale-105',
       inactive: 'bg-white text-blue-600 border-2 border-blue-300 hover:border-blue-500',
     },
-    FYP: {
+    dissertation: {
       active: 'bg-purple-600 text-white border-2 border-purple-600 shadow-lg scale-105',
       inactive: 'bg-white text-purple-600 border-2 border-purple-300 hover:border-purple-500',
     },
@@ -795,7 +783,7 @@ export default function ThesesPage() {
       <section className="relative -mt-28 pt-36 pb-6 text-center">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
 
-          <p className="text-base sm:text-2xl md:text-xl text-gray-700 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-gray-700 max-w-2xl mx-auto">
             Explore theses and Final Year Projects (FYP) from Rwandan-based Universities and
             Rwandans who studied in foreign universities
           </p>
@@ -920,7 +908,6 @@ export default function ThesesPage() {
           {!showSearchResults && (
             <>
               {/* Results toolbar — back link, "Now showing", settings gear */}
-               
               
 
               {/* Publications list */}
@@ -998,7 +985,15 @@ export default function ThesesPage() {
       </section>
 
       {/* Upload FAB — sends logged-in users to their dashboard, others to login */}
-     
+      <Link
+        href={uploadDestination}
+        className="fixed right-4 sm:right-6 bottom-4 sm:bottom-6 z-50 flex items-center gap-2 sm:gap-3 bg-[#FFD700] text-[#050A14] px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-2xl hover:scale-110 transition-all font-bold text-xs sm:text-sm uppercase"
+      >
+        Upload Book
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+      </Link>
 
       {/* Footer */}
       <footer className="bg-[#0c1e30] text-white pt-14 pb-8 px-4 sm:px-8">

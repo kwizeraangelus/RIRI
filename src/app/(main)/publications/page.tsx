@@ -177,9 +177,11 @@ export default function PublicationsPage() {
                           <p className="font-medium text-black text-base sm:text-lg break-words">
                             {highlight(pub.title || 'Untitled', q)}
                           </p>
-                          <p className="text-black text-sm italic mt-1 text-left truncate">
-                            {highlight(authors, q)}
-                          </p>
+                          {!isOpen && (
+                            <p className="text-black text-sm italic mt-1 text-left truncate">
+                              {highlight(authors, q)}
+                            </p>
+                          )}
                         </div>
                         <svg
                           className={`w-5 h-5 text-black flex-shrink-0 mt-1 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}

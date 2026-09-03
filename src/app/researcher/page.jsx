@@ -1357,18 +1357,19 @@ const handleQuickPhotoSave = async () => {
     <h3 className="text-xl font-bold text-slate-800 mb-1">Add Publication</h3>
     <p className="text-sm text-slate-500 mb-6">How would you like to add it?</p>
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <button type="button" onClick={() => setAddMethod('doi')}
-        className="p-6 border-2 border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 text-left transition">
-        <div className="text-2xl mb-2"></div>
-        <div className="font-semibold text-slate-800">Import by DOI</div>
-        <div className="text-xs text-slate-500 mt-1">Pulls title, authors, journal automatically</div>
-      </button>
       <button type="button" onClick={() => setAddMethod('orcid')}
         className="p-6 border-2 border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 text-left transition">
         <div className="text-2xl mb-2"></div>
         <div className="font-semibold text-slate-800">Import by ORCID</div>
         <div className="text-xs text-slate-500 mt-1">Pick from all works on your ORCID record</div>
       </button>
+      <button type="button" onClick={() => setAddMethod('doi')}
+        className="p-6 border-2 border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 text-left transition">
+        <div className="text-2xl mb-2"></div>
+        <div className="font-semibold text-slate-800">Import by DOI</div>
+        <div className="text-xs text-slate-500 mt-1">Pulls title, authors, journal automatically</div>
+      </button>
+      
       {/* <button type="button" onClick={() => setAddMethod('manual')}
         className="p-6 border-2 border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 text-left transition">
         <div className="text-2xl mb-2">✍️</div>
