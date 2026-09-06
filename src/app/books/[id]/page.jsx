@@ -240,7 +240,7 @@ export default function BookDetailPage() {
           
           
           <p className="text-sm uppercase tracking-widest text-gray-500 font-bold"></p>
-          <h1 className="mt-2 text-4xl md:text-5xl font-bold text-gray-900">{book.title}</h1>
+          <h1 className="mt-2 text-4xl md:text-3xl font-bold text-gray-900">{book.title}</h1>
           <p className="mt-3 text-lg text-gray-600 italic">
             By <span className="font-semibold text-gray-800">{book.authors || 'Unknown'}</span>
           </p>

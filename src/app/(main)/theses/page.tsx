@@ -333,7 +333,7 @@ const PublicationListItem: React.FC<
 
         <h3
           onClick={() => router.push(`/books/${id}`)}
-          className="text-lg sm:text-xl font-medium text-blue-700 hover:underline cursor-pointer leading-snug mb-1"
+          className="text-lg sm:text-2xl font-medium text-blue-700 hover:underline cursor-pointer leading-snug mb-1"
         >
           {title}
         </h3>
@@ -985,7 +985,7 @@ export default function ThesesPage() {
       </section>
 
       {/* Upload FAB — sends logged-in users to their dashboard, others to login */}
-      <Link
+      {/*<Link
         href={uploadDestination}
         className="fixed right-4 sm:right-6 bottom-4 sm:bottom-6 z-50 flex items-center gap-2 sm:gap-3 bg-[#FFD700] text-[#050A14] px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-2xl hover:scale-110 transition-all font-bold text-xs sm:text-sm uppercase"
       >
@@ -993,7 +993,7 @@ export default function ThesesPage() {
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
         </svg>
-      </Link>
+      </Link>*/}
 
       {/* Footer */}
       <footer className="bg-[#0c1e30] text-white pt-14 pb-8 px-4 sm:px-8">

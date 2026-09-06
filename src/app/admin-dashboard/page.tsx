@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { format } from 'date-fns';
 import { getApiUrl } from '@/utils/api';
 
@@ -104,6 +104,10 @@ interface Filters {
   submission_type: string;
 }
 
+interface UniversityComboboxProps {
+  value: string;
+  onChange: (value: string) => void;
+}
 
 
 export default function AdminDashboard() {
@@ -156,6 +160,51 @@ export default function AdminDashboard() {
     author: '',
     submission_type: ''
   });
+
+  // Institution lists
+const PUBLIC_INSTITUTIONS = [
+  'University of Rwanda',
+  'Institute of Legal Practice And Development',
+  'Rwanda Polytechnic',
+  'African Biomanufacturing Institute',
+];
+
+const PRIVATE_INSTITUTIONS = [
+  'African Institute of Mathematical Sciences Rwanda (AIMS-Rwanda)',
+  'African Leadership University (ALU)',
+  'Adventist University of Central Africa (AUCA)',
+  'Carnegie Mellon University Africa (CMU-A)',
+  'Catholic University of Rwanda (CUR)',
+  'College of Surgeons of East, Central and Southern Africa (COSECSA)',
+  'East Africa University of Rwanda (EAUR)',
+  'Independent Institute of Lay Adventists of Kigali (INILAK)',
+  'Institut Catholique de Kabgayi (ICK)',
+  'Institut d’Enseignement Supérieur de Ruhengeri (INES)',
+  'Institut Polytechnique de Byumba (IPB)',
+  'Kibogora Polytechnics (KP)',
+  'Kigali Independent University (ULK)',
+  'Mount Kigali University (MKU)',
+  'Protestant Institute of Arts and Social Sciences (PIASS)',
+  'Ruli Higher Institute of Health Sainte Rose de Lima (RHIH)',
+  'Rwanda Tourism University College (RTUC)',
+  'Institut Supérieur Pédagogique de Gitwe (ISPG)',
+  'University of Global Health Equity (UGHE)',
+  'University of Kigali (UoK)',
+  'Vatel School Rwanda',
+  'Oklahoma Christian University (OCU)',
+  'Ngoma Adventist College of Health Sciences – NACHS (Campus for AUCA)',
+  'Rwanda Institute for Conservation Agriculture (RICA)',
+  'East African Christian College (EACC)',
+  'Africa College of Theology (ACT)',
+  'Kepler College',
+  'Africa Health Sciences University (AHSU)',
+  'University of Medical Science and Technology (UMST) – Rwanda Campus Cross Border',
+  'Hanika Anglican Integrated Polytechnic (HAIP)',
+  'Muhabura Integrated Polytechnic College (MIPC)',
+  'Saint Joseph Integrated Technical College – SJITC-Nyamirambo',
+  'ULK Polytechnic Institute – UPI',
+  'African School of Governance',
+];
   const resolveFileUrl = (path?: string): string => {
   if (!path) return '';
   return path.startsWith('http') ? path : getApiUrl(path);
@@ -696,6 +745,145 @@ export default function AdminDashboard() {
     });
   };
 
+
+
+interface UniversityComboboxProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
+  const [inputValue, setInputValue] = useState(value);
+  const [isOpen, setIsOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const query = inputValue.trim().toLowerCase();
+
+  const filteredPublic = query
+    ? PUBLIC_INSTITUTIONS.filter(name => name.toLowerCase().includes(query))
+    : PUBLIC_INSTITUTIONS;
+
+  const filteredPrivate = query
+    ? PRIVATE_INSTITUTIONS.filter(name => name.toLowerCase().includes(query))
+    : PRIVATE_INSTITUTIONS;
+
+  // Flat list for keyboard navigation (public first, then private)
+  const flatOptions = [...filteredPublic, ...filteredPrivate];
+
+  const selectOption = (name: string) => {
+    setInputValue(name);
+    onChange(name);
+    setIsOpen(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      setIsOpen(true);
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex(i => Math.min(i + 1, flatOptions.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex(i => Math.max(i - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (isOpen && flatOptions[highlightedIndex]) {
+        selectOption(flatOptions[highlightedIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setIsOpen(false);
+    }
+  };
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      <input
+        type="text"
+        placeholder="Type or select university name"
+        value={inputValue}
+        onChange={(e) => {
+          setInputValue(e.target.value);
+          onChange(e.target.value); // free typing is always accepted
+          setIsOpen(true);
+          setHighlightedIndex(0);
+        }}
+        onFocus={() => setIsOpen(true)}
+        onKeyDown={handleKeyDown}
+        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
+        required
+      />
+
+      {isOpen && (filteredPublic.length > 0 || filteredPrivate.length > 0) && (
+        <div className="absolute z-20 mt-1 w-full max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
+          {filteredPublic.length > 0 && (
+            <div>
+              <div className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50 sticky top-0">
+                Public Institutions
+              </div>
+              {filteredPublic.map((name) => {
+                const flatIdx = flatOptions.indexOf(name);
+                return (
+                  <div
+                    key={name}
+                    onMouseDown={() => selectOption(name)}
+                    onMouseEnter={() => setHighlightedIndex(flatIdx)}
+                    className={`px-3 py-2 text-sm cursor-pointer ${
+                      flatIdx === highlightedIndex ? 'bg-[#4a772e]/10' : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    {name}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {filteredPrivate.length > 0 && (
+            <div>
+              <div className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50 sticky top-0">
+                Private Institutions
+              </div>
+              {filteredPrivate.map((name) => {
+                const flatIdx = flatOptions.indexOf(name);
+                return (
+                  <div
+                    key={name}
+                    onMouseDown={() => selectOption(name)}
+                    onMouseEnter={() => setHighlightedIndex(flatIdx)}
+                    className={`px-3 py-2 text-sm cursor-pointer ${
+                      flatIdx === highlightedIndex ? 'bg-[#4a772e]/10' : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    {name}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
   if (loading) return <div className="text-center py-10 text-[#4a772e] font-bold">Loading...</div>;
 
   return (
@@ -1121,25 +1309,20 @@ export default function AdminDashboard() {
                     /* ===== SIMPLIFIED UNIVERSITY CREATION FORM ===== */
                     <div className="space-y-4 max-w-xl">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          University Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="University name"
-                          value={userForm.university_name}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            const uniName = e.target.value;
-                            setUserForm(prev => ({
-                              ...prev,
-                              university_name: uniName,
-                              username: generateUsernameFromUniversity(uniName)
-                            }));
-                          }}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
-                          required
-                        />
-                      </div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    University Name <span className="text-red-500">*</span>
+  </label>
+  <UniversityCombobox
+    value={userForm.university_name}
+    onChange={(uniName) => {
+      setUserForm(prev => ({
+        ...prev,
+        university_name: uniName,
+        username: generateUsernameFromUniversity(uniName)
+      }));
+    }}
+  />
+</div>
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">

@@ -194,11 +194,16 @@ export default function PublicationsPage() {
                       {/* EXPANDED DETAIL */}
                       {isOpen && (
                         <div className="px-6 pb-6 pt-3 bg-gray-50 border-t border-gray-100 text-base text-gray-600 space-y-3">
-                          {pub.publication_type && (
-                            <span className="inline-block text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-3 py-1 rounded">
-                              {pub.publication_type}
-                            </span>
-                          )}
+                          {/* ── Publication type badge, above the title ── */}
+{pub.publication_type && (
+  <span className="inline-block text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-3 py-1 rounded mb-2">
+    {pub.publication_type === 'journal'
+      ? 'Article'
+      : pub.publication_type === 'conference'
+      ? 'Conference Paper'
+      : pub.publication_type}
+  </span>
+)}
                           <p><span className="text-black font-bold">Authors:</span> {highlight(authors, q)}</p>
                           {(pub.journal_name || pub.publisher) && (
                             <p>
