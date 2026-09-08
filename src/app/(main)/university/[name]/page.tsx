@@ -48,6 +48,7 @@ export default function UniversityPage() {
   const [stats, setStats] = useState<UniversityStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<'all' | 'thesis' | 'FYP'>('all');
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchUniversityData();
@@ -56,14 +57,12 @@ export default function UniversityPage() {
   const fetchUniversityData = async () => {
     setIsLoading(true);
     try {
-      // Fetch publications
       const pubRes = await fetch(getApiUrl('/api/innovations/public-list/'));
       const allPublications: Publication[] = pubRes.ok ? await pubRes.json() : [];
       const approvedPubs = allPublications.filter(p => p.status === 'approved');
 
       setPublications(approvedPubs);
 
-      // Filter by university (backend field is `university_name`, not `university`)
       const uniPubs = approvedPubs.filter(p =>
         p.university_name?.toLowerCase().includes(universityName.toLowerCase())
       );
@@ -74,7 +73,6 @@ export default function UniversityPage() {
 
       setUniversityPublications(filteredPubs);
 
-      // Calculate stats
       const theses = uniPubs.filter(p => p.degree_type === 'thesis').length;
       const FYP = uniPubs.filter(p => p.degree_type === 'FYP').length;
 
@@ -108,13 +106,12 @@ export default function UniversityPage() {
         recentYear: years.length > 0 ? years[0] : undefined
       });
 
-      // Fetch researchers from this university
-      const researchersRes = await fetch(getApiUrl('/api/researchers/')); // Adjust endpoint if needed
+      const researchersRes = await fetch(getApiUrl('/api/researchers/'));
       if (researchersRes.ok) {
         const allResearchers: Researcher[] = await researchersRes.json();
         const uniResearchers = allResearchers
           .filter(r => r.university_name?.toLowerCase().includes(universityName.toLowerCase()))
-          .slice(0, 6); // Show up to 6 notable researchers
+          .slice(0, 6);
         setResearchers(uniResearchers);
       }
     } catch (error) {
@@ -265,7 +262,7 @@ export default function UniversityPage() {
           </div>
         )}
 
-        {/* Publications Grid */}
+        {/* Publications List */}
         {universityPublications.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-3xl shadow-2xl">
             <div className="text-4xl text-gray-300 mb-4">📚</div>
@@ -281,64 +278,93 @@ export default function UniversityPage() {
               </span>
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {universityPublications.map(publication => (
+            <div className="bg-white rounded-3xl shadow-xl border border-gray-200 px-6 sm:px-10">
+              {universityPublications.map((publication) => (
                 <div
                   key={publication.id}
-                  onClick={() => window.location.href = `/books/${publication.id}`}
-                  className="cursor-pointer group transform transition-all hover:scale-[1.02]"
+                  className="flex gap-5 py-6 border-b border-gray-200 last:border-b-0"
                 >
-                  <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-gray-200 bg-white hover:border-blue-300 hover:shadow-2xl transition-all">
-                    <div className="h-56 bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center relative overflow-hidden">
-                      {publication.cover_image ? (
-                        <img
-                          src={publication.cover_image}
-                          alt={publication.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          onError={(e) => {
-                            e.currentTarget.src = 'https://placehold.co/600x400/E0E7FF/1E40AF?text=No+Cover';
-                          }}
-                        />
-                      ) : (
+                  {/* Thumbnail */}
+                  <button
+                    onClick={() => window.location.href = `/books/${publication.id}`}
+                    className="hidden sm:flex flex-shrink-0 w-[110px] h-[140px] bg-white border border-gray-300 rounded-sm shadow-sm items-center justify-center overflow-hidden"
+                    aria-label={`Open ${publication.title}`}
+                  >
+                    {publication.cover_image ? (
+                      <img
+                        src={publication.cover_image}
+                        alt={publication.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <svg className="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.2} d="M9 12h6m-6 4h6m-7 5h8a2 2 0 002-2V7.414a1 1 0 00-.293-.707l-3.414-3.414A1 1 0 0013.586 3H7a2 2 0 00-2 2v13a2 2 0 002 2z" />
+                      </svg>
+                    )}
+                  </button>
+
+                  {/* Content */}
+                  <div className="min-w-0 flex-1">
+                    <h3
+                      onClick={() => window.location.href = `/books/${publication.id}`}
+                      className="text-lg sm:text-2xl font-medium text-blue-700 hover:underline cursor-pointer leading-snug mb-1"
+                    >
+                      {publication.title}
+                    </h3>
+
+                    <p className="sm:text-xl text-gray-500 mb-2">
+                      {publication.year && <>({publication.year}) </>}
+                      {publication.authors && <span className="text-gray-700"> . </span>}
+                      {publication.authors && (
+                        <span className="text-black sm:text-xl">{publication.authors}</span>
+                      )}
+                      .
+                      {publication.supervisor_name && (
                         <>
-                          <span className="text-6xl text-gray-300">📖</span>
-                          <p className="text-xl font-medium text-gray-500 mt-4 tracking-wider">
-                            {publication.degree_type?.toUpperCase() || 'RESEARCH'}
-                          </p>
+                          <span className="text-gray-500 italic"> </span>
+                          {publication.supervisor_name}
                         </>
                       )}
-                      {publication.degree_type && (
-                        <div className={`absolute top-4 right-4 px-4 py-2 rounded-full text-xs font-bold text-white shadow-lg ${getDegreeColor(publication.degree_type)}`}>
-                          {publication.degree_type === 'thesis' ? 'THESIS' : 'FYP'}
-                        </div>
-                      )}
-                    </div>
+                    </p>
 
-                    <div className="p-6">
-                      <h4 className="font-bold text-gray-800 text-lg line-clamp-2 mb-3 group-hover:text-blue-700 transition">
-                        {publication.title}
-                      </h4>
-                      <div className="space-y-2 mb-4">
-                        <p className="text-gray-700 text-sm"><span className="text-gray-500 font-medium">Author:</span> {publication.authors}</p>
-                        {publication.supervisor_name && (
-                          <p className="text-gray-700 text-sm"><span className="text-gray-500 font-medium">Supervisor:</span> {publication.supervisor_name}</p>
-                        )}
-                        {publication.year && (
-                          <p className="text-gray-700 text-sm"><span className="text-gray-500 font-medium">Year:</span> {publication.year}</p>
-                        )}
-                        {publication.submission_type && (
-                          <p className="text-blue-700 font-semibold text-sm"><span className="text-gray-500 font-medium">Field:</span> {formatFieldName(publication.submission_type)}</p>
-                        )}
-                      </div>
-                      <p className="text-gray-600 text-sm line-clamp-3 mb-4">
-                        {publication.description || 'No description available.'}
-                      </p>
-                      <div className="flex items-center text-blue-600 font-semibold text-sm group-hover:text-blue-800">
-                        Read Publication
-                        <svg className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <p className={`sm:text-xl text-gray-700 leading-relaxed ${expandedId === publication.id ? '' : 'line-clamp-2'}`}>
+                      {publication.description || 'No description available.'}
+                    </p>
+
+                    <div className="mt-2 flex flex-wrap items-center gap-4">
+                      <button
+                        onClick={() =>
+                          setExpandedId(expandedId === publication.id ? null : publication.id)
+                        }
+                        className="inline-flex items-center gap-1 text-blue-600 hover:underline text-sm font-medium"
+                      >
+                        <svg
+                          className={`w-4 h-4 transition-transform ${expandedId === publication.id ? 'rotate-180' : ''}`}
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
-                      </div>
+                        {expandedId === publication.id ? 'Show less' : 'Show more'}
+                      </button>
+
+                      {publication.degree_type && (
+                        <span
+                          className={`px-2.5 py-0.5 rounded text-[10px] font-semibold text-white uppercase tracking-wide ${
+                            publication.degree_type === 'thesis' ? 'bg-blue-600' : 'bg-purple-600'
+                          }`}
+                        >
+                          {publication.degree_type === 'thesis' ? 'Thesis' : 'FYP'}
+                        </span>
+                      )}
+
+                      {publication.submission_type && (
+                        <span className="text-blue-700 font-semibold text-xs">
+                          {formatFieldName(publication.submission_type)}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

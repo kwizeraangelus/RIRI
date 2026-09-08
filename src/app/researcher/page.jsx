@@ -1496,69 +1496,66 @@ const handleQuickPhotoSave = async () => {
             
 
             <div className="flex items-start justify-between gap-3">
+  <h3 className="text-lg font-bold text-slate-800 group-hover:text-blue-700 transition-colors">
+    {pub.title}
+  </h3>
+  {/* ── Edit / Delete buttons ── */}
+  <div className="flex gap-2 flex-shrink-0">
+    <button
+      onClick={() => handleEditClick(pub)}
+      className="text-xs px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-md font-medium transition-colors"
+    >
+      ✏️ Edit
+    </button>
+    <button
+      onClick={() => handleDeletePublication(pub.id)}
+      className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors"
+    >
+      🗑️ Delete
+    </button>
+  </div>
+</div>
 
-              
-              <h3 className="text-lg font-bold text-slate-800 group-hover:text-blue-700 transition-colors">{pub.title}</h3>
-              {/* ── Edit / Delete buttons ── */}
-              <div className="flex gap-2 flex-shrink-0">
-                <button
-                  onClick={() => handleEditClick(pub)}
-                  className="text-xs px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-md font-medium transition-colors"
-                >
-                  ✏️ Edit
-                </button>
-                <button
-                  onClick={() => handleDeletePublication(pub.id)}
-                  className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors"
-                >
-                  🗑️ Delete
-                </button>
-              </div>
-            </div>
+{/* Authors */}
+<p className="text-sm sm:text-base text-slate-600 mt-1">
+  <span className="font-medium">Authors:</span>{' '}
+  {Array.isArray(pub.authors)
+    ? pub.authors.join(' • ')
+    : researcher.name}
+</p>
+{/* ── Journal/Conference + DOI row, with PDF button on the right ── */}
+<div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+  <p className="text-sm text-slate-600 m-0">
+    {[pub.journal_name, pub.conference_info, pub.publisher, pub.year]
+      .filter(Boolean)
+      .join(' • ')}
+    {pub.doi && (
+      <>
+        {' • '}
+        
+         <a href={`https://doi.org/${pub.doi}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 font-mono hover:underline"
+          title={pub.doi}
+        >
+          DOI
+        </a>
+      </>
+    )}
+  </p>
 
-            <p className="text-sm text-slate-600 mt-1">
-              <span className="font-medium text-slate-700">Authors:</span>{' '}
-              {Array.isArray(pub.authors) ? pub.authors.join(' • ') : pub.authors}
-            </p>
-
-            {/* ── Journal/Conference + DOI badge row, with PDF button on the right ── */}
-            <div className="mt-2 text-sm flex flex-wrap items-center justify-between gap-2">
-              <div className="flex flex-wrap items-center gap-1.5">
-                {pub.journal_name && (
-                  <span className="px-2.5 py-1 rounded-full text-black text-xs">
-                    {pub.journal_name}
-                    {pub.year && <span className="text-black"> · {pub.year}</span>}
-                    {pub.doi && <span className="text-blue-600 font-mono"> · DOI: {pub.doi}</span>}
-                  </span>
-                )}
-
-                {pub.conference_info && (
-                  <span className="px-2.5 py-1 rounded-full text-black text-xs">
-                    {pub.conference_info}
-                    {pub.year && <span className="text-purple-400"> · {pub.year}</span>}
-                    {pub.doi && <span className="text-blue-600 font-mono"> · DOI: {pub.doi}</span>}
-                  </span>
-                )}
-                
-
-                {pub.publisher && (
-                  <span className="px-2.5 py-1 rounded-full text-black text-xs">
-                    {pub.publisher}
-                  </span>
-                )}
-              </div>
-
-              {pub.pdf_path && (
-                <a
-                  href={pub.pdf_path}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs px-3 py-1.5 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors shrink-0"
-                >
-                  📑 PDF
-                </a>
-              )}
-            </div>
+  {pub.pdf_path && (
+    
+    <a  href={pub.pdf_path}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition shrink-0"
+    >
+      📑 PDF
+    </a>
+  )}
+</div>
 
             {/* ── Abstract toggle button (kept, commented) / HTML link (kept, commented) ── */}
             {/*

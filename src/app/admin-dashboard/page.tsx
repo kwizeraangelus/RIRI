@@ -110,6 +110,188 @@ interface UniversityComboboxProps {
 }
 
 
+
+
+  // Institution lists
+const PUBLIC_INSTITUTIONS = [
+  'University of Rwanda',
+  'Institute of Legal Practice And Development',
+  'Rwanda Polytechnic',
+  'African Biomanufacturing Institute',
+];
+
+const PRIVATE_INSTITUTIONS = [
+  'African Institute of Mathematical Sciences Rwanda (AIMS-Rwanda)',
+  'African Leadership University (ALU)',
+  'Adventist University of Central Africa (AUCA)',
+  'Carnegie Mellon University Africa (CMU-A)',
+  'Catholic University of Rwanda (CUR)',
+  'College of Surgeons of East, Central and Southern Africa (COSECSA)',
+  'East Africa University of Rwanda (EAUR)',
+  'Independent Institute of Lay Adventists of Kigali (INILAK)',
+  'Institut Catholique de Kabgayi (ICK)',
+  'Institut d’Enseignement Supérieur de Ruhengeri (INES)',
+  'Institut Polytechnique de Byumba (IPB)',
+  'Kibogora Polytechnics (KP)',
+  'Kigali Independent University (ULK)',
+  'Mount Kigali University (MKU)',
+  'Protestant Institute of Arts and Social Sciences (PIASS)',
+  'Ruli Higher Institute of Health Sainte Rose de Lima (RHIH)',
+  'Rwanda Tourism University College (RTUC)',
+  'Institut Supérieur Pédagogique de Gitwe (ISPG)',
+  'University of Global Health Equity (UGHE)',
+  'University of Kigali (UoK)',
+  'Vatel School Rwanda',
+  'Oklahoma Christian University (OCU)',
+  'Ngoma Adventist College of Health Sciences – NACHS (Campus for AUCA)',
+  'Rwanda Institute for Conservation Agriculture (RICA)',
+  'East African Christian College (EACC)',
+  'Africa College of Theology (ACT)',
+  'Kepler College',
+  'Africa Health Sciences University (AHSU)',
+  'University of Medical Science and Technology (UMST) – Rwanda Campus Cross Border',
+  'Hanika Anglican Integrated Polytechnic (HAIP)',
+  'Muhabura Integrated Polytechnic College (MIPC)',
+  'Saint Joseph Integrated Technical College – SJITC-Nyamirambo',
+  'ULK Polytechnic Institute – UPI',
+  'African School of Governance',
+];
+
+
+
+function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
+  const [inputValue, setInputValue] = useState(value);
+  const [isOpen, setIsOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const query = inputValue.trim().toLowerCase();
+
+  const filteredPublic = query
+    ? PUBLIC_INSTITUTIONS.filter(name => name.toLowerCase().includes(query))
+    : PUBLIC_INSTITUTIONS;
+
+  const filteredPrivate = query
+    ? PRIVATE_INSTITUTIONS.filter(name => name.toLowerCase().includes(query))
+    : PRIVATE_INSTITUTIONS;
+
+  // Flat list for keyboard navigation (public first, then private)
+  const flatOptions = [...filteredPublic, ...filteredPrivate];
+
+  const selectOption = (name: string) => {
+    setInputValue(name);
+    onChange(name);
+    setIsOpen(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      setIsOpen(true);
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex(i => Math.min(i + 1, flatOptions.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex(i => Math.max(i - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (isOpen && flatOptions[highlightedIndex]) {
+        selectOption(flatOptions[highlightedIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setIsOpen(false);
+    }
+  };
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      <input
+        type="text"
+        placeholder="Type or select university name"
+        value={inputValue}
+        onChange={(e) => {
+          setInputValue(e.target.value);
+          onChange(e.target.value); // free typing is always accepted
+          setIsOpen(true);
+          setHighlightedIndex(0);
+        }}
+        onFocus={() => setIsOpen(true)}
+        onKeyDown={handleKeyDown}
+        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
+        required
+      />
+
+      {isOpen && (filteredPublic.length > 0 || filteredPrivate.length > 0) && (
+        <div className="absolute z-20 mt-1 w-full max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
+          {filteredPublic.length > 0 && (
+            <div>
+              <div className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50 sticky top-0">
+                Public Institutions
+              </div>
+              {filteredPublic.map((name) => {
+                const flatIdx = flatOptions.indexOf(name);
+                return (
+                  <div
+                    key={name}
+                    onMouseDown={() => selectOption(name)}
+                    onMouseEnter={() => setHighlightedIndex(flatIdx)}
+                    className={`px-3 py-2 text-sm cursor-pointer ${
+                      flatIdx === highlightedIndex ? 'bg-[#4a772e]/10' : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    {name}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {filteredPrivate.length > 0 && (
+            <div>
+              <div className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50 sticky top-0">
+                Private Institutions
+              </div>
+              {filteredPrivate.map((name) => {
+                const flatIdx = flatOptions.indexOf(name);
+                return (
+                  <div
+                    key={name}
+                    onMouseDown={() => selectOption(name)}
+                    onMouseEnter={() => setHighlightedIndex(flatIdx)}
+                    className={`px-3 py-2 text-sm cursor-pointer ${
+                      flatIdx === highlightedIndex ? 'bg-[#4a772e]/10' : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    {name}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<string>('pending');
   const [data, setData] = useState<DashboardData>({ kpis: {}, pending: [] });
@@ -161,50 +343,7 @@ export default function AdminDashboard() {
     submission_type: ''
   });
 
-  // Institution lists
-const PUBLIC_INSTITUTIONS = [
-  'University of Rwanda',
-  'Institute of Legal Practice And Development',
-  'Rwanda Polytechnic',
-  'African Biomanufacturing Institute',
-];
 
-const PRIVATE_INSTITUTIONS = [
-  'African Institute of Mathematical Sciences Rwanda (AIMS-Rwanda)',
-  'African Leadership University (ALU)',
-  'Adventist University of Central Africa (AUCA)',
-  'Carnegie Mellon University Africa (CMU-A)',
-  'Catholic University of Rwanda (CUR)',
-  'College of Surgeons of East, Central and Southern Africa (COSECSA)',
-  'East Africa University of Rwanda (EAUR)',
-  'Independent Institute of Lay Adventists of Kigali (INILAK)',
-  'Institut Catholique de Kabgayi (ICK)',
-  'Institut d’Enseignement Supérieur de Ruhengeri (INES)',
-  'Institut Polytechnique de Byumba (IPB)',
-  'Kibogora Polytechnics (KP)',
-  'Kigali Independent University (ULK)',
-  'Mount Kigali University (MKU)',
-  'Protestant Institute of Arts and Social Sciences (PIASS)',
-  'Ruli Higher Institute of Health Sainte Rose de Lima (RHIH)',
-  'Rwanda Tourism University College (RTUC)',
-  'Institut Supérieur Pédagogique de Gitwe (ISPG)',
-  'University of Global Health Equity (UGHE)',
-  'University of Kigali (UoK)',
-  'Vatel School Rwanda',
-  'Oklahoma Christian University (OCU)',
-  'Ngoma Adventist College of Health Sciences – NACHS (Campus for AUCA)',
-  'Rwanda Institute for Conservation Agriculture (RICA)',
-  'East African Christian College (EACC)',
-  'Africa College of Theology (ACT)',
-  'Kepler College',
-  'Africa Health Sciences University (AHSU)',
-  'University of Medical Science and Technology (UMST) – Rwanda Campus Cross Border',
-  'Hanika Anglican Integrated Polytechnic (HAIP)',
-  'Muhabura Integrated Polytechnic College (MIPC)',
-  'Saint Joseph Integrated Technical College – SJITC-Nyamirambo',
-  'ULK Polytechnic Institute – UPI',
-  'African School of Governance',
-];
   const resolveFileUrl = (path?: string): string => {
   if (!path) return '';
   return path.startsWith('http') ? path : getApiUrl(path);
@@ -747,142 +886,9 @@ const PRIVATE_INSTITUTIONS = [
 
 
 
-interface UniversityComboboxProps {
-  value: string;
-  onChange: (value: string) => void;
-}
 
-function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
-  const [inputValue, setInputValue] = useState(value);
-  const [isOpen, setIsOpen] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const wrapperRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setInputValue(value);
-  }, [value]);
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const query = inputValue.trim().toLowerCase();
-
-  const filteredPublic = query
-    ? PUBLIC_INSTITUTIONS.filter(name => name.toLowerCase().includes(query))
-    : PUBLIC_INSTITUTIONS;
-
-  const filteredPrivate = query
-    ? PRIVATE_INSTITUTIONS.filter(name => name.toLowerCase().includes(query))
-    : PRIVATE_INSTITUTIONS;
-
-  // Flat list for keyboard navigation (public first, then private)
-  const flatOptions = [...filteredPublic, ...filteredPrivate];
-
-  const selectOption = (name: string) => {
-    setInputValue(name);
-    onChange(name);
-    setIsOpen(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
-      setIsOpen(true);
-      return;
-    }
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setHighlightedIndex(i => Math.min(i + 1, flatOptions.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setHighlightedIndex(i => Math.max(i - 1, 0));
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (isOpen && flatOptions[highlightedIndex]) {
-        selectOption(flatOptions[highlightedIndex]);
-      }
-    } else if (e.key === 'Escape') {
-      setIsOpen(false);
-    }
-  };
-
-  return (
-    <div ref={wrapperRef} className="relative">
-      <input
-        type="text"
-        placeholder="Type or select university name"
-        value={inputValue}
-        onChange={(e) => {
-          setInputValue(e.target.value);
-          onChange(e.target.value); // free typing is always accepted
-          setIsOpen(true);
-          setHighlightedIndex(0);
-        }}
-        onFocus={() => setIsOpen(true)}
-        onKeyDown={handleKeyDown}
-        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a772e] focus:border-transparent"
-        required
-      />
-
-      {isOpen && (filteredPublic.length > 0 || filteredPrivate.length > 0) && (
-        <div className="absolute z-20 mt-1 w-full max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
-          {filteredPublic.length > 0 && (
-            <div>
-              <div className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50 sticky top-0">
-                Public Institutions
-              </div>
-              {filteredPublic.map((name) => {
-                const flatIdx = flatOptions.indexOf(name);
-                return (
-                  <div
-                    key={name}
-                    onMouseDown={() => selectOption(name)}
-                    onMouseEnter={() => setHighlightedIndex(flatIdx)}
-                    className={`px-3 py-2 text-sm cursor-pointer ${
-                      flatIdx === highlightedIndex ? 'bg-[#4a772e]/10' : 'hover:bg-gray-50'
-                    }`}
-                  >
-                    {name}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {filteredPrivate.length > 0 && (
-            <div>
-              <div className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50 sticky top-0">
-                Private Institutions
-              </div>
-              {filteredPrivate.map((name) => {
-                const flatIdx = flatOptions.indexOf(name);
-                return (
-                  <div
-                    key={name}
-                    onMouseDown={() => selectOption(name)}
-                    onMouseEnter={() => setHighlightedIndex(flatIdx)}
-                    className={`px-3 py-2 text-sm cursor-pointer ${
-                      flatIdx === highlightedIndex ? 'bg-[#4a772e]/10' : 'hover:bg-gray-50'
-                    }`}
-                  >
-                    {name}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
   if (loading) return <div className="text-center py-10 text-[#4a772e] font-bold">Loading...</div>;
 
@@ -912,18 +918,18 @@ function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
             <h3 className="text-sm md:text-base">Pending Innovations</h3>
           </div>
           {/* NEW: Pending Researches count box */}
-          <div className="bg-[#4a772e] text-white p-4 md:p-6 rounded-lg shadow text-center flex-1 min-w-[150px] md:min-w-[200px]">
+        {/*  <div className="bg-[#4a772e] text-white p-4 md:p-6 rounded-lg shadow text-center flex-1 min-w-[150px] md:min-w-[200px]">
             <div className="text-2xl md:text-4xl font-bold">{data.kpis.pending_researches_count || 0}</div>
             <h3 className="text-sm md:text-base">Pending Researches</h3>
-          </div>
-        </div>
+          </div>*/}
+        </div> 
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         {/* MAIN CONTENT AREA */}
         <div className="lg:col-span-2 bg-white p-4 md:p-6 rounded-lg shadow">
           {/* PENDING BOOKS TAB */}
-          {activeTab === 'pending' && (
+         {/** {activeTab === 'pending' && (
             <>
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
                 <div>
@@ -946,7 +952,7 @@ function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
                   data.pending.map(item => (
                     <div key={item.id} className="bg-white border-2 border-[#e0e0b7] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex flex-col md:flex-row">
-                        {/* COVER IMAGE */}
+                        
                         <div className="md:w-48 md:h-64 bg-gray-100 flex items-center justify-center p-4">
                           {item.cover_image_url ? (
                             <img
@@ -964,7 +970,7 @@ function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
                             <div className="text-gray-400">No Cover Image</div>
                           )}
                         </div>
-                        {/* CONTENT */}
+                        
                         <div className="flex-1 p-4 md:p-6">
                           <h4 className="text-lg md:text-xl font-bold text-[#4a772e] mb-1">{item.title}</h4>
                           <p className="text-sm text-gray-700 mb-1">
@@ -973,7 +979,7 @@ function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
                           <p className="text-sm text-gray-600 mb-3">
                             <span className="font-medium">Type:</span> {item.submission_type || 'Unknown'}
                           </p>
-                          {/* CLICKABLE DOCUMENT */}
+                          
                           {item.file_path && (
                             <button
                               onClick={() => {
@@ -995,7 +1001,7 @@ function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
                               View Document
                             </button>
                           )}
-                          {/* ACTION BUTTONS */}
+                          
                           <div className="flex flex-col sm:flex-row gap-2 mt-4">
                             <button
                               onClick={() => handleAction(item.id, 'approve')}
@@ -1016,7 +1022,7 @@ function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
                               Reject
                             </button>
                           </div>
-                          {/* REJECT FEEDBACK */}
+                          
                           {selectedId === item.id && (
                             <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
                               <label className="block text-sm font-medium text-red-800 mb-2">
@@ -1053,7 +1059,7 @@ function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
                 )}
               </div>
             </>
-          )}
+          ) */}
 
           {/* APPROVED BOOKS TAB */}
           {activeTab === 'approved' && (
@@ -2019,11 +2025,11 @@ function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Pending Books
+            Dashboard
           </button>
 
           {/* NEW: Pending Research button */}
-          <button
+          {/* <button
             onClick={() => window.location.href = 'admin-dashboard/pending-researches'}
             className="w-full py-3 px-4 text-left font-bold border rounded-lg transition flex items-center gap-3 bg-[#d8e5c7] text-[#4a772e] border-[#8c9c6f] hover:bg-[#c4d5b0]"
           >
@@ -2031,9 +2037,9 @@ function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
             Pending dessertation/theses
-          </button>
+          </button> */}
 
-          <button
+         {/*} <button
             onClick={() => window.location.href = '/admin-dashboard/pending-publication'}
             className="w-full py-3 px-4 text-left font-bold border rounded-lg transition flex items-center gap-3 bg-[#d8e5c7] text-[#4a772e] border-[#8c9c6f] hover:bg-[#c4d5b0]"
           >
@@ -2041,7 +2047,7 @@ function UniversityCombobox({ value, onChange }: UniversityComboboxProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             Pending research
-          </button>
+          </button> */}
           <select
   onChange={(e) => {
     if (e.target.value) {

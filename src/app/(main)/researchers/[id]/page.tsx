@@ -183,57 +183,49 @@ export default function PublicResearcherProfile() {
                 </h3>
 
                 {/* Authors */}
-                <p className="text-sm sm:text-base text-slate-600 mt-2 sm:mt-3">
-                  <span className="font-medium">Authors:</span>{' '}
-                  {Array.isArray(pub.authors)
-                    ? pub.authors.join(' • ')
-                    : researcher.name}
-                </p>
+<p className="text-sm sm:text-base text-slate-600 mt-2 sm:mt-3">
+  <span className="font-medium">Authors:</span>{' '}
+  {Array.isArray(pub.authors)
+    ? pub.authors.join(' • ')
+    : researcher.name}
+</p>
 
-                {/* ── Journal/Conference + DOI badge row, with PDF button on the right ── */}
-                <div className="mt-3 sm:mt-4 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                    {pub.journal_name && (
-                      <span className="px-3 py-1 sm:px-4 sm:py-1.5  rounded-full text-black text-sm sm:text-base flex items-center gap-1">
-                        {pub.journal_name}
-                        {pub.year && <span className="text-slate-400"> · {pub.year}</span>}
-                        {pub.doi && (
-                          <span className="font-mono text-blue-600"> · DOI: {pub.doi}</span>
-                        )}
-                      </span>
-                    )}
+{/* ── Journal/Conference + DOI row, with PDF button on the right ── */}
+<div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+  <p className="text-sm text-slate-600 m-0">
+    {[pub.journal_name, pub.conference_info, pub.publisher, pub.year]
+      .filter(Boolean)
+      .join(' • ')}
+    {pub.doi && (
+      <>
+        {' • '}
+        
+         <a href={`https://doi.org/${pub.doi}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 font-mono hover:underline"
+          title={pub.doi}
+        >
+          DOI
+        </a>
+      </>
+    )}
+  </p>
 
-                    {pub.conference_info && (
-                      <span className="px-3 py-1 sm:px-4 sm:py-1.5 bg-purple-100 rounded-full text-purple-700 text-sm sm:text-base flex items-center gap-1">
-                        🎤 {pub.conference_info}
-                        {pub.year && <span className="text-purple-400"> · {pub.year}</span>}
-                        {pub.doi && (
-                          <span className="font-mono text-blue-600"> · DOI: {pub.doi}</span>
-                        )}
-                      </span>
-                    )}
-
-                    {pub.publisher && (
-                      <span className="px-3 py-1 sm:px-4 sm:py-1.5 bg-green-100 rounded-full text-green-700 text-sm sm:text-base flex items-center gap-1">
-                        📔 {pub.publisher}
-                      </span>
-                    )}
-                  </div>
-
-                  {pub.pdf_path && (
-                    <a
-                      href={pub.pdf_path}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition shrink-0"
-                    >
-                      📑 PDF
-                    </a>
-                  )}
-                </div>
+  {pub.pdf_path && (
+    
+    <a  href={pub.pdf_path}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition shrink-0"
+    >
+      📑 PDF
+    </a>
+  )}
+</div>
 
                 {/* Action Buttons (Abstract / HTML) */}
-                <div className="flex flex-wrap gap-2 sm:gap-3 mt-5 sm:mt-6">
+              {/* <div className="flex flex-wrap gap-2 sm:gap-3 mt-5 sm:mt-6">
                   {pub.abstract && (
                     <button
                       onClick={() =>
@@ -267,7 +259,7 @@ export default function PublicResearcherProfile() {
                       🌐 HTML
                     </a>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
 

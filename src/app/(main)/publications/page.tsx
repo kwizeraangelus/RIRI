@@ -15,6 +15,7 @@ interface Publication {
   publisher?: string;
   publication_type?: string;
   pdf_path?: string;
+  year?: string;
   doi?: string;
   url?: string;
   user?: User;
@@ -196,7 +197,7 @@ export default function PublicationsPage() {
                         <div className="px-6 pb-6 pt-3 bg-gray-50 border-t border-gray-100 text-base text-gray-600 space-y-3">
                           {/* ── Publication type badge, above the title ── */}
 {pub.publication_type && (
-  <span className="inline-block text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-3 py-1 rounded mb-2">
+  <span className="inline-block text-sm font-bold  tracking-wider bg-blue-100 text-blue-500 px-3 py-1 rounded mb-2">
     {pub.publication_type === 'journal'
       ? 'Article'
       : pub.publication_type === 'conference'
@@ -205,25 +206,18 @@ export default function PublicationsPage() {
   </span>
 )}
                           <p><span className="text-black font-bold">Authors:</span> {highlight(authors, q)}</p>
-                          {(pub.journal_name || pub.publisher) && (
-                            <p>
-                              <span className="text-black font-bold">Journal / Publisher:</span>{' '}
-                              {highlight(pub.journal_name || pub.publisher || '', q)}
-                            </p>
-                          )}
-                          {pub.doi && (
-                            <p>
-                              <span className="text-black font-bold">DOI:</span>{' '}
-                              <a
-                                href={`https://doi.org/${pub.doi}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-mono text-blue-600 hover:underline"
-                              >
-                                {pub.doi}
-                              </a>
-                            </p>
-                          )}
+{(pub.journal_name || pub.publisher || pub.year) && (
+  <p>
+    {(pub.journal_name || pub.publisher) && (
+      <>
+        <span className="text-black font-bold">Journal / Publisher:</span>{' '}
+        {highlight(pub.journal_name || pub.publisher || '', q)}.
+      </>
+    )}
+    {pub.year && <> {pub.year}.</>}
+  </p>
+)}
+                         
                           {pub.pdf_path && (
                             <a
                               href={pub.pdf_path}
