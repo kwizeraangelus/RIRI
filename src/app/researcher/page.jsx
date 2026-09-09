@@ -1479,11 +1479,11 @@ const handleQuickPhotoSave = async () => {
     ) : publications.map((pub, idx) => (
       <div key={pub.id} className="group border border-slate-200 rounded-xl p-5 hover:shadow-lg transition-all bg-white hover:border-blue-200">
         <div className="flex items-start gap-4">
-          <div className="flex-shrink-0 w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-xs">{idx + 1}</div>
+          
           <div className="flex-1">
 {/* ── Publication type badge, above the title ── */}
 {pub.publication_type && (
-  <span className="inline-block text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-3 py-1 rounded mb-2">
+  <span className="inline-block text-xs font-bold  tracking-wider bg-blue-100 text-blue-700 px-3 py-1 rounded mb-2">
     {pub.publication_type === 'journal'
       ? 'Article'
       : pub.publication_type === 'conference'
@@ -1499,21 +1499,6 @@ const handleQuickPhotoSave = async () => {
   <h3 className="text-lg font-bold text-slate-800 group-hover:text-blue-700 transition-colors">
     {pub.title}
   </h3>
-  {/* ── Edit / Delete buttons ── */}
-  <div className="flex gap-2 flex-shrink-0">
-    <button
-      onClick={() => handleEditClick(pub)}
-      className="text-xs px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-md font-medium transition-colors"
-    >
-      ✏️ Edit
-    </button>
-    <button
-      onClick={() => handleDeletePublication(pub.id)}
-      className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors"
-    >
-      🗑️ Delete
-    </button>
-  </div>
 </div>
 
 {/* Authors */}
@@ -1523,6 +1508,7 @@ const handleQuickPhotoSave = async () => {
     ? pub.authors.join(' • ')
     : researcher.name}
 </p>
+
 {/* ── Journal/Conference + DOI row, with PDF button on the right ── */}
 <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
   <p className="text-sm text-slate-600 m-0">
@@ -1557,33 +1543,49 @@ const handleQuickPhotoSave = async () => {
   )}
 </div>
 
-            {/* ── Abstract toggle button (kept, commented) / HTML link (kept, commented) ── */}
-            {/*
-            <div className="flex gap-2 mt-3">
-              {pub.abstract && (
-                <button
-                  onClick={() => setOpenAbstractId(openAbstractId === pub.id ? null : pub.id)}
-                  className="text-xs px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-gray-700 rounded-md font-medium transition-colors flex items-center gap-1"
-                >
-                  📄 Abstract
-                  <span className="text-blue-500">{openAbstractId === pub.id ? '▲' : '▼'}</span>
-                </button>
-              )}
+{/* ── Edit / Delete buttons — now at the bottom of the section ── */}
+<div className="flex gap-2 mt-3">
+  <button
+    onClick={() => handleEditClick(pub)}
+    className="text-xs px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-md font-medium transition-colors"
+  >
+    ✏️ Edit
+  </button>
+  <button
+    onClick={() => handleDeletePublication(pub.id)}
+    className="text-xs px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md font-medium transition-colors"
+  >
+    🗑️ Delete
+  </button>
+</div>
 
-              {(pub.doi || pub.url) && (
-                <a href={pub.url || `https://doi.org/${pub.doi}`} target="_blank"
-                  className="text-xs px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md font-medium transition-colors">🌐 HTML</a>
-              )}
-            </div>
-            */}
+{/* ── Abstract toggle button (kept, commented) / HTML link (kept, commented) ── */}
+{/*
+<div className="flex gap-2 mt-3">
+  {pub.abstract && (
+    <button
+      onClick={() => setOpenAbstractId(openAbstractId === pub.id ? null : pub.id)}
+      className="text-xs px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-gray-700 rounded-md font-medium transition-colors flex items-center gap-1"
+    >
+      📄 Abstract
+      <span className="text-blue-500">{openAbstractId === pub.id ? '▲' : '▼'}</span>
+    </button>
+  )}
 
-            {/* ── Inline abstract paragraph ── */}
-            {openAbstractId === pub.id && pub.abstract && (
-              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-xs font-semibold text-gray-900 mb-1">Abstract</p>
-                <p className="text-xs text-gray-700 leading-relaxed">{pub.abstract}</p>
-              </div>
-            )}
+  {(pub.doi || pub.url) && (
+    <a href={pub.url || `https://doi.org/${pub.doi}`} target="_blank"
+      className="text-xs px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md font-medium transition-colors">🌐 HTML</a>
+  )}
+</div>
+*/}
+
+{/* ── Inline abstract paragraph ── */}
+{openAbstractId === pub.id && pub.abstract && (
+  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+    <p className="text-xs font-semibold text-gray-900 mb-1">Abstract</p>
+    <p className="text-xs text-gray-700 leading-relaxed">{pub.abstract}</p>
+  </div>
+)}
           </div>
         </div>
       </div>

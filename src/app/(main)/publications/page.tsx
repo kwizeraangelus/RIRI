@@ -205,8 +205,8 @@ export default function PublicationsPage() {
       : pub.publication_type}
   </span>
 )}
-                          <p><span className="text-black font-bold">Authors:</span> {highlight(authors, q)}</p>
-{(pub.journal_name || pub.publisher || pub.year) && (
+                         <p><span className="text-black font-bold">Authors:</span> {highlight(authors, q)}</p>
+{(pub.journal_name || pub.publisher || pub.year || pub.doi) && (
   <p>
     {(pub.journal_name || pub.publisher) && (
       <>
@@ -215,6 +215,17 @@ export default function PublicationsPage() {
       </>
     )}
     {pub.year && <> {pub.year}.</>}
+    {pub.doi && (
+      
+      <a  href={`https://doi.org/${pub.doi}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="font-mono text-blue-600 hover:underline"
+        title={pub.doi}
+      >
+        DOI
+      </a>
+    )}
   </p>
 )}
                          

@@ -67,13 +67,26 @@ export default function PublicResearcherProfile() {
           <div className="space-y-5 sm:space-y-6">
             {/* Square Profile Image */}
             <div className="flex justify-center">
-              <div className="w-36 h-36 sm:w-44 sm:h-44 lg:w-48 lg:h-48 border-4 border-white shadow-lg overflow-hidden bg-gray-100 rounded-xl">
-                <img
-                  src={researcher.image || "https://placeholder.co"}
-                  alt={researcher.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              <div className="w-36 h-36 sm:w-44 sm:h-44 lg:w-48 lg:h-48 border-4 border-white shadow-lg overflow-hidden bg-gray-100 rounded-xl flex items-center justify-center">
+  {researcher.image ? (
+    <img
+      src={researcher.image}
+      alt={researcher.name}
+      className="w-full h-full object-cover"
+      onError={(e) => {
+        e.currentTarget.style.display = 'none';
+        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+      }}
+    />
+  ) : null}
+  <svg
+    className={`w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 text-gray-300 ${researcher.image ? 'hidden' : ''}`}
+    fill="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.866 0-7 2.239-7 5v2h14v-2c0-2.761-3.134-5-7-5z" />
+  </svg>
+</div>
             </div>
 
             {/* Info */}
@@ -130,9 +143,9 @@ export default function PublicResearcherProfile() {
         {/* Left Side - Bio + Publications - Appears SECOND on mobile, first on desktop */}
         <div className="lg:col-span-2 space-y-6 sm:space-y-8 order-last lg:order-first">
           <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-5 sm:p-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-2">
+            <h3 className="text-2xl font-semibold text-gray-900 mb-4">
               {researcher.name}
-            </h1>
+            </h3>
             <p className="text-slate-600 mb-4 sm:mb-6 text-base sm:text-lg">
               {researcher.qualification}
             </p>
@@ -162,14 +175,11 @@ export default function PublicResearcherProfile() {
         >
           <div className="flex flex-col gap-3 sm:gap-4">
             <div className="flex items-start gap-3 sm:gap-4">
-              <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-sm sm:text-base">
-                {index + 1}
-              </div>
 
               <div className="flex-1 min-w-0">
                 {/* ── Publication type badge, above the title ── */}
                 {pub.publication_type && (
-                  <span className="inline-block text-xs sm:text-sm font-bold uppercase tracking-wider bg-blue-100 text-blue-700 px-3 py-1 rounded mb-2">
+                  <span className="inline-block text-xs sm:text-sm font-bold  tracking-wider bg-blue-100 text-blue-700 px-3 py-1 rounded mb-2">
                     {pub.publication_type === 'journal'
                       ? 'Article'
                       : pub.publication_type === 'conference'
@@ -178,12 +188,12 @@ export default function PublicResearcherProfile() {
                   </span>
                 )}
 
-                <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-slate-800 leading-tight">
-                  {pub.title}
-                </h3>
+                <h3 className="text-lg font-bold text-slate-800 group-hover:text-blue-700 transition-colors">
+    {pub.title}
+  </h3>
 
                 {/* Authors */}
-<p className="text-sm sm:text-base text-slate-600 mt-2 sm:mt-3">
+<p className="text-sm sm:text-base text-slate-600 mt-1">
   <span className="font-medium">Authors:</span>{' '}
   {Array.isArray(pub.authors)
     ? pub.authors.join(' • ')
