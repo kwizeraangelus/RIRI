@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { getApiUrl } from '@/utils/api';
+import { RiriLoading, RiriError } from '@/components/RiriStatus';
 
 type ResearcherDetail = {
   id: string;
@@ -30,33 +31,30 @@ export default function PublicResearcherProfile() {
   const [loading, setLoading] = useState(true);
   const [openAbstractId, setOpenAbstractId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!id) return;
+ const [error, setError] = useState<string | null>(null);
 
-    fetch(getApiUrl(`/api/researchers/${id}`))
-      .then(res => res.json())
-      .then(setResearcher)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [id]);
+useEffect(() => {
+  if (!id) return;
+  setLoading(true);
+  setError(null);
+  fetchProfile();
+}, [id]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#E0F2FE] flex items-center justify-center">
-        <div className="text-2xl sm:text-4xl font-light text-slate-600 animate-pulse">
-          Loading Profile...
-        </div>
-      </div>
-    );
-  }
+const fetchProfile = () => {
+  fetch(getApiUrl(`/api/researchers/${id}`))
+    .then(res => {
+      if (!res.ok) throw new Error('Could not load this researcher profile');
+      return res.json();
+    })
+    .then(setResearcher)
+    .catch(err => setError(err.message || 'Network error'))
+    .finally(() => setLoading(false));
+};
+ if (loading) return <RiriLoading label="Loading profile" />;
+if (error) return <RiriError message={error} onRetry={fetchProfile} />;
+if (!researcher) return <RiriError message="Researcher not found" onRetry={() => window.location.reload()} />;
 
-  if (!researcher) {
-    return (
-      <div className="text-center py-20 text-red-600 text-xl sm:text-2xl">
-        Researcher not found
-      </div>
-    );
-  }
+ 
 
   return (
     <div className="min-h-screen bg-[#E0F2FE]">

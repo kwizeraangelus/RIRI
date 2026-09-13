@@ -7,6 +7,8 @@ import {
   Edit3, Save, X, Camera, FileText, ExternalLink,
   Upload, Loader2, Check, AlertCircle, Lock, Eye, EyeOff,
 } from 'lucide-react';
+import { RiriLoading } from '@/components/RiriStatus';
+
 
 interface UserProfile {
   id: string;
@@ -398,6 +400,8 @@ export default function ProfilePage() {
   const avatarSrc = profile.profile_image
     ? (profile.profile_image.startsWith('blob:') ? profile.profile_image : fileUrl(profile.profile_image))
     : '';
+
+    if (loading) return <RiriLoading label="Loading profile" />;
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg,#0a1628 0%,#0c1e30 55%,#0d2240 100%)', paddingTop: 96, paddingBottom: 80, color: '#fff', fontFamily: 'var(--font-poppins,sans-serif)' }}>

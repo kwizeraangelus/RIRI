@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { getApiUrl } from '@/utils/api';
+import { RiriLoading, RiriError } from '@/components/RiriStatus';
+
+
 
 export default function EventDashboard() {
   const router = useRouter();
@@ -279,11 +282,8 @@ export default function EventDashboard() {
     }
   };
 
-  if (loading) return (
-    <div className="min-h-screen bg-[#E0F2FE] flex items-center justify-center">
-      <div className="text-2xl font-semibold text-gray-600">Loading...</div>
-    </div>
-  );
+  if (loading) return <RiriLoading label="Loading event organizer" />;
+if (error) return <RiriError message={error} onRetry={yourFetchFunctionName} />;
 
   return (
     <div className="min-h-screen bg-[#E0F2FE]">

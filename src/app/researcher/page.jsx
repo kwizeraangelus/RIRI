@@ -1150,6 +1150,12 @@ const handleQuickPhotoSave = async () => {
               <input type="checkbox" checked={selectedPutCodes.includes(w.putCode)} onChange={() => toggleWork(w.putCode)} className="mt-1" />
               <div className="flex-1">
                 <p className="font-semibold text-slate-800 text-sm">{w.title}</p>
+                {w.authors && w.authors.length > 0 && (
+    <p className="text-xs text-slate-600 mt-0.5">
+      {w.authors.slice(0, 5).join(', ')}
+      {w.authors.length > 5 ? ` +${w.authors.length - 5} more` : ''}
+    </p>
+  )}
                 <p className="text-xs text-slate-500 mt-0.5">{[w.journal, w.year, w.doi].filter(Boolean).join(' • ')}</p>
               </div>
             </label>

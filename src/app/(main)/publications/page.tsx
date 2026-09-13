@@ -2,6 +2,9 @@
 import { useState, useEffect, useMemo, ReactNode } from 'react';
 import Link from 'next/link';
 import { getApiUrl } from '@/utils/api';
+import { RiriLoading, RiriError } from '@/components/RiriStatus';
+import error from 'next/dist/api/error';
+
 
 interface User {
   username?: string;
@@ -81,6 +84,10 @@ export default function PublicationsPage() {
         : part
     );
   };
+
+
+  
+if (loading) return <RiriLoading label="Loading oublications" />;
 
   return (
     <div className="min-h-screen bg-[#E0F2FE] text-gray-900">

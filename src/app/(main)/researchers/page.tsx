@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getApiUrl } from '@/utils/api';
 import { Search } from 'lucide-react';
+import { RiriLoading, RiriError } from '@/components/RiriStatus';
 
 type Researcher = {
   id: string;
@@ -103,8 +104,9 @@ export default function ResearchersPage() {
   );
 };
 
-  if (loading) return <div className="text-center py-20 text-3xl">Loading Researchers...</div>;
-  if (error) return <div className="text-center py-20 text-red-600 text-3xl">Error: {error}</div>;
+
+  if (loading) return <RiriLoading label="Loading researchers" />;
+  if (error) return <RiriError message={error} onRetry={fetchResearchers} />;
 
   return (
     <div className=" bg-[#E0F2FE] text-gray-900">

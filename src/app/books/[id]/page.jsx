@@ -20,6 +20,8 @@ import {
   Newspaper
 } from 'lucide-react';
 import { getApiUrl } from '@/utils/api';
+import { RiriLoading, RiriError } from '@/components/RiriStatus';
+
 
 export default function BookDetailPage() {
   const { id } = useParams();
@@ -231,6 +233,8 @@ export default function BookDetailPage() {
       <p className="text-gray-600">No research data available.</p>
     </div>
   );
+  if (loading) return <RiriLoading label="Loading book" />;
+if (error) return <RiriError message={error} onRetry={yourFetchFunctionName} />;
 
   return (
     <article className="min-h-screen bg-[#E0F2FE] py-8 px-4">

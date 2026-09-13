@@ -4,6 +4,9 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getApiUrl } from '@/utils/api';
+import { RiriLoading, RiriError } from '@/components/RiriStatus';
+import error from 'next/dist/api/error';
+
 
 // ──────────────────────────────────────────────────────
 // Types
@@ -776,6 +779,9 @@ export default function ThesesPage() {
   // ──────────────────────────────────────────────────────
   // Render
   // ──────────────────────────────────────────────────────
+
+  if (isLoading) return <RiriLoading label="Loading theses/FYP" />;
+
   return (
     <div className="min-h-screen bg-[#E0F2FE] text-gray-900 relative overflow-x-hidden">
 

@@ -54,7 +54,7 @@ function ResearcherProfileForm() {
     'graduation_country',
     'Field',
     'ResearchArea',
-    'bio',
+    
   ];
 
   const handleChange = (name: string, value: string) => {

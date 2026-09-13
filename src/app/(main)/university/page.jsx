@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { getApiUrl } from '@/utils/api';
+import { RiriLoading, RiriError } from '@/components/RiriStatus';
+
+
 
 const ACADEMIC_FIELDS = [
   'Engineering', 'Medicine/Health Sciences', 'Arts & Humanities', 'Natural Sciences', 'Social Sciences',
@@ -460,13 +463,8 @@ const toggleExpand = (id) => {
 const uploadsStartIndex = (uploadsPage - 1) * uploadsPerPage;
 const pagedUploads = uploads.slice(uploadsStartIndex, uploadsStartIndex + uploadsPerPage);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#E0F2FE] flex items-center justify-center">
-        <div className="text-2xl font-semibold text-gray-600">Loading...</div>
-      </div>
-    );
-  }
+ if (loading) return <RiriLoading label="Loading University dashboard" />;
+
 
   return (
     <div className="min-h-screen bg-[#E0F2FE]">

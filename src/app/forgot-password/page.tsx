@@ -4,6 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Loader2, Mail, ArrowLeft } from 'lucide-react';
 import { getApiUrl } from '@/utils/api';
+import { RiriLoading, RiriError } from '@/components/RiriStatus';
+
+
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -32,6 +35,9 @@ export default function ForgotPasswordPage() {
       setLoading(false);
     }
   };
+ 
+
+  if (loading) return <RiriLoading label="Loading forgot password" />;
 
   return (
     <div className="min-h-screen bg-[#E0F2FE] text-gray-900">
