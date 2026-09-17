@@ -183,8 +183,19 @@ if (loading) return <RiriLoading label="Loading oublications" />;
                       >
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-black text-base sm:text-lg break-words">
-                            {highlight(pub.title || 'Untitled', q)}
-                          </p>
+  {pub.doi ? (
+    
+     <a href={`https://doi.org/${pub.doi}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="hover:text-blue-700 hover:underline transition-colors"
+    >
+      {highlight(pub.title || 'Untitled', q)}
+    </a>
+  ) : (
+    highlight(pub.title || 'Untitled', q)
+  )}
+</p>
                           {!isOpen && (
                             <p className="text-black text-sm italic mt-1 text-left truncate">
                               {highlight(authors, q)}
@@ -212,40 +223,44 @@ if (loading) return <RiriLoading label="Loading oublications" />;
       : pub.publication_type}
   </span>
 )}
-                         <p><span className="text-black font-bold">Authors:</span> {highlight(authors, q)}</p>
-{(pub.journal_name || pub.publisher || pub.year || pub.doi) && (
-  <p>
-    {(pub.journal_name || pub.publisher) && (
-      <>
-        <span className="text-black font-bold">Journal / Publisher:</span>{' '}
-        {highlight(pub.journal_name || pub.publisher || '', q)}.
-      </>
-    )}
-    {pub.year && <> {pub.year}.</>}
-    {pub.doi && (
-      
-      <a  href={`https://doi.org/${pub.doi}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="font-mono text-blue-600 hover:underline"
-        title={pub.doi}
-      >
-        DOI
-      </a>
-    )}
-  </p>
-)}
-                         
-                          {pub.pdf_path && (
-                            <a
-                              href={pub.pdf_path}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-[#050A14] font-semibold hover:underline mt-2 text-base"
-                            >
-                              📑 Read PDF
-                            </a>
-                          )}
+ <p><span className="text-black font-bold">Authors:</span> {highlight(authors, q)}</p>
+
+<div className="flex items-center justify-between gap-2 flex-wrap">
+  {(pub.journal_name || pub.publisher || pub.year || pub.doi) && (
+    <p className="m-0">
+      <span className="text-black font-bold">Journal / Publisher:</span>{' '}
+      {(pub.journal_name || pub.publisher) && (
+        <>{highlight(pub.journal_name || pub.publisher || '', q)}</>
+      )}
+      {pub.year && <> • {pub.year}</>}
+      {pub.doi && (
+        <>
+          {' • '}
+          
+           <a href={`https://doi.org/${pub.doi}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-blue-600 hover:underline"
+            title={pub.doi}
+          >
+            DOI
+          </a>
+        </>
+      )}
+    </p>
+  )}
+
+  {pub.pdf_path && (
+    
+     <a href={pub.pdf_path}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 text-[#050A14] font-semibold hover:underline text-base shrink-0"
+    >
+      Read PDF
+    </a>
+  )}
+</div>
                         </div>
                       )}
                     </div>

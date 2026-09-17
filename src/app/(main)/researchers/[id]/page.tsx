@@ -187,8 +187,19 @@ if (!researcher) return <RiriError message="Researcher not found" onRetry={() =>
                 )}
 
                 <h3 className="text-lg font-bold text-slate-800 group-hover:text-blue-700 transition-colors">
-    {pub.title}
-  </h3>
+  {pub.doi ? (
+    
+     <a href={`https://doi.org/${pub.doi}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="hover:text-blue-700 hover:underline transition-colors"
+    >
+      {pub.title}
+    </a>
+  ) : (
+    pub.title
+  )}
+</h3>
 
                 {/* Authors */}
 <p className="text-sm sm:text-base text-slate-600 mt-1">
@@ -199,7 +210,7 @@ if (!researcher) return <RiriError message="Researcher not found" onRetry={() =>
 </p>
 
 {/* ── Journal/Conference + DOI row, with PDF button on the right ── */}
-<div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+<div className="flex items-center justify-between gap-2">
   <p className="text-sm text-slate-600 m-0">
     {[pub.journal_name, pub.conference_info, pub.publisher, pub.year]
       .filter(Boolean)
@@ -222,12 +233,12 @@ if (!researcher) return <RiriError message="Researcher not found" onRetry={() =>
 
   {pub.pdf_path && (
     
-    <a  href={pub.pdf_path}
+     <a href={pub.pdf_path}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition shrink-0"
+      className="text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2.5 text-red-700 rounded-lg font-medium transition shrink-0"
     >
-      📑 PDF
+      PDF
     </a>
   )}
 </div>

@@ -1542,9 +1542,9 @@ const handleQuickPhotoSave = async () => {
     <a  href={pub.pdf_path}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition shrink-0"
+      className="text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2.5  hover:text-red-200 text-red-700 rounded-lg font-medium transition shrink-0"
     >
-      📑 PDF
+    PDF
     </a>
   )}
 </div>
