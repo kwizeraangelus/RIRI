@@ -32,6 +32,11 @@ export default function PublicResearcherProfile() {
   const [openAbstractId, setOpenAbstractId] = useState<string | null>(null);
 
  const [error, setError] = useState<string | null>(null);
+const [query, setQuery] = useState('');
+ 
+// ── Pagination (10 per page) ──
+const resultsPerPage = 10;
+const [currentPage, setCurrentPage] = useState(1);
 
 useEffect(() => {
   if (!id) return;
@@ -40,6 +45,13 @@ useEffect(() => {
   fetchProfile();
 }, [id]);
 
+useEffect(() => {
+  setCurrentPage(1);
+}, [researcher?.id]);
+
+useEffect(() => {
+  setCurrentPage(1);
+}, [query]);
 const fetchProfile = () => {
   fetch(getApiUrl(`/api/researchers/${id}`))
     .then(res => {
@@ -50,9 +62,36 @@ const fetchProfile = () => {
     .catch(err => setError(err.message || 'Network error'))
     .finally(() => setLoading(false));
 };
+
+
+
+
+
  if (loading) return <RiriLoading label="Loading profile" />;
 if (error) return <RiriError message={error} onRetry={fetchProfile} />;
 if (!researcher) return <RiriError message="Researcher not found" onRetry={() => window.location.reload()} />;
+
+const publications = researcher.publications || [];
+
+const filteredPublications = publications.filter((pub) => {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const authors = Array.isArray(pub.authors) ? pub.authors.join(', ') : pub.authors || '';
+  return (
+    (pub.title || '').toLowerCase().includes(q) ||
+    authors.toLowerCase().includes(q) ||
+    (pub.journal_name || '').toLowerCase().includes(q) ||
+    (pub.publisher || '').toLowerCase().includes(q) ||
+    (pub.publication_type || '').toLowerCase().includes(q)
+  );
+});
+
+const totalResults = filteredPublications.length;
+const totalPages = Math.max(1, Math.ceil(totalResults / resultsPerPage));
+const pageStartIndex = (currentPage - 1) * resultsPerPage;
+const pagePublications = filteredPublications.slice(pageStartIndex, pageStartIndex + resultsPerPage);
+
+
 
  
 
@@ -156,17 +195,43 @@ if (!researcher) return <RiriError message="Researcher not found" onRetry={() =>
 
           {/* Publications Section */}
 <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-5 sm:p-8">
-  <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-5 sm:mb-6">
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 sm:mb-6">
+  <h2 className="text-2xl sm:text-3xl font-bold text-slate-800">
     Publications
   </h2>
 
-  {researcher.publications.length === 0 ? (
+  <div className="flex items-center bg-slate-50 rounded-lg border border-slate-200 px-3 py-2 gap-2 w-full sm:w-64">
+    <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+    </svg>
+    <input
+      type="text"
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      placeholder="Search publications…"
+      className="flex-1 text-sm text-gray-800 placeholder-gray-400 outline-none bg-transparent"
+    />
+    {query && (
+      <button
+        onClick={() => setQuery('')}
+        className="text-gray-400 hover:text-gray-600 flex-shrink-0"
+        aria-label="Clear search"
+      >
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    )}
+  </div>
+</div>
+
+  {filteredPublications.length === 0 ? (
     <div className="text-center py-10 sm:py-12 text-gray-500 text-base sm:text-lg">
-      No publications available yet.
-    </div>
+    {query.trim() ? `No results for "${query}"` : 'No publications available yet.'}
+  </div>
   ) : (
     <div className="space-y-6 sm:space-y-8">
-      {researcher.publications.map((pub, index) => (
+      {pagePublications.map((pub, index) => (
         <div
           key={pub.id}
           className="border border-slate-200 rounded-xl p-4 sm:p-6 hover:shadow-md transition-all"
@@ -187,61 +252,61 @@ if (!researcher) return <RiriError message="Researcher not found" onRetry={() =>
                 )}
 
                 <h3 className="text-lg font-bold text-slate-800 group-hover:text-blue-700 transition-colors">
-  {pub.doi ? (
+                  {pub.doi ? (
     
-     <a href={`https://doi.org/${pub.doi}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="hover:text-blue-700 hover:underline transition-colors"
-    >
-      {pub.title}
-    </a>
-  ) : (
-    pub.title
-  )}
-</h3>
+                     <a href={`https://doi.org/${pub.doi}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-blue-700 hover:underline transition-colors"
+                    >
+                      {pub.title}
+                    </a>
+                  ) : (
+                    pub.title
+                  )}
+                </h3>
 
                 {/* Authors */}
-<p className="text-sm sm:text-base text-slate-600 mt-1">
-  <span className="font-medium">Authors:</span>{' '}
-  {Array.isArray(pub.authors)
-    ? pub.authors.join(' • ')
-    : researcher.name}
-</p>
+                <p className="text-sm sm:text-base text-slate-600 mt-1">
+                  <span className="font-medium">Authors:</span>{' '}
+                  {Array.isArray(pub.authors)
+                    ? pub.authors.join(' • ')
+                    : researcher.name}
+                </p>
 
-{/* ── Journal/Conference + DOI row, with PDF button on the right ── */}
-<div className="flex items-center justify-between gap-2">
-  <p className="text-sm text-slate-600 m-0">
-    {[pub.journal_name, pub.conference_info, pub.publisher, pub.year]
-      .filter(Boolean)
-      .join(' • ')}
-    {pub.doi && (
-      <>
-        {' • '}
+                {/* ── Journal/Conference + DOI row, with PDF button on the right ── */}
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm text-slate-600 m-0">
+                    {[pub.journal_name, pub.conference_info, pub.publisher, pub.year]
+                      .filter(Boolean)
+                      .join(' • ')}
+                    {pub.doi && (
+                      <>
+                        {' • '}
         
-         <a href={`https://doi.org/${pub.doi}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 font-mono hover:underline"
-          title={pub.doi}
-        >
-          DOI
-        </a>
-      </>
-    )}
-  </p>
+                         <a href={`https://doi.org/${pub.doi}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 font-mono hover:underline"
+                          title={pub.doi}
+                        >
+                          DOI
+                        </a>
+                      </>
+                    )}
+                  </p>
 
-  {pub.pdf_path && (
+                  {pub.pdf_path && (
     
-     <a href={pub.pdf_path}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2.5 text-red-700 rounded-lg font-medium transition shrink-0"
-    >
-      PDF
-    </a>
-  )}
-</div>
+                     <a href={pub.pdf_path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2.5 text-red-700 rounded-lg font-medium transition shrink-0"
+                    >
+                      PDF
+                    </a>
+                  )}
+                </div>
 
                 {/* Action Buttons (Abstract / HTML) */}
               {/* <div className="flex flex-wrap gap-2 sm:gap-3 mt-5 sm:mt-6">
@@ -282,6 +347,8 @@ if (!researcher) return <RiriError message="Researcher not found" onRetry={() =>
               </div>
             </div>
 
+            
+
             {/* Full-width Abstract */}
             {openAbstractId === pub.id && pub.abstract && (
               <div className="mt-2 p-4 sm:p-6 bg-gray-100 border border-gray-300 rounded-lg w-full">
@@ -296,6 +363,44 @@ if (!researcher) return <RiriError message="Researcher not found" onRetry={() =>
           </div>
         </div>
       ))}
+      {totalPages > 1 && (
+  <div className="flex items-center justify-center gap-1.5 mt-8">
+    <button
+      onClick={() => setCurrentPage(1)}
+      disabled={currentPage === 1}
+      className="px-3 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      First
+    </button>
+    <button
+      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+      disabled={currentPage === 1}
+      className="px-2.5 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      &lt;
+    </button>
+    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+      <button
+        key={page}
+        onClick={() => setCurrentPage(page)}
+        className={`min-w-[34px] px-2.5 py-1.5 text-sm border rounded ${
+          currentPage === page
+            ? 'bg-teal-500 text-white border-teal-500 font-medium'
+            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+        }`}
+      >
+        {page}
+      </button>
+    ))}
+    <button
+      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+      disabled={currentPage === totalPages}
+      className="px-2.5 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      &gt;
+    </button>
+  </div>
+)}
     </div>
   )}
 </div>
