@@ -22,14 +22,16 @@ const nextConfig: NextConfig = {
   },
 
   // 🌟 CLEAN REWRITE: Catches both with and without trailing slashes safely
-  async rewrites() {
+    async rewrites() {
     return [
       {
+        // Smoothly forwards non-trailing slash routes directly to Hostinger
         source: "/api/:path*", 
         destination: "https://riri.rw*", 
       },
     ];
   }
+
 };
 
 export default nextConfig;
