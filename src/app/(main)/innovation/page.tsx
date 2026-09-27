@@ -85,7 +85,7 @@ const InnovationCard: React.FC<Innovation> = ({
  const imageSrc = photo
   ? photo.startsWith('http')
     ? photo                    // R2 URL — use directly
-    : `https://api.riri.rw${photo}`  // legacy local path
+    : `https://riri.rw{photo}`  // 🌟 CHANGED: Funnels legacy local paths through the proxy
   : null;
 
   const sponsorshipInfo = SPONSORSHIP_OPTIONS.find(opt => opt.value === sponsorship_needed);

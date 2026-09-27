@@ -95,18 +95,18 @@ const [loading, setLoading] = useState(true);
             <div className="sticky top-8">
               {innovation.photo ? (
   <Image
-    src={
-      innovation.photo.startsWith('http')
-        ? innovation.photo
-        : `https://api.riri.rw${innovation.photo}`
-    }   // ← Full backend URL
-    alt={innovation.name}
-    width={500}
-    height={600}
-    className="w-full h-auto rounded-2xl shadow-2xl border-8 border-white object-cover"
-    unoptimized
-    priority
-  />
+  src={
+    innovation.photo.startsWith('http')
+      ? innovation.photo
+      : `https://riri.rw{innovation.photo}` // 🌟 CHANGED: Bypasses the subdomain block
+  }   
+  alt={innovation.name}
+  width={500}
+  height={600}
+  className="w-full h-auto rounded-2xl shadow-2xl border-8 border-white object-cover"
+  unoptimized
+  priority
+/>
 ) : (
   <div className="bg-gradient-to-br from-gray-200 to-gray-300 border-8 border-dashed border-gray-400 rounded-2xl w-full h-96 flex items-center justify-center shadow-xl">
     <span className="text-gray-600 text-3xl font-bold">No Photo</span>

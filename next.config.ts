@@ -59,6 +59,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "https://riri.rw*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
