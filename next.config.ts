@@ -59,17 +59,21 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
-  return [
-    {
-      // 1. Matches any incoming path that starts with /api/
-      source: "/api/:path*", 
-      
-      // 2. Correctly forwards it to your live NestJS Hostinger server
-      destination: "https://riri.rw*", 
-    },
-  ];
-}
+   async rewrites() {
+    return [
+      {
+        // 1. Catches requests with a trailing slash, e.g., /api/innovations/public-list/
+        source: "/api/:path*/", 
+        destination: "https://riri.rw", 
+      },
+      {
+        // 2. Catches requests WITHOUT a trailing slash, e.g., /api/innovations/public-list
+        source: "/api/:path*", 
+        destination: "https://riri.rw*", 
+      },
+    ];
+  }
+
 };
 
 export default nextConfig;
