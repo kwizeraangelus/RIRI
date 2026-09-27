@@ -6,7 +6,7 @@
     },
     {
       "source": "/api/:path*",
-      "destination": "https://riri.rw*"
+      "destination": "https://api.riri.rw/:path*"
     }
   ]
 }

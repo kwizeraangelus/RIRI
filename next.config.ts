@@ -59,17 +59,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-   async rewrites() {
+     async rewrites() {
     return [
       {
-        // 1. Catches requests with a trailing slash, e.g., /api/innovations/public-list/
         source: "/api/:path*/", 
         destination: "https://riri.rw", 
       },
       {
-        // 2. Catches requests WITHOUT a trailing slash, e.g., /api/innovations/public-list
         source: "/api/:path*", 
-        destination: "https://riri.rw*", 
+        destination: "https://api.riri.rw/:path*", 
       },
     ];
   }
