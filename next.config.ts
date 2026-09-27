@@ -60,13 +60,16 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "https://riri.rw*",
-      },
-    ];
-  },
+  return [
+    {
+      // 1. Matches any incoming path that starts with /api/
+      source: "/api/:path*", 
+      
+      // 2. Correctly forwards it to your live NestJS Hostinger server
+      destination: "https://riri.rw*", 
+    },
+  ];
+}
 };
 
 export default nextConfig;
