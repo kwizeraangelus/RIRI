@@ -59,12 +59,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-       async rewrites() {
+        async rewrites() {
     return [
-      {
-        source: "/api/:path*/", 
-        destination: "https://riri.rw", 
-      },
       {
         source: "/api/:path*", 
         destination: "https://riri.rw*", 
