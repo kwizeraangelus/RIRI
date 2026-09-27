@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
   return [
     {
       source: "/api/:path*",
-      destination: "https://api.riri.rw/:path*",
+      destination: "https://api.riri.rw/api/:path*",
     },
   ];
 }
