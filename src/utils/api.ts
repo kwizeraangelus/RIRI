@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'https://riri.rw';
+export const API_BASE_URL = 'https://www.riri.rw';
 
 export const getApiUrl = (endpoint: string): string => {
   let cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
